@@ -386,36 +386,132 @@ export class Header {
       <!-- Backdrop for Mega-Menu & Search -->
       <div class="header-dim-backdrop" id="headerDimBackdrop"></div>
 
-      <!-- Mobile Drawer -->
+      <!-- High-End Mobile Navigation Drawer (FMCG Standard) -->
       <div class="mobile-drawer" id="mobileMenuDrawer" aria-hidden="true">
         <div class="mobile-drawer-backdrop" id="drawerBackdrop"></div>
         <div class="mobile-drawer-content">
+          
+          <!-- Drawer Header -->
           <div class="mobile-drawer-header">
-            <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="mobile-drawer-logo" width="110" />
-            <button type="button" class="close-drawer-btn" id="closeDrawerBtn" aria-label="Fermer">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="mobile-drawer-brand">
+              <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="mobile-drawer-logo" width="105" />
+              <span class="mobile-drawer-origin-badge">🇨🇲 Douala, Cameroun</span>
+            </div>
+            <button type="button" class="close-drawer-btn" id="closeDrawerBtn" aria-label="Fermer le menu">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             </button>
           </div>
-          <nav class="mobile-nav">
-            <ul class="mobile-nav-list">
-              <li><a href="/" class="mobile-nav-link">Accueil</a></li>
-              <li><a href="/entreprise" class="mobile-nav-link">Entreprise & Histoire</a></li>
-              <li><a href="/saveurs" class="mobile-nav-link">Nos Saveurs</a></li>
-              <li><a href="/engagements" class="mobile-nav-link">Engagements RSE</a></li>
-              <li><a href="/galerie" class="mobile-nav-link">Galerie & Événements</a></li>
-              <li><a href="/points-de-vente" class="mobile-nav-link">Points de vente (Cameroun)</a></li>
-              <li><a href="/b2b" class="mobile-nav-link">Espace B2B & Distributeurs</a></li>
-              <li><a href="/contact" class="mobile-nav-link">Contact & Hotline</a></li>
-            </ul>
-          </nav>
+
+          <!-- Drawer Body Nav -->
+          <div class="mobile-drawer-body">
+            <nav class="mobile-nav" aria-label="Navigation mobile">
+              <ul class="mobile-nav-list">
+                <li>
+                  <a href="/" class="mobile-nav-link">
+                    <span>Accueil</span>
+                    <span class="mobile-chevron">›</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/entreprise" class="mobile-nav-link">
+                    <span>L'Entreprise & Histoire</span>
+                    <span class="mobile-chevron">›</span>
+                  </a>
+                </li>
+                
+                <!-- Nos Saveurs with Direct Flavor Sublinks -->
+                <li class="mobile-nav-item-flavors">
+                  <a href="/saveurs" class="mobile-nav-link mobile-nav-parent">
+                    <span>Nos Saveurs (Collection 100% Purs)</span>
+                    <span class="mobile-chevron">›</span>
+                  </a>
+                  <div class="mobile-flavor-sublinks">
+                    <a href="/saveurs/cocktail-bissap" class="mobile-sublink flavor-bissap">
+                      <span class="sublink-dot dot-bissap"></span>
+                      <span>Cocktail de Bissap</span>
+                    </a>
+                    <a href="/saveurs/ananas-gingembre" class="mobile-sublink flavor-ananas">
+                      <span class="sublink-dot dot-ananas"></span>
+                      <span>Ananas Gingembre</span>
+                    </a>
+                    <a href="/saveurs/pur-ananas" class="mobile-sublink flavor-pur-ananas">
+                      <span class="sublink-dot dot-pur-ananas"></span>
+                      <span>Pur Jus d'Ananas</span>
+                    </a>
+                    <a href="/saveurs/pasteque-orange" class="mobile-sublink flavor-pasteque">
+                      <span class="sublink-dot dot-pasteque"></span>
+                      <span>Pastèque Orange</span>
+                    </a>
+                  </div>
+                </li>
+
+                <li>
+                  <a href="/engagements" class="mobile-nav-link">
+                    <span>Engagements RSE & Terroirs</span>
+                    <span class="mobile-chevron">›</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/galerie" class="mobile-nav-link">
+                    <span>Galerie & Événements</span>
+                    <span class="mobile-chevron">›</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/points-de-vente" class="mobile-nav-link">
+                    <span>Points de Vente (Cameroun)</span>
+                    <span class="mobile-chevron">›</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/b2b" class="mobile-nav-link">
+                    <span>Espace B2B & Distributeurs</span>
+                    <span class="mobile-badge-new">B2B</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/contact" class="mobile-nav-link">
+                    <span>Contact & Service Client</span>
+                    <span class="mobile-chevron">›</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+
+            <!-- WhatsApp Hotline Quick Card in Drawer -->
+            <div class="mobile-drawer-hotline-card">
+              <div class="hotline-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                </svg>
+              </div>
+              <div class="hotline-card-info">
+                <span class="hotline-card-title">Hotline Commandes WhatsApp</span>
+                <span class="hotline-card-num">+237 6 77 42 66 12</span>
+              </div>
+              <a 
+                href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="hotline-card-action"
+                aria-label="Contacter sur WhatsApp"
+              >
+                Discuter
+              </a>
+            </div>
+          </div>
+
+          <!-- Drawer Footer CTA -->
           <div class="mobile-drawer-footer">
             <button type="button" class="btn btn-primary w-full" id="mobileDrawerOrderBtn">
-              <span>Commander maintenant</span>
+              <span>Commander en ligne</span>
+              <span class="btn-arrow-circle" aria-hidden="true">→</span>
             </button>
           </div>
+
         </div>
       </div>
     `;
@@ -565,7 +661,7 @@ export class Header {
     const drawerBackdrop = this.element.querySelector('#drawerBackdrop');
     const drawerOrderBtn = this.element.querySelector('#mobileDrawerOrderBtn');
 
-    mobileBtn?.addEventListener('click', () => this.toggleMobileMenu(true));
+    mobileBtn?.addEventListener('click', () => this.toggleMobileMenu(!this.isMenuOpen));
     closeDrawerBtn?.addEventListener('click', () => this.toggleMobileMenu(false));
     drawerBackdrop?.addEventListener('click', () => this.toggleMobileMenu(false));
 
@@ -650,10 +746,12 @@ export class Header {
     if (open) {
       drawer?.classList.add('is-open');
       btn?.setAttribute('aria-expanded', 'true');
+      btn?.classList.add('is-active');
       document.body.style.overflow = 'hidden';
     } else {
       drawer?.classList.remove('is-open');
       btn?.setAttribute('aria-expanded', 'false');
+      btn?.classList.remove('is-active');
       document.body.style.overflow = '';
     }
   }

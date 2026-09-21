@@ -53,16 +53,16 @@
   --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* --- Fluid Typography Scale --- */
+  /* --- Fluid Typography Scale (Optimized for Mobile, Tablet & Desktop) --- */
   --text-xs: clamp(0.75rem, 0.72rem + 0.2vw, 0.875rem);
   --text-sm: clamp(0.875rem, 0.84rem + 0.25vw, 0.975rem);
   --text-base: clamp(1rem, 0.95rem + 0.3vw, 1.1rem);
   --text-lg: clamp(1.125rem, 1.05rem + 0.4vw, 1.25rem);
   --text-xl: clamp(1.25rem, 1.15rem + 0.6vw, 1.45rem);
-  --text-2xl: clamp(1.5rem, 1.35rem + 0.8vw, 1.85rem);
-  --text-3xl: clamp(1.85rem, 1.6rem + 1.2vw, 2.35rem);
-  --text-4xl: clamp(2.35rem, 2rem + 1.8vw, 3.25rem);
-  --text-hero: clamp(3.2rem, 2.6rem + 4.5vw, 6.2rem);
+  --text-2xl: clamp(1.4rem, 1.25rem + 0.8vw, 1.85rem);
+  --text-3xl: clamp(1.55rem, 1.35rem + 1.2vw, 2.35rem);
+  --text-4xl: clamp(1.85rem, 1.55rem + 1.8vw, 3.25rem);
+  --text-hero: clamp(2.2rem, 1.8rem + 3.8vw, 5.8rem);
 
   /* --- Spacing --- */
   --space-1: 0.25rem;
@@ -80,8 +80,9 @@
 
   /* --- Layout & Radii --- */
   --container-max-width: 1240px;
-  --container-padding: clamp(1.25rem, 4vw, 2.5rem);
-  --header-height: 88px;
+  --container-padding: clamp(1rem, 3.5vw, 2.5rem);
+  --header-height: 74px;
+  --header-height-mobile: 64px;
 
   --radius-sm: 8px;
   --radius-md: 16px;

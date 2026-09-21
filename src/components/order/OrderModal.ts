@@ -58,7 +58,9 @@ export class OrderModal {
               <select class="form-select" id="orderFlavor" required>
                 <option value="Cocktail de Bissap" ${activeFlavor === 'bissap' ? 'selected' : ''}>Cocktail de Bissap (Fleurs d'Hibiscus & Ananas)</option>
                 <option value="Jus d'Ananas Gingembre" ${activeFlavor === 'ananas' ? 'selected' : ''}>Jus d'Ananas Gingembre (Énergie Solaire)</option>
-                <option value="Pack Mixte Découverte">Pack Découverte (Bissap + Ananas)</option>
+                <option value="100% Pur Jus d'Ananas">100% Pur Jus d'Ananas (Douceur Solaire)</option>
+                <option value="Nectar Pastèque Orange">Nectar Pastèque Orange (Fraîcheur & Hydratation)</option>
+                <option value="Pack Mixte Découverte (4 Saveurs)">Pack Découverte (Les 4 Saveurs)</option>
               </select>
             </div>
 

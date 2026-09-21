@@ -6,10 +6,16 @@
 /* Page Hero Section */
 .page-hero {
   position: relative;
-  padding: calc(var(--space-16) + 40px) 0 var(--space-12);
+  padding: calc(var(--header-height, 74px) + var(--space-4)) 0 var(--space-8);
   background: linear-gradient(180deg, rgba(88, 168, 38, 0.06) 0%, rgba(255, 255, 255, 0) 100%);
   border-bottom: 1px solid rgba(22, 43, 29, 0.06);
   overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .page-hero {
+    padding: calc(var(--header-height, 74px) + var(--space-8)) 0 var(--space-12);
+  }
 }
 
 .page-hero-glow {
@@ -66,13 +72,15 @@
 }
 
 .page-hero-title {
-  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  font-size: clamp(1.8rem, 5vw, 3.4rem);
   font-weight: 900;
   color: var(--text-headline);
   line-height: 1.1;
   max-width: 860px;
   margin-bottom: var(--space-4);
   letter-spacing: -0.025em;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .page-hero-subtitle {
@@ -87,9 +95,15 @@
   background: #FFFFFF;
   border-bottom: 1px solid rgba(22, 43, 29, 0.08);
   position: sticky;
-  top: 74px;
+  top: 64px;
   z-index: 20;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+@media (min-width: 641px) {
+  .page-subnav-bar {
+    top: 74px;
+  }
 }
 
 .page-subnav-list {
@@ -176,7 +190,7 @@
 
 .editorial-img {
   width: 100%;
-  height: 380px;
+  height: clamp(220px, 40vh, 380px);
   object-fit: cover;
   display: block;
   transition: transform 0.6s ease;
@@ -331,6 +345,14 @@
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.03);
 }
 
+@media (max-width: 640px) {
+  .product-deep-card {
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+    gap: var(--space-5);
+  }
+}
+
 @media (min-width: 900px) {
   .product-deep-card {
     grid-template-columns: 360px 1fr;
@@ -437,16 +459,19 @@
 /* Nutrition Transparency Table */
 .nutrition-table-wrap {
   width: 100%;
+  max-width: 100%;
   background: #FFFFFF;
   border-radius: var(--radius-xl);
   border: 1px solid rgba(22, 43, 29, 0.08);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
   margin-top: var(--space-12);
 }
 
 .nutrition-table {
   width: 100%;
+  min-width: 580px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -510,7 +535,7 @@
   border: 1.5px solid rgba(22, 43, 29, 0.12);
   border-radius: var(--radius-md);
   font-family: inherit;
-  font-size: var(--text-sm);
+  font-size: 16px;
   color: var(--text-headline);
   background: #FFFFFF;
   transition: border-color var(--duration-fast) ease;
@@ -952,17 +977,24 @@
 }
 
 .product-hero {
-  padding-top: var(--space-12);
-  padding-bottom: var(--space-16);
+  padding-top: calc(var(--header-height, 74px) + var(--space-4));
+  padding-bottom: var(--space-10);
   border-bottom: 1px solid rgba(22, 43, 29, 0.08);
   position: relative;
   overflow: hidden;
 }
 
+@media (min-width: 768px) {
+  .product-hero {
+    padding-top: calc(var(--header-height, 74px) + var(--space-8));
+    padding-bottom: var(--space-16);
+  }
+}
+
 .product-hero-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-10);
+  gap: var(--space-8);
   align-items: center;
 }
 
@@ -974,12 +1006,14 @@
 }
 
 .product-hero-title {
-  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
   font-weight: 900;
   color: var(--text-headline);
-  line-height: 1.08;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   margin-bottom: var(--space-2);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .product-hero-subtitle {
@@ -1036,6 +1070,18 @@
   margin-bottom: var(--space-8);
 }
 
+@media (max-width: 639px) {
+  .product-hero-actions {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+  }
+  .product-hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .btn-product-order {
   color: #FFFFFF !important;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
@@ -1084,12 +1130,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .product-stage-disc {
   position: relative;
-  width: clamp(280px, 42vw, 480px);
-  height: clamp(280px, 42vw, 480px);
+  width: clamp(220px, 70vw, 460px);
+  height: clamp(220px, 70vw, 460px);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1097,8 +1144,9 @@
 }
 
 .product-stage-bottle {
-  height: clamp(340px, 50vh, 540px);
+  height: clamp(260px, 45vh, 520px);
   width: auto;
+  max-width: 85vw;
   object-fit: contain;
   filter: drop-shadow(0 25px 35px rgba(22, 43, 29, 0.28));
   animation: float-bottle 5s ease-in-out infinite;
@@ -1234,6 +1282,13 @@
   border: 1px solid rgba(22, 43, 29, 0.08);
   padding: var(--space-8);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+}
+
+@media (max-width: 640px) {
+  .product-ingredients-box,
+  .product-nutrition-box {
+    padding: var(--space-5);
+  }
 }
 
 .product-ingredients-box h3,

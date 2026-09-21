@@ -33,6 +33,12 @@
   align-items: center;
 }
 
+@media (max-width: 640px) {
+  .header-main-bar {
+    height: 64px;
+  }
+}
+
 .header-container {
   display: flex;
   align-items: center;
@@ -47,6 +53,12 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .header-brand-group {
+    gap: 8px;
+  }
 }
 
 .brand-logo-link {
@@ -80,6 +92,12 @@
   transition: transform 0.25s var(--ease-spring);
 }
 
+@media (max-width: 640px) {
+  .brand-logo-img {
+    height: 35px;
+  }
+}
+
 .brand-logo-link:hover .brand-logo-img {
   transform: scale(1.03);
 }
@@ -97,6 +115,12 @@
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+}
+
+@media (max-width: 640px) {
+  .region-pill {
+    display: none; /* Displayed inside the mobile drawer */
+  }
 }
 
 .region-pill:hover {
@@ -210,6 +234,12 @@
   gap: var(--space-3);
 }
 
+@media (max-width: 640px) {
+  .header-actions {
+    gap: 8px;
+  }
+}
+
 /* Circular Search Button (Coca-Cola Style) */
 .icon-circle-btn {
   width: 40px;
@@ -221,6 +251,13 @@
   border: none;
   cursor: pointer;
   transition: transform 0.2s var(--ease-spring), background 0.2s ease;
+}
+
+@media (max-width: 640px) {
+  .icon-circle-btn {
+    width: 36px;
+    height: 36px;
+  }
 }
 
 .search-trigger-btn {
@@ -258,11 +295,12 @@
   }
 }
 
-/* Mobile Hamburger Button */
+/* Mobile Hamburger Button with Smooth Morphing to X */
 .mobile-menu-btn {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   gap: 5px;
   width: 40px;
   height: 40px;
@@ -270,8 +308,19 @@
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  padding: 9px;
+  padding: 10px;
   transition: background 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 640px) {
+  .mobile-menu-btn {
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+    gap: 4px;
+  }
 }
 
 @media (min-width: 992px) {
@@ -282,10 +331,34 @@
 
 .mobile-menu-btn span {
   display: block;
-  width: 100%;
+  width: 18px;
   height: 2px;
   background: #111111;
   border-radius: 2px;
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  transform-origin: center center;
+}
+
+.mobile-menu-btn.is-active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.mobile-menu-btn.is-active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.mobile-menu-btn.is-active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 640px) {
+  .mobile-menu-btn.is-active span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .mobile-menu-btn.is-active span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
 }
 
 /* ==========================================================================
@@ -698,7 +771,7 @@
 }
 
 /* ==========================================================================
-   MOBILE DRAWER
+   HIGH-END MOBILE DRAWER (FMCG STANDARD)
    ========================================================================== */
 .mobile-drawer {
   position: fixed;
@@ -706,6 +779,7 @@
   z-index: var(--z-modal);
   pointer-events: none;
   visibility: hidden;
+  transition: visibility var(--duration-normal);
 }
 
 .mobile-drawer.is-open {
@@ -716,8 +790,9 @@
 .mobile-drawer-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(10, 25, 16, 0.45);
-  backdrop-filter: blur(6px);
+  background: rgba(10, 25, 16, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   opacity: 0;
   transition: opacity var(--duration-normal) ease;
 }
@@ -731,16 +806,17 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 84%;
-  max-width: 360px;
+  width: 88%;
+  max-width: 380px;
   background: #FFFFFF;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
-  padding: var(--space-6);
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.18);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   transform: translateX(100%);
-  transition: transform var(--duration-normal) var(--ease-smooth);
+  transition: transform var(--duration-normal) var(--ease-spring);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .mobile-drawer.is-open .mobile-drawer-content {
@@ -751,40 +827,230 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid #EEF2EC;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(22, 43, 29, 0.08);
+  background: #FAFCF9;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.mobile-drawer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mobile-drawer-logo {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+}
+
+.mobile-drawer-origin-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-brand-deep-green);
 }
 
 .close-drawer-btn {
   background: #F0F4EE;
   border: none;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   color: var(--text-headline);
-  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.close-drawer-btn:hover {
+  background: #E2E8E0;
+  transform: scale(1.05);
+}
+
+.mobile-drawer-body {
+  flex: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .mobile-nav-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  margin-top: var(--space-6);
+  gap: 4px;
+  margin: 0;
+  padding: 0;
 }
 
 .mobile-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
   color: var(--text-headline);
-  font-size: var(--text-lg);
+  font-size: 15px;
   font-weight: 700;
   text-decoration: none;
+  transition: all 0.18s ease;
 }
 
-.mobile-nav-link:hover {
+.mobile-nav-link:hover,
+.mobile-nav-link:active {
+  background: rgba(88, 168, 38, 0.08);
   color: var(--color-brand-green);
+  transform: translateX(4px);
+}
+
+.mobile-chevron {
+  font-size: 18px;
+  color: #A3B5A1;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.mobile-nav-link:hover .mobile-chevron {
+  color: var(--color-brand-green);
+  transform: translateX(2px);
+}
+
+.mobile-badge-new {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--color-brand-deep-green);
+  background: rgba(88, 168, 38, 0.15);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* Flavor Sublinks */
+.mobile-nav-item-flavors {
+  background: rgba(22, 43, 29, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(22, 43, 29, 0.05);
+  padding-bottom: 8px;
+}
+
+.mobile-flavor-sublinks {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 10px 6px 16px;
+}
+
+.mobile-sublink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-body);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.mobile-sublink:hover,
+.mobile-sublink:active {
+  background: #FFFFFF;
+  color: var(--text-headline);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transform: translateX(3px);
+}
+
+.sublink-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-bissap { background: #C4003E; }
+.dot-ananas { background: #E08700; }
+.dot-pur-ananas { background: #E6A100; }
+.dot-pasteque { background: #E64A19; }
+
+/* WhatsApp Hotline Card in Drawer */
+.mobile-drawer-hotline-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.08) 0%, rgba(22, 43, 29, 0.04) 100%);
+  border: 1px solid rgba(37, 211, 102, 0.25);
+  border-radius: var(--radius-lg);
+  margin-top: 8px;
+}
+
+.hotline-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+}
+
+.hotline-card-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.hotline-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #111111;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.hotline-card-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0A3D22;
+}
+
+.hotline-card-action {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #FFFFFF;
+  background: #0A3D22;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.hotline-card-action:hover {
+  background: #25D366;
+}
+
+.mobile-drawer-footer {
+  padding: 16px 20px 24px;
+  border-top: 1px solid rgba(22, 43, 29, 0.08);
+  background: #FFFFFF;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 .mobile-drawer-footer .w-full {
   width: 100%;
+  justify-content: center;
+  padding: 13px 20px;
+  font-size: 14px;
 }
