@@ -10,7 +10,8 @@ export type RoutePath =
   | '/engagements'
   | '/points-de-vente'
   | '/b2b'
-  | '/contact';
+  | '/contact'
+  | '/galerie';
 
 export interface RouteInfo {
   path: RoutePath;
@@ -46,6 +47,10 @@ export const ROUTES_METADATA: Record<RoutePath, { title: string; description: st
   '/contact': {
     title: 'Contact Officiel & Service Consommateurs — Société Nidjeu',
     description: 'Contactez la Société Nidjeu à Douala et Yaoundé. Hotline WhatsApp, service client et informations institutionnelles.'
+  },
+  '/galerie': {
+    title: 'Galerie & Événements — Dégustations & Moments Consommateurs | Nidj Juice',
+    description: 'Revivez nos dégustations officielles, salons gastronomiques et les moments partagés par nos consommateurs à Douala, Yaoundé et Kribi.'
   }
 };
 
@@ -123,6 +128,8 @@ export class Router {
       path = '/points-de-vente';
     } else if (rawPath === '/rse' || rawPath === '/durabilite') {
       path = '/engagements';
+    } else if (rawPath === '/evenements' || rawPath === '/moments' || rawPath === '/gallery') {
+      path = '/galerie';
     } else if (rawPath in ROUTES_METADATA) {
       path = rawPath as RoutePath;
     } else {
@@ -152,6 +159,8 @@ export class Router {
       normalized = '/points-de-vente';
     } else if (rawPath === '/rse' || rawPath === '/durabilite') {
       normalized = '/engagements';
+    } else if (rawPath === '/evenements' || rawPath === '/moments' || rawPath === '/gallery') {
+      normalized = '/galerie';
     } else if (rawPath in ROUTES_METADATA) {
       normalized = rawPath as RoutePath;
     } else {

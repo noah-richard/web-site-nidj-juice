@@ -82,7 +82,14 @@ export class Header {
                 </a>
               </li>
 
-              <!-- Tab 4: Points de vente -->
+              <!-- Tab 4: Galerie & Événements -->
+              <li class="nav-item">
+                <a href="/galerie" class="nav-link" data-link="galerie">
+                  Galerie
+                </a>
+              </li>
+
+              <!-- Tab 5: Points de vente -->
               <li class="nav-item">
                 <a href="/points-de-vente" class="nav-link" data-link="points-de-vente">
                   Points de vente
@@ -398,6 +405,7 @@ export class Header {
               <li><a href="/entreprise" class="mobile-nav-link">Entreprise & Histoire</a></li>
               <li><a href="/saveurs" class="mobile-nav-link">Nos Saveurs</a></li>
               <li><a href="/engagements" class="mobile-nav-link">Engagements RSE</a></li>
+              <li><a href="/galerie" class="mobile-nav-link">Galerie & Événements</a></li>
               <li><a href="/points-de-vente" class="mobile-nav-link">Points de vente (Cameroun)</a></li>
               <li><a href="/b2b" class="mobile-nav-link">Espace B2B & Distributeurs</a></li>
               <li><a href="/contact" class="mobile-nav-link">Contact & Hotline</a></li>

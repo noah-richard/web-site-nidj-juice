@@ -17,6 +17,7 @@ import { EngagementsPage } from '../pages/EngagementsPage';
 import { LocationsPage } from '../pages/LocationsPage';
 import { B2BPage } from '../pages/B2BPage';
 import { ContactPage } from '../pages/ContactPage';
+import { GalleryPage } from '../pages/GalleryPage';
 
 export class App {
   private root: HTMLElement;
@@ -111,6 +112,9 @@ export class App {
           break;
         case '/contact':
           pageComponent = new ContactPage();
+          break;
+        case '/galerie':
+          pageComponent = new GalleryPage();
           break;
         case '/':
         default:

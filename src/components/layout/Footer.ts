@@ -79,6 +79,7 @@ export class Footer {
                 <li><a href="/entreprise" class="footer-nav-link">L'Entreprise</a></li>
                 <li><a href="/saveurs" class="footer-nav-link">Nos Saveurs</a></li>
                 <li><a href="/engagements" class="footer-nav-link">Engagements RSE</a></li>
+                <li><a href="/galerie" class="footer-nav-link">Galerie & Événements</a></li>
                 <li><a href="/points-de-vente" class="footer-nav-link">Points de vente</a></li>
                 <li><a href="/b2b" class="footer-nav-link">Espace B2B</a></li>
                 <li><a href="/contact" class="footer-nav-link">Contact & FAQ</a></li>
