@@ -18,6 +18,7 @@ import { LocationsPage } from '../pages/LocationsPage';
 import { B2BPage } from '../pages/B2BPage';
 import { ContactPage } from '../pages/ContactPage';
 import { GalleryPage } from '../pages/GalleryPage';
+import { ProductDetailPage } from '../pages/ProductDetailPage';
 
 export class App {
   private root: HTMLElement;
@@ -94,13 +95,16 @@ export class App {
 
       let pageComponent: { getElement: () => HTMLElement; destroy?: () => void };
 
-      switch (path) {
-        case '/entreprise':
-          pageComponent = new CompanyPage();
-          break;
-        case '/saveurs':
-          pageComponent = new FlavorsPage();
-          break;
+      if (path.startsWith('/saveurs/')) {
+        pageComponent = new ProductDetailPage(path);
+      } else {
+        switch (path) {
+          case '/entreprise':
+            pageComponent = new CompanyPage();
+            break;
+          case '/saveurs':
+            pageComponent = new FlavorsPage();
+            break;
         case '/engagements':
           pageComponent = new EngagementsPage();
           break;
@@ -116,10 +120,11 @@ export class App {
         case '/galerie':
           pageComponent = new GalleryPage();
           break;
-        case '/':
-        default:
-          pageComponent = new HomePage();
-          break;
+          case '/':
+          default:
+            pageComponent = new HomePage();
+            break;
+        }
       }
 
       this.currentPageInstance = pageComponent;

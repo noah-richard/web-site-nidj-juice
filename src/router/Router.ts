@@ -7,6 +7,10 @@ export type RoutePath =
   | '/'
   | '/entreprise'
   | '/saveurs'
+  | '/saveurs/cocktail-bissap'
+  | '/saveurs/ananas-gingembre'
+  | '/saveurs/pur-ananas'
+  | '/saveurs/pasteque-orange'
   | '/engagements'
   | '/points-de-vente'
   | '/b2b'
@@ -29,8 +33,24 @@ export const ROUTES_METADATA: Record<RoutePath, { title: string; description: st
     description: 'Découvrez l’histoire, la raison d’être, la gouvernance camerounaise et les normes d’excellence de la Société Nidjeu.'
   },
   '/saveurs': {
-    title: 'Nos Saveurs — Collection Officielle Nidj Juice | Bissap & Ananas',
-    description: 'Explorez nos nectars 100% naturels : Cocktail de Bissap et Jus d’Ananas Gingembre, avec fiches nutritionnelles transparentes.'
+    title: 'Nos Saveurs — Collection Officielle Nidj Juice | Nectars 100% Purs',
+    description: 'Explorez nos nectars 100% naturels : Cocktail de Bissap, Ananas Gingembre, Pur Ananas et Pastèque Orange.'
+  },
+  '/saveurs/cocktail-bissap': {
+    title: 'Cocktail de Bissap — Infusion Royale d’Hibiscus | Nidj Juice',
+    description: 'Découvrez notre Cocktail de Bissap signature : infusion de calices d’hibiscus du Grand Nord, menthe et jus d’ananas frais 100% naturel.'
+  },
+  '/saveurs/ananas-gingembre': {
+    title: 'Jus d’Ananas Gingembre — Énergie & Vitalité Pure | Nidj Juice',
+    description: 'Découvrez notre Jus d’Ananas Gingembre : ananas mûrs des terroirs camerounais et gingembre frais pressé pour un tonus vivifiant.'
+  },
+  '/saveurs/pur-ananas': {
+    title: 'Pur Jus d’Ananas — La Douceur Solaire du Cameroun | Nidj Juice',
+    description: '100% Pur Jus d’Ananas extrait à froid au Cameroun. Zéro sucre ajouté, zéro conservateur, toute la pulpe veloutée du fruit frais.'
+  },
+  '/saveurs/pasteque-orange': {
+    title: 'Nectar Pastèque Orange — Fraîcheur & Hydratation Maximale | Nidj Juice',
+    description: 'La rencontre rafraîchissante de la pastèque juteuse et de l’orange vitaminée. Un nectar 100% naturel idéal pour les journées ensoleillées.'
   },
   '/engagements': {
     title: 'Nos Engagements RSE & Durabilité — Société Nidjeu',
@@ -122,6 +142,10 @@ export class Router {
     let path: RoutePath;
     if (rawPath === '/marques' || rawPath === '/nos-saveurs') {
       path = '/saveurs';
+    } else if (rawPath === '/saveurs/bissap') {
+      path = '/saveurs/cocktail-bissap';
+    } else if (rawPath === '/saveurs/ananas') {
+      path = '/saveurs/ananas-gingembre';
     } else if (rawPath === '/company' || rawPath === '/societe') {
       path = '/entreprise';
     } else if (rawPath === '/stores' || rawPath === '/locator') {
@@ -153,6 +177,10 @@ export class Router {
     let normalized: RoutePath;
     if (rawPath === '/marques' || rawPath === '/nos-saveurs') {
       normalized = '/saveurs';
+    } else if (rawPath === '/saveurs/bissap') {
+      normalized = '/saveurs/cocktail-bissap';
+    } else if (rawPath === '/saveurs/ananas') {
+      normalized = '/saveurs/ananas-gingembre';
     } else if (rawPath === '/company' || rawPath === '/societe') {
       normalized = '/entreprise';
     } else if (rawPath === '/stores' || rawPath === '/locator') {

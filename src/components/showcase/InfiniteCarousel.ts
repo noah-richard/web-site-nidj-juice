@@ -6,6 +6,7 @@
 import type { ShowcaseProduct, CarouselEvents } from './showcase.types';
 import { ShowcaseCard } from './ShowcaseCard';
 import { audioController } from '../../features/audio-controller';
+import { router } from '../../router/Router';
 
 export class InfiniteCarousel {
   public readonly container: HTMLElement;
@@ -81,22 +82,29 @@ export class InfiniteCarousel {
         this.cards.push(card);
         this.track.appendChild(card.element);
 
-        // Click card to center it smoothly
-        card.element.addEventListener('click', () => {
+        // Click card: if already centered, navigate to product page; if not centered, snap to center
+        card.element.addEventListener('click', (e) => {
           if (Math.abs(this.dragVelocity) > 0.15) return;
-          audioController.playPop();
-          this.snapToCard(card.index);
+          if ((e.target as HTMLElement).closest('.showcase-floating-cta')) {
+            // Already handled by ctaEl
+            return;
+          }
+          const isCenter = card.element.classList.contains('is-center');
+          if (isCenter) {
+            audioController.playPop();
+            router.navigate(`/saveurs/${product.id}`);
+          } else {
+            audioController.playPop();
+            this.snapToCard(card.index);
+          }
         });
 
-        // Click floating CTA on card
+        // Click floating CTA on card: always navigate directly to dedicated product page
         card.ctaEl.addEventListener('click', (e) => {
           e.stopPropagation();
+          e.preventDefault();
           audioController.playPop();
-          window.dispatchEvent(
-            new CustomEvent('nidj:open-order-modal', {
-              detail: { storeHint: product.name }
-            })
-          );
+          router.navigate(`/saveurs/${product.id}`);
         });
 
         globalIndex++;

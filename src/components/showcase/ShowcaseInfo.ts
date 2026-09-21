@@ -69,14 +69,22 @@ export class ShowcaseInfo {
 
         <!-- Conversion Action Button -->
         <div class="showcase-action-row">
-          <button type="button" class="btn btn-showcase-order" data-flavor-id="${product.id}" style="--btn-color: ${product.accentColor};">
-            <span>${product.ctaText}</span>
+          <a 
+            href="/saveurs/${product.id}" 
+            class="btn btn-primary btn-showcase-explore" 
+            style="background: ${product.accentColor}; border-color: ${product.accentColor};"
+          >
+            <span>Explorer la page dédiée</span>
             <span class="btn-arrow-circle" aria-hidden="true">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
               </svg>
             </span>
+          </a>
+
+          <button type="button" class="btn btn-outline btn-showcase-order" data-flavor-id="${product.id}">
+            <span>Commander</span>
           </button>
         </div>
       </div>

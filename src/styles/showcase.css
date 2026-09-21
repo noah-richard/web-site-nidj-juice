@@ -463,6 +463,14 @@
 .showcase-action-row {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-showcase-explore {
+  color: #FFFFFF !important;
+  box-shadow: 0 8px 24px rgba(22, 43, 29, 0.18);
 }
 
 .btn-showcase-order {

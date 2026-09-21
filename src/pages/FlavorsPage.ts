@@ -40,11 +40,12 @@ export class FlavorsPage {
       <!-- Sticky Subnav Anchors -->
       <nav class="page-subnav-bar" aria-label="Navigation des saveurs">
         <div class="container">
-          <ul class="page-subnav-list">
-            <li><a href="/saveurs#bissap" class="page-subnav-link">Cocktail de Bissap</a></li>
-            <li><a href="/saveurs#ananas" class="page-subnav-link">Ananas Gingembre</a></li>
-            <li><a href="/saveurs#duo" class="page-subnav-link">Packs Découverte & Cartons</a></li>
-            <li><a href="/saveurs#nutrition" class="page-subnav-link">Transparence Nutritionnelle</a></li>
+            <li><a href="/saveurs/cocktail-bissap" class="page-subnav-link">Cocktail de Bissap</a></li>
+            <li><a href="/saveurs/ananas-gingembre" class="page-subnav-link">Ananas Gingembre</a></li>
+            <li><a href="/saveurs/pur-ananas" class="page-subnav-link">Pur Jus d'Ananas</a></li>
+            <li><a href="/saveurs/pasteque-orange" class="page-subnav-link">Pastèque Orange</a></li>
+            <li><a href="/saveurs#duo" class="page-subnav-link">Packs & Cartons</a></li>
+            <li><a href="/saveurs#nutrition" class="page-subnav-link">Nutrition</a></li>
           </ul>
         </div>
       </nav>
@@ -92,12 +93,15 @@ export class FlavorsPage {
             </div>
 
             <div class="hero-cta-group" style="margin-top: 20px;">
-              <button type="button" class="btn btn-primary order-flavor-btn" data-flavor-name="Cocktail de Bissap">
-                <span>Commander du Bissap</span>
-                <span class="btn-arrow-circle" aria-hidden="true">→</span>
+              <a href="/saveurs/cocktail-bissap" class="btn btn-primary">
+                <span>Découvrir la page dédiée</span>
+                <span class="btn-arrow-circle" aria-hidden="true">↗</span>
+              </a>
+              <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="Cocktail de Bissap">
+                <span>Commander</span>
               </button>
-              <a href="/points-de-vente" class="btn btn-outline">
-                <span>Voir les points de vente</span>
+              <a href="/points-de-vente" class="btn btn-ghost">
+                <span>Points de vente</span>
               </a>
             </div>
           </div>
@@ -143,11 +147,122 @@ export class FlavorsPage {
             </div>
 
             <div class="hero-cta-group" style="margin-top: 20px;">
-              <button type="button" class="btn btn-primary order-flavor-btn" data-flavor-name="Ananas Gingembre">
-                <span>Commander de l'Ananas</span>
-                <span class="btn-arrow-circle" aria-hidden="true">→</span>
+              <a href="/saveurs/ananas-gingembre" class="btn btn-primary">
+                <span>Découvrir la page dédiée</span>
+                <span class="btn-arrow-circle" aria-hidden="true">↗</span>
+              </a>
+              <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="Ananas Gingembre">
+                <span>Commander</span>
               </button>
-              <a href="/points-de-vente" class="btn btn-outline">
+              <a href="/points-de-vente" class="btn btn-ghost">
+                <span>Points de vente</span>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Product 3: Pur Jus d'Ananas -->
+        <article id="pur-ananas" class="product-deep-card">
+          <div class="product-stage-box" style="background: radial-gradient(circle, rgba(212, 136, 6, 0.12) 0%, transparent 70%);">
+            <img 
+              src="/assets/images/bottle-ananas.png" 
+              alt="Bouteille Nidj Juice Pur Jus d'Ananas" 
+              class="product-stage-img"
+              loading="lazy"
+            />
+          </div>
+          <div class="product-deep-content">
+            <span class="product-category-pill" style="background: rgba(212, 136, 6, 0.15); color: #B57400;">Pureté Solaire 100%</span>
+            <h2>Pur Jus d'Ananas</h2>
+            <p class="product-story-quote">
+              « La quintessence du fruit pur cueilli à maturité parfaite sous le ciel tropical : une pulpe veloutée et une caresse dorée. »
+            </p>
+            <p class="editorial-body">
+              100% pur jus extrait à froid sans aucune dilution ni sucre ajouté. Récolté dans les bassins alluviaux fertiles de Penja et du Littoral, ce nectar offre une douceur soyeuse et la fraîcheur authentique de l'ananas camerounais en bouteille.
+            </p>
+
+            <div class="product-specs-grid">
+              <div class="spec-item">
+                <span class="spec-item-label">Contenance</span>
+                <span class="spec-item-val">50 cl</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">Origine Fruits</span>
+                <span class="spec-item-val">Penja & Littoral</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">Bienfaits</span>
+                <span class="spec-item-val">Vitamines C & Minéraux</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">Prix Conseillé</span>
+                <span class="spec-item-val">1 000 FCFA</span>
+              </div>
+            </div>
+
+            <div class="hero-cta-group" style="margin-top: 20px;">
+              <a href="/saveurs/pur-ananas" class="btn btn-primary">
+                <span>Découvrir la page dédiée</span>
+                <span class="btn-arrow-circle" aria-hidden="true">↗</span>
+              </a>
+              <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="Pur Jus d'Ananas">
+                <span>Commander</span>
+              </button>
+              <a href="/points-de-vente" class="btn btn-ghost">
+                <span>Points de vente</span>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Product 4: Pastèque Orange -->
+        <article id="pasteque-orange" class="product-deep-card">
+          <div class="product-stage-box" style="background: radial-gradient(circle, rgba(230, 57, 70, 0.12) 0%, transparent 70%);">
+            <img 
+              src="/assets/images/bottle-bissap.png" 
+              alt="Bouteille Nidj Juice Pastèque Orange" 
+              class="product-stage-img"
+              loading="lazy"
+            />
+          </div>
+          <div class="product-deep-content">
+            <span class="product-category-pill" style="background: rgba(230, 57, 70, 0.15); color: #C40026;">Fraîcheur & Hydratation</span>
+            <h2>Pastèque Orange</h2>
+            <p class="product-story-quote">
+              « La fraîcheur cristalline et désaltérante de la pastèque juteuse exaltée par le peps vitaminé de l'orange dorée. »
+            </p>
+            <p class="editorial-body">
+              La rencontre ultra-désaltérante de la pastèque juteuse et de l'orange gorgée de soleil. Conçu pour apporter une sensation d'hydratation immédiate et revigorante lors des journées ensoleillées à Douala, Yaoundé et Kribi.
+            </p>
+
+            <div class="product-specs-grid">
+              <div class="spec-item">
+                <span class="spec-item-label">Contenance</span>
+                <span class="spec-item-val">50 cl</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">Origine Fruits</span>
+                <span class="spec-item-val">Sud & Ouest</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">Bienfaits</span>
+                <span class="spec-item-val">Hydratation & Lycopène</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">Prix Conseillé</span>
+                <span class="spec-item-val">1 000 FCFA</span>
+              </div>
+            </div>
+
+            <div class="hero-cta-group" style="margin-top: 20px;">
+              <a href="/saveurs/pasteque-orange" class="btn btn-primary">
+                <span>Découvrir la page dédiée</span>
+                <span class="btn-arrow-circle" aria-hidden="true">↗</span>
+              </a>
+              <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="Pastèque Orange">
+                <span>Commander</span>
+              </button>
+              <a href="/points-de-vente" class="btn btn-ghost">
                 <span>Points de vente</span>
               </a>
             </div>

@@ -48,13 +48,13 @@ export class ShowcaseCard {
           <div class="showcase-bottle-shadow" aria-hidden="true"></div>
 
           <!-- Floating Pill CTA Button (Explorer ↗) -->
-          <button type="button" class="showcase-floating-cta" aria-label="Découvrir ${product.name}">
+          <a href="/saveurs/${product.id}" class="showcase-floating-cta" aria-label="Découvrir la page dédiée à ${product.name}">
             <span>Explorer</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6">
               <line x1="7" y1="17" x2="17" y2="7"></line>
               <polyline points="7 7 17 7 17 17"></polyline>
             </svg>
-          </button>
+          </a>
         </div>
       </div>
     `;

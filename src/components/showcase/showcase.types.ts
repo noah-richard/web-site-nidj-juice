@@ -17,6 +17,21 @@ export interface ShowcaseProduct {
   badges: string[];
   ctaText: string;
   tastingHint: string;
+  category?: string;
+  quote?: string;
+  recipeStory?: string;
+  ingredients?: string[];
+  nutrition?: {
+    energy: string;
+    sugars: string;
+    vitaminC: string;
+    antioxidants: string;
+    potassium?: string;
+  };
+  tastingNotes?: { title: string; note: string; icon: string }[];
+  formats?: string[];
+  terroir?: string;
+  origin?: string;
 }
 
 export interface CarouselItemState {
