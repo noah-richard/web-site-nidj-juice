@@ -29,8 +29,16 @@ export class OrderModal {
     return this.element;
   }
 
+  public refresh(): void {
+    if (!this.isOpen) {
+      this.render();
+      this.bindEvents();
+    }
+  }
+
   private render(): void {
     const activeFlavor = themeController.getFlavor();
+    const products = cmsService.getProducts();
 
     this.element.innerHTML = `
       <div class="modal-dialog">
@@ -57,11 +65,10 @@ export class OrderModal {
             <div class="form-group">
               <label class="form-label" for="orderFlavor">Senteur Souhaitée *</label>
               <select class="form-select" id="orderFlavor" required>
-                <option value="Cocktail de Bissap" ${activeFlavor === 'bissap' ? 'selected' : ''}>Cocktail de Bissap (Fleurs d'Hibiscus & Ananas)</option>
-                <option value="Jus d'Ananas Gingembre" ${activeFlavor === 'ananas' ? 'selected' : ''}>Jus d'Ananas Gingembre (Énergie Solaire)</option>
-                <option value="100% Pur Jus d'Ananas">100% Pur Jus d'Ananas (Douceur Solaire)</option>
-                <option value="Nectar Pastèque Orange">Nectar Pastèque Orange (Fraîcheur & Hydratation)</option>
-                <option value="Pack Mixte Découverte (4 Saveurs)">Pack Découverte (Les 4 Saveurs)</option>
+                ${products.map((p) => `
+                  <option value="${p.name}" ${p.id.includes(activeFlavor) ? 'selected' : ''}>${p.name} (${p.tag || p.subtitle})</option>
+                `).join('')}
+                <option value="Pack Mixte Découverte">Pack Découverte (Toutes Saveurs)</option>
               </select>
             </div>
 

@@ -8,6 +8,7 @@ import type { VideoReel } from '../../types/product.types';
 
 export class VideoReelsSection {
   private element: HTMLElement;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('section');
@@ -159,5 +160,19 @@ export class VideoReelsSection {
 
       observer.observe(video);
     });
+
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.render();
+        this.bindEvents();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 }

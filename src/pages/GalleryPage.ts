@@ -3,14 +3,14 @@
    Interactive Community, Events & Consumer Moments Gallery with Lightbox
    ========================================================================== */
 
-import { GALLERY_CATEGORIES, GALLERY_ITEMS, type GalleryCategory, type GalleryItem } from '../data/gallery.data';
-import { OFFICIAL_CONTACT } from '../data/stores.data';
+import { GALLERY_CATEGORIES, type GalleryCategory, type GalleryItem } from '../data/gallery.data';
 import { cmsService } from '../services/cms.service';
 
 export class GalleryPage {
   private element: HTMLElement;
   private currentCategory: GalleryCategory = 'all';
   private activeItem: GalleryItem | null = null;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('div');
@@ -95,7 +95,7 @@ export class GalleryPage {
           </div>
           <div style="margin-top: 16px;">
             <a 
-              href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu,%20voici%20ma%20photo%20pour%20la%20galerie%20%23NidjJuiceMoments%20!" 
+              href="https://wa.me/${cmsService.getSettings().whatsappNumber}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu,%20voici%20ma%20photo%20pour%20la%20galerie%20%23NidjJuiceMoments%20!" 
               target="_blank" 
               rel="noopener noreferrer" 
               class="btn btn-primary"
@@ -202,7 +202,7 @@ export class GalleryPage {
       if (!card) return;
 
       const itemId = card.dataset.itemId;
-      const found = GALLERY_ITEMS.find((it) => it.id === itemId);
+      const found = cmsService.getGalleryItems().find((it) => it.id === itemId);
       if (found) {
         this.openLightbox(found);
       }
@@ -222,6 +222,19 @@ export class GalleryPage {
         this.closeLightbox();
       }
     });
+
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.updateGrid();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 
   private updateGrid(): void {

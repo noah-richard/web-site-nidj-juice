@@ -13,12 +13,20 @@ import { cmsService } from '../services/cms.service';
 export class ProductDetailPage {
   private element: HTMLElement;
   private product: ShowcaseProduct;
+  private rawProductId: string;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor(productId: string) {
+    this.rawProductId = productId;
     this.element = document.createElement('div');
     this.element.className = 'page page-product-detail';
 
-    // Find product or fallback to first
+    this.product = this.resolveProduct(productId);
+    this.render();
+    this.bindEvents();
+  }
+
+  private resolveProduct(productId: string): ShowcaseProduct {
     const cleanId = productId.replace(/^\/saveurs\//, '').replace(/\/$/, '');
     const products = cmsService.getProducts();
     let matched = products.find((p) => p.id === cleanId);
@@ -29,10 +37,7 @@ export class ProductDetailPage {
       if (cleanId === 'ananas') matched = products.find((p) => p.id === 'ananas-gingembre');
     }
     
-    this.product = matched || products[0] || SHOWCASE_PRODUCTS[0];
-
-    this.render();
-    this.bindEvents();
+    return matched || products[0] || SHOWCASE_PRODUCTS[0];
   }
 
   public getElement(): HTMLElement {
@@ -402,5 +407,20 @@ export class ProductDetailPage {
         }
       });
     });
+
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.product = this.resolveProduct(this.rawProductId);
+        this.render();
+        this.bindEvents();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 }

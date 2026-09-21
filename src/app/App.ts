@@ -30,6 +30,9 @@ export class App {
   private ambientCanvas: AmbientCanvas | null = null;
   private currentPageInstance: { destroy?: () => void } | null = null;
 
+  private currentPath: RoutePath = '/';
+  private currentHash: string = '';
+
   constructor(root: HTMLElement) {
     this.root = root;
   }
@@ -76,11 +79,40 @@ export class App {
 
     // 7. Initialize Router and mount initial route
     router.init((path: RoutePath, hash: string) => {
+      this.currentPath = path;
+      this.currentHash = hash;
       this.renderRoute(path, hash);
     });
   }
 
-  private renderRoute(path: RoutePath, _hash: string): void {
+  private createPageComponent(path: RoutePath): { getElement: () => HTMLElement; destroy?: () => void } {
+    if (path.startsWith('/saveurs/')) {
+      return new ProductDetailPage(path);
+    }
+    switch (path) {
+      case '/nidj-juice-backoffice':
+        return new BackofficePage();
+      case '/entreprise':
+        return new CompanyPage();
+      case '/saveurs':
+        return new FlavorsPage();
+      case '/engagements':
+        return new EngagementsPage();
+      case '/points-de-vente':
+        return new LocationsPage();
+      case '/b2b':
+        return new B2BPage();
+      case '/contact':
+        return new ContactPage();
+      case '/galerie':
+        return new GalleryPage();
+      case '/':
+      default:
+        return new HomePage();
+    }
+  }
+
+  private renderRoute(path: RoutePath, _hash: string, silent: boolean = false): void {
     if (!this.mainElement) return;
 
     // Clean up previous page if needed
@@ -104,49 +136,22 @@ export class App {
       this.ambientCanvas?.start();
     }
 
+    // If silent live-refresh (from real-time CMS update), instantly replace DOM without transition delay
+    if (silent) {
+      const pageComponent = this.createPageComponent(path);
+      this.currentPageInstance = pageComponent;
+      this.mainElement.innerHTML = '';
+      this.mainElement.appendChild(pageComponent.getElement());
+      return;
+    }
+
     this.mainElement.style.opacity = '0';
 
     setTimeout(() => {
       if (!this.mainElement) return;
       this.mainElement.innerHTML = '';
 
-      let pageComponent: { getElement: () => HTMLElement; destroy?: () => void };
-
-      if (path.startsWith('/saveurs/')) {
-        pageComponent = new ProductDetailPage(path);
-      } else {
-        switch (path) {
-          case '/nidj-juice-backoffice':
-            pageComponent = new BackofficePage();
-            break;
-          case '/entreprise':
-            pageComponent = new CompanyPage();
-            break;
-          case '/saveurs':
-            pageComponent = new FlavorsPage();
-            break;
-          case '/engagements':
-            pageComponent = new EngagementsPage();
-            break;
-          case '/points-de-vente':
-            pageComponent = new LocationsPage();
-            break;
-          case '/b2b':
-            pageComponent = new B2BPage();
-            break;
-          case '/contact':
-            pageComponent = new ContactPage();
-            break;
-          case '/galerie':
-            pageComponent = new GalleryPage();
-            break;
-          case '/':
-          default:
-            pageComponent = new HomePage();
-            break;
-        }
-      }
-
+      const pageComponent = this.createPageComponent(path);
       this.currentPageInstance = pageComponent;
       this.mainElement.appendChild(pageComponent.getElement());
       this.mainElement.style.opacity = '1';
@@ -172,6 +177,19 @@ export class App {
       const customEvent = e as CustomEvent<{ storeHint?: string }>;
       audioController.playDrop();
       this.orderModal?.open(customEvent.detail?.storeHint);
+    });
+
+    // Real-time synchronization when CMS Backoffice is updated (in this tab or across tabs)
+    window.addEventListener('nidj:cms-data-changed', () => {
+      // 1. Refresh global components
+      this.header?.refresh();
+      this.footer?.refresh();
+      this.orderModal?.refresh();
+
+      // 2. If user is currently browsing any public page (not editing inside backoffice), live-refresh the page view
+      if (this.currentPath !== '/nidj-juice-backoffice') {
+        this.renderRoute(this.currentPath, this.currentHash, true);
+      }
     });
   }
 

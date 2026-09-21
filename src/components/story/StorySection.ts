@@ -3,6 +3,8 @@
    Soft rounded container: Brand narrative + 2x2 Feature Cards Grid
    ========================================================================== */
 
+import { cmsService } from '../../services/cms.service';
+
 export class StorySection {
   private element: HTMLElement;
 
@@ -18,6 +20,8 @@ export class StorySection {
   }
 
   private render(): void {
+    const company = cmsService.getCompanyContent();
+
     this.element.innerHTML = `
       <div class="container">
         
@@ -31,11 +35,11 @@ export class StorySection {
               <span class="about-tag">À PROPOS</span>
               
               <h2 class="about-title">
-                <strong>Nidj Juice</strong> — des jus 100% naturels pour ceux qui recherchent le meilleur de la nature sans compromis sur le goût.
+                ${company.leadTitle || '<strong>Nidj Juice</strong> — des jus 100% naturels pour ceux qui recherchent le meilleur de la nature sans compromis sur le goût.'}
               </h2>
 
               <p class="about-desc">
-                Conçus et fabriqués au Cameroun par la <strong>Société Nidjeu</strong>, nos jus sont issus de fruits frais récoltés à parfaite maturité, sans aucun ajout de sucre raffiné ni conservateur artificiel.
+                ${company.leadDesc || 'Conçus et fabriqués au Cameroun par la <strong>Société Nidjeu</strong>, nos jus sont issus de fruits frais récoltés à parfaite maturité, sans aucun ajout de sucre raffiné ni conservateur artificiel.'}
               </p>
 
               <div class="about-action">

@@ -13,6 +13,7 @@ export class BrandShowcaseSection {
   private carousel: InfiniteCarousel | null = null;
   private infoPanel: ShowcaseInfo;
   private controls: ShowcaseControls;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('section');
@@ -29,6 +30,22 @@ export class BrandShowcaseSection {
       onSelectIndex: (idx) => this.carousel?.selectProductIndex(idx)
     });
 
+    this.render();
+
+    this.unsubscribeCms = cmsService.onDataChanged(() => {
+      this.rebuildShowcase();
+    });
+  }
+
+  private rebuildShowcase(): void {
+    this.carousel?.destroy();
+    this.carousel = null;
+    const products = cmsService.getProducts();
+    this.controls = new ShowcaseControls(products.length, {
+      onPrev: () => this.carousel?.prev(),
+      onNext: () => this.carousel?.next(),
+      onSelectIndex: (idx) => this.carousel?.selectProductIndex(idx)
+    });
     this.render();
   }
 
@@ -108,5 +125,9 @@ export class BrandShowcaseSection {
 
   public destroy(): void {
     this.carousel?.destroy();
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 }

@@ -3,8 +3,8 @@
    Horizontal berry/fruit banner with embedded instant order form & floating bottle
    ========================================================================== */
 
-import { OFFICIAL_CONTACT } from '../../data/stores.data';
 import { audioController } from '../../features/audio-controller';
+import { cmsService } from '../../services/cms.service';
 
 export class PromoOrderBanner {
   private element: HTMLElement;
@@ -135,7 +135,9 @@ export class PromoOrderBanner {
         `• Lieu de livraison : ${city}\n\n` +
         `_Commande initiée depuis la bannière officielle Nidj Juice (Société Nidjeu)_`;
 
-      const url = `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      const settings = cmsService.getSettings();
+      const whatsappNum = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '237677426612';
+      const url = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     });
   }

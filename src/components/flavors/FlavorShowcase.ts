@@ -5,10 +5,12 @@
 
 import { themeController } from '../../features/theme-controller';
 import { audioController } from '../../features/audio-controller';
+import { cmsService } from '../../services/cms.service';
 import type { FlavorId } from '../../types/product.types';
 
 export class FlavorShowcase {
   private element: HTMLElement;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('section');
@@ -23,6 +25,10 @@ export class FlavorShowcase {
   }
 
   private render(): void {
+    const products = cmsService.getProducts();
+    const ananas = products.find((p) => p.id === 'ananas-gingembre' || p.id === 'ananas') || products[1] || products[0];
+    const bissap = products.find((p) => p.id === 'cocktail-bissap' || p.id === 'bissap') || products[0];
+
     this.element.innerHTML = `
       <div class="container">
         
@@ -39,13 +45,13 @@ export class FlavorShowcase {
           
           <!-- Card 1: Jus d'Ananas Gingembre -->
           <article class="assortment-card card-ananas" data-flavor-id="ananas">
-            <h3 class="sr-only">Nidj Juice — Jus d'Ananas Gingembre</h3>
+            <h3 class="sr-only">Nidj Juice — ${ananas?.name || "Jus d'Ananas Gingembre"}</h3>
             <div class="card-halo halo-ananas" aria-hidden="true"></div>
             
             <div class="card-visual-stage">
               <img 
-                src="/assets/images/bottle-ananas.png" 
-                alt="Bouteille Nidj Juice Jus d'Ananas Gingembre" 
+                src="${ananas?.bottleImage || '/assets/images/bottle-ananas.png'}" 
+                alt="Bouteille Nidj Juice ${ananas?.name || "Jus d'Ananas Gingembre"}" 
                 class="assortment-bottle-img"
                 loading="lazy"
               />
@@ -53,7 +59,7 @@ export class FlavorShowcase {
 
             <div class="card-action-box">
               <button type="button" class="btn btn-pill-flavor btn-pill-ananas" data-select-flavor="ananas">
-                <span>Ananas Gingembre</span>
+                <span>${ananas?.name || 'Ananas Gingembre'}</span>
                 <span class="btn-arrow-circle" aria-hidden="true">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -66,13 +72,13 @@ export class FlavorShowcase {
 
           <!-- Card 2: Cocktail de Bissap -->
           <article class="assortment-card card-bissap is-active" data-flavor-id="bissap">
-            <h3 class="sr-only">Nidj Juice — Cocktail de Bissap</h3>
+            <h3 class="sr-only">Nidj Juice — ${bissap?.name || 'Cocktail de Bissap'}</h3>
             <div class="card-halo halo-bissap" aria-hidden="true"></div>
             
             <div class="card-visual-stage">
               <img 
-                src="/assets/images/bottle-bissap.png" 
-                alt="Bouteille Nidj Juice Cocktail de Bissap" 
+                src="${bissap?.bottleImage || '/assets/images/bottle-bissap.png'}" 
+                alt="Bouteille Nidj Juice ${bissap?.name || 'Cocktail de Bissap'}" 
                 class="assortment-bottle-img"
                 loading="lazy"
               />
@@ -80,7 +86,7 @@ export class FlavorShowcase {
 
             <div class="card-action-box">
               <button type="button" class="btn btn-pill-flavor btn-pill-bissap" data-select-flavor="bissap">
-                <span>Cocktail de Bissap</span>
+                <span>${bissap?.name || 'Cocktail de Bissap'}</span>
                 <span class="btn-arrow-circle" aria-hidden="true">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -98,13 +104,13 @@ export class FlavorShowcase {
             
             <div class="card-visual-stage duo-stage">
               <img 
-                src="/assets/images/bottle-bissap.png" 
+                src="${bissap?.bottleImage || '/assets/images/bottle-bissap.png'}" 
                 alt="Pack Découverte Nidj Juice" 
                 class="assortment-bottle-img bottle-left"
                 loading="lazy"
               />
               <img 
-                src="/assets/images/bottle-ananas.png" 
+                src="${ananas?.bottleImage || '/assets/images/bottle-ananas.png'}" 
                 alt="Pack Découverte Nidj Juice" 
                 class="assortment-bottle-img bottle-right"
                 loading="lazy"
@@ -169,5 +175,19 @@ export class FlavorShowcase {
         card.classList.toggle('is-active', match);
       });
     });
+
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.render();
+        this.bindEvents();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 }

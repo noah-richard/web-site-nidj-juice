@@ -1,15 +1,20 @@
 /* ==========================================================================
    NIDJ JUICE — COMPANY PAGE (/entreprise)
    The Nidj Company Corporate Portal (Coca-Cola / Pepsi Standard)
+   Dynamically connected in Real-Time to CMS Service
    ========================================================================== */
+
+import { cmsService } from '../services/cms.service';
 
 export class CompanyPage {
   private element: HTMLElement;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('div');
     this.element.className = 'page page-company';
     this.render();
+    this.bindEvents();
   }
 
   public getElement(): HTMLElement {
@@ -17,6 +22,8 @@ export class CompanyPage {
   }
 
   private render(): void {
+    const company = cmsService.getCompanyContent();
+
     this.element.innerHTML = `
       <!-- Page Hero Header -->
       <section class="page-hero">
@@ -28,10 +35,10 @@ export class CompanyPage {
             <span>Entreprise</span>
           </nav>
           
-          <div class="page-hero-tag">Institutionnel • Société Nidjeu</div>
-          <h1 class="page-hero-title">Valoriser la richesse naturelle du Cameroun à travers des nectars purs d'exception.</h1>
+          <div class="page-hero-tag">${company.tagline || 'Institutionnel • Société Nidjeu'}</div>
+          <h1 class="page-hero-title">${company.leadTitle || "Valoriser la richesse naturelle du Cameroun à travers des nectars purs d'exception."}</h1>
           <p class="page-hero-subtitle">
-            Depuis sa création à Douala, la Société Nidjeu s'engage pour une nouvelle ère de boissons saines : des fruits frais locaux récoltés à maturité, une chaîne de transformation exigeante et la fierté d'un savoir-faire 100% camerounais.
+            ${company.leadDesc || "Depuis sa création à Douala, la Société Nidjeu s'engage pour une nouvelle ère de boissons saines : des fruits frais locaux récoltés à maturité, une chaîne de transformation exigeante et la fierté d'un savoir-faire 100% camerounais."}
           </p>
         </div>
       </section>
@@ -55,24 +62,24 @@ export class CompanyPage {
         <!-- Key Metrics Highlights -->
         <div class="stat-pillars-grid">
           <div class="stat-pillar-card">
-            <div class="stat-pillar-number">100%</div>
-            <div class="stat-pillar-title">Naturel & Authentique</div>
-            <div class="stat-pillar-desc">Zéro colorant chimique, aucun conservateur de synthèse ni sucre raffiné.</div>
+            <div class="stat-pillar-number">${company.stat1Num || '100%'}</div>
+            <div class="stat-pillar-title">${company.stat1Label || 'Naturel & Authentique'}</div>
+            <div class="stat-pillar-desc">${company.stat1Desc || 'Zéro colorant chimique, aucun conservateur de synthèse ni sucre raffiné.'}</div>
           </div>
           <div class="stat-pillar-card">
-            <div class="stat-pillar-number">237</div>
-            <div class="stat-pillar-title">Fierté Camerounaise</div>
-            <div class="stat-pillar-desc">Fruits récoltés, pressés et conditionnés localement dans nos ateliers à Douala.</div>
+            <div class="stat-pillar-number">${company.stat2Num || '237'}</div>
+            <div class="stat-pillar-title">${company.stat2Label || 'Fierté Camerounaise'}</div>
+            <div class="stat-pillar-desc">${company.stat2Desc || 'Fruits récoltés, pressés et conditionnés localement dans nos ateliers à Douala.'}</div>
           </div>
           <div class="stat-pillar-card">
-            <div class="stat-pillar-number">+10</div>
-            <div class="stat-pillar-title">Points de Vente Agréés</div>
-            <div class="stat-pillar-desc">Présence à Douala, Yaoundé, Bafoussam et Kribi avec livraison réfrigérée.</div>
+            <div class="stat-pillar-number">${company.stat3Num || '+10'}</div>
+            <div class="stat-pillar-title">${company.stat3Label || 'Points de Vente Agréés'}</div>
+            <div class="stat-pillar-desc">${company.stat3Desc || 'Présence à Douala, Yaoundé, Bafoussam et Kribi avec livraison réfrigérée.'}</div>
           </div>
           <div class="stat-pillar-card">
-            <div class="stat-pillar-number">0%</div>
-            <div class="stat-pillar-title">Additifs Artificiels</div>
-            <div class="stat-pillar-desc">Pasteurisation douce préservant les vitamines, enzymes et saveurs intactes.</div>
+            <div class="stat-pillar-number">${company.stat4Num || '1000+'}</div>
+            <div class="stat-pillar-title">${company.stat4Label || 'Familles Agricoles'}</div>
+            <div class="stat-pillar-desc">${company.stat4Desc || 'Partenariat direct avec les coopératives d’hibiscus du Nord et de fruits du Littoral.'}</div>
           </div>
         </div>
 
@@ -80,9 +87,9 @@ export class CompanyPage {
         <section id="vision" class="editorial-split-grid">
           <div class="editorial-text-box">
             <span class="page-hero-tag">Mission 2030</span>
-            <h2>Notre vision et notre raison d'être</h2>
+            <h2>${company.visionTitle || "Notre vision et notre raison d'être"}</h2>
             <p class="editorial-lead">
-              Redéfinir le marché des boissons en Afrique avec des créations saines, vivifiantes et fièrement ancrées dans nos terroirs.
+              ${company.visionDesc || "Redéfinir le marché des boissons en Afrique avec des créations saines, vivifiantes et fièrement ancrées dans nos terroirs."}
             </p>
             <p class="editorial-body">
               Face à l'omniprésence des sodas industriels surchargés en sucres raffinés et arômes synthétiques, la <strong>Société Nidjeu</strong> a fait le choix audacieux de l'intransigeance : redonner leurs lettres de noblesse aux trésors botaniques d'Afrique centrale. 
@@ -157,9 +164,9 @@ export class CompanyPage {
         <section id="savoir-faire" class="editorial-split-grid reverse">
           <div class="editorial-text-box">
             <span class="page-hero-tag">Excellence Agro-Industrielle</span>
-            <h2>Le savoir-faire Société Nidjeu</h2>
+            <h2>${company.savoirFaireTitle || "Le savoir-faire Société Nidjeu"}</h2>
             <p class="editorial-lead">
-              Une alliance subtile entre tradition africaine et rigueur technologique contemporaine.
+              ${company.savoirFaireDesc || "Une alliance subtile entre tradition africaine et rigueur technologique contemporaine."}
             </p>
             <p class="editorial-body">
               Chaque bouteille de <strong>Nidj Juice</strong> passe par un processus méticuleux :
@@ -264,5 +271,20 @@ export class CompanyPage {
 
       </div>
     `;
+  }
+
+  private bindEvents(): void {
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.render();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 }

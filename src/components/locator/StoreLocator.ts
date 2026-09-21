@@ -3,7 +3,6 @@
    Interactive directory for Douala, Yaoundé, Bafoussam, Kribi + B2B Inquiries
    ========================================================================== */
 
-import { OFFICIAL_CONTACT } from '../../data/stores.data';
 import type { StoreLocation } from '../../types/product.types';
 import { cmsService } from '../../services/cms.service';
 
@@ -11,6 +10,7 @@ export class StoreLocator {
   private element: HTMLElement;
   private currentCityFilter: string = 'all';
   private searchQuery: string = '';
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('section');
@@ -39,6 +39,8 @@ export class StoreLocator {
 
   private render(): void {
     const stores = this.getFilteredStores();
+    const settings = cmsService.getSettings();
+    const whatsappNum = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '237677426612';
 
     this.element.innerHTML = `
       <div class="container">
@@ -94,7 +96,7 @@ export class StoreLocator {
           </div>
           <div class="b2b-actions">
             <a 
-              href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu%2C%20je%20suis%20un%20professionnel%20et%20souhaite%20distribuer%20Nidj%20Juice." 
+              href="https://wa.me/${whatsappNum}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu%2C%20je%20suis%20un%20professionnel%20et%20souhaite%20distribuer%20Nidj%20Juice." 
               target="_blank" 
               rel="noopener noreferrer" 
               class="btn btn-primary"
@@ -219,6 +221,19 @@ export class StoreLocator {
         this.updateStoreList();
       }
     });
+
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.updateStoreList();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 
   private updateStoreList(): void {

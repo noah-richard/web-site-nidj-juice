@@ -32,6 +32,13 @@ export interface ShowcaseProduct {
   formats?: string[];
   terroir?: string;
   origin?: string;
+  tag?: string;
+  price?: string;
+  volume?: string;
+  story?: string;
+  calories?: string;
+  sugar?: string;
+  vitaminC?: string;
 }
 
 export interface CarouselItemState {

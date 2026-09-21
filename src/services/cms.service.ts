@@ -98,6 +98,34 @@ export class CmsService {
 
   private constructor() {
     this.db = this.loadFromStorage() || this.getDefaultDatabase();
+
+    // Cross-tab real-time synchronization
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY && e.newValue) {
+          try {
+            this.db = JSON.parse(e.newValue);
+            window.dispatchEvent(new CustomEvent('nidj:cms-data-changed', { detail: this.db }));
+          } catch (err) {
+            console.error('Failed to parse storage update', err);
+          }
+        }
+      });
+    }
+  }
+
+  public reload(): void {
+    this.db = this.loadFromStorage() || this.getDefaultDatabase();
+    window.dispatchEvent(new CustomEvent('nidj:cms-data-changed', { detail: this.db }));
+  }
+
+  public onDataChanged(callback: (db: CmsDatabase) => void): () => void {
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent<CmsDatabase>;
+      callback(customEvent.detail || this.db);
+    };
+    window.addEventListener('nidj:cms-data-changed', handler);
+    return () => window.removeEventListener('nidj:cms-data-changed', handler);
   }
 
   public static getInstance(): CmsService {

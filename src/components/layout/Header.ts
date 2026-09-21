@@ -3,7 +3,7 @@
    High-End FMCG Corporate Standard • Real Multi-Page Dedicated Routes
    ========================================================================== */
 
-import { OFFICIAL_CONTACT } from '../../data/stores.data';
+import { cmsService } from '../../services/cms.service';
 
 export class Header {
   private element: HTMLElement;
@@ -27,7 +27,18 @@ export class Header {
     return this.element;
   }
 
+  public refresh(): void {
+    const wasMenuOpen = this.isMenuOpen;
+    this.render();
+    this.bindEvents();
+    if (wasMenuOpen) {
+      this.element.querySelector('#mobileDrawer')?.classList.add('is-open');
+    }
+  }
+
   private render(): void {
+    const settings = cmsService.getSettings();
+    const products = cmsService.getProducts();
     this.element.innerHTML = `
       <div class="header-main-bar">
         <div class="header-container container">
@@ -129,7 +140,7 @@ export class Header {
 
             <!-- WhatsApp Direct Hotline Button -->
             <a 
-              href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}" 
+              href="https://wa.me/${settings.whatsappNumber}" 
               target="_blank" 
               rel="noopener noreferrer" 
               class="icon-circle-btn hotline-btn" 
@@ -274,23 +285,16 @@ export class Header {
 
             <!-- Right: Visual Flavor Teasers -->
             <div class="mega-column-products">
-              <a href="/saveurs#bissap" class="flavor-mini-card" data-flavor="bissap" style="text-decoration:none;">
-                <img src="/assets/images/bottle-bissap.png" alt="Bissap" class="mini-bottle-img" />
-                <div class="mini-card-text">
-                  <span class="mini-tag ruby">Hibiscus Royal</span>
-                  <span class="mini-name">Cocktail de Bissap</span>
-                  <span class="mini-price">1 000 FCFA</span>
-                </div>
-              </a>
-
-              <a href="/saveurs#ananas" class="flavor-mini-card" data-flavor="ananas" style="text-decoration:none;">
-                <img src="/assets/images/bottle-ananas.png" alt="Ananas" class="mini-bottle-img" />
-                <div class="mini-card-text">
-                  <span class="mini-tag gold">Énergie Terroir</span>
-                  <span class="mini-name">Ananas Gingembre</span>
-                  <span class="mini-price">1 000 FCFA</span>
-                </div>
-              </a>
+              ${products.slice(0, 2).map((p) => `
+                <a href="/saveurs/${p.id}" class="flavor-mini-card" data-flavor="${p.id}" style="text-decoration:none;">
+                  <img src="${p.bottleImage}" alt="${p.name}" class="mini-bottle-img" />
+                  <div class="mini-card-text">
+                    <span class="mini-tag ${p.id.includes('bissap') ? 'ruby' : 'gold'}">${p.tag}</span>
+                    <span class="mini-name">${p.name}</span>
+                    <span class="mini-price">${p.price || '1 000 FCFA'}</span>
+                  </div>
+                </a>
+              `).join('')}
             </div>
 
           </div>
@@ -490,10 +494,10 @@ export class Header {
               </div>
               <div class="hotline-card-info">
                 <span class="hotline-card-title">Hotline Commandes WhatsApp</span>
-                <span class="hotline-card-num">+237 6 77 42 66 12</span>
+                <span class="hotline-card-num">${settings.phoneDisplay}</span>
               </div>
               <a 
-                href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}" 
+                href="https://wa.me/${settings.whatsappNumber}" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 class="hotline-card-action"

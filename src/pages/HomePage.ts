@@ -16,6 +16,9 @@ export class HomePage {
   private element: HTMLElement;
   private hero: HeroSection;
   private showcase: BrandShowcaseSection;
+  private flavors: FlavorShowcase;
+  private reels: VideoReelsSection;
+  private locator: StoreLocator;
 
   constructor() {
     this.element = document.createElement('div');
@@ -24,18 +27,18 @@ export class HomePage {
     this.hero = new HeroSection();
     const about = new StorySection();
     this.showcase = new BrandShowcaseSection();
-    const flavors = new FlavorShowcase();
+    this.flavors = new FlavorShowcase();
     const promo = new PromoOrderBanner();
-    const reels = new VideoReelsSection();
-    const locator = new StoreLocator();
+    this.reels = new VideoReelsSection();
+    this.locator = new StoreLocator();
 
     this.element.appendChild(this.hero.getElement());
     this.element.appendChild(about.getElement());
     this.element.appendChild(this.showcase.getElement());
-    this.element.appendChild(flavors.getElement());
+    this.element.appendChild(this.flavors.getElement());
     this.element.appendChild(promo.getElement());
-    this.element.appendChild(reels.getElement());
-    this.element.appendChild(locator.getElement());
+    this.element.appendChild(this.reels.getElement());
+    this.element.appendChild(this.locator.getElement());
   }
 
   public getElement(): HTMLElement {
@@ -45,5 +48,8 @@ export class HomePage {
   public destroy(): void {
     this.hero.destroy();
     this.showcase.destroy();
+    this.flavors.destroy();
+    this.reels.destroy();
+    this.locator.destroy();
   }
 }

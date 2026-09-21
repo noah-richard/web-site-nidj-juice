@@ -1,10 +1,14 @@
 /* ==========================================================================
    NIDJ JUICE — FLAVORS PAGE (/saveurs)
    Official Brand & Product Showcase (Coca-Cola / Pepsi Brands Standard)
+   Dynamically connected in Real-Time to CMS Service
    ========================================================================== */
+
+import { cmsService } from '../services/cms.service';
 
 export class FlavorsPage {
   private element: HTMLElement;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('div');
@@ -18,6 +22,8 @@ export class FlavorsPage {
   }
 
   private render(): void {
+    const products = cmsService.getProducts();
+
     this.element.innerHTML = `
       <!-- Page Hero Header -->
       <section class="page-hero">
@@ -40,10 +46,10 @@ export class FlavorsPage {
       <!-- Sticky Subnav Anchors -->
       <nav class="page-subnav-bar" aria-label="Navigation des saveurs">
         <div class="container">
-            <li><a href="/saveurs/cocktail-bissap" class="page-subnav-link">Cocktail de Bissap</a></li>
-            <li><a href="/saveurs/ananas-gingembre" class="page-subnav-link">Ananas Gingembre</a></li>
-            <li><a href="/saveurs/pur-ananas" class="page-subnav-link">Pur Jus d'Ananas</a></li>
-            <li><a href="/saveurs/pasteque-orange" class="page-subnav-link">Pastèque Orange</a></li>
+          <ul class="page-subnav-list">
+            ${products.map((p) => `
+              <li><a href="/saveurs/${p.id}" class="page-subnav-link">${p.name}</a></li>
+            `).join('')}
             <li><a href="/saveurs#duo" class="page-subnav-link">Packs & Cartons</a></li>
             <li><a href="/saveurs#nutrition" class="page-subnav-link">Nutrition</a></li>
           </ul>
@@ -53,221 +59,58 @@ export class FlavorsPage {
       <!-- Main Products Container -->
       <div class="container section">
 
-        <!-- Product 1: Cocktail de Bissap -->
-        <article id="bissap" class="product-deep-card">
-          <div class="product-stage-box bissap">
-            <img 
-              src="/assets/images/bottle-bissap.png" 
-              alt="Bouteille Nidj Juice Cocktail de Bissap" 
-              class="product-stage-img"
-              loading="lazy"
-            />
-          </div>
-          <div class="product-deep-content">
-            <span class="product-category-pill pill-bissap">Infusion Royale & Agrumes</span>
-            <h2>Cocktail de Bissap</h2>
-            <p class="product-story-quote">
-              « L'élégance pourpre des calices d'hibiscus mariée à la fraîcheur vive de la menthe et des agrumes du terroir. »
-            </p>
-            <p class="editorial-body">
-              Notre <strong>Cocktail de Bissap</strong> réinvente la boisson emblématique d'Afrique centrale. Les fleurs d'hibiscus sabdariffa sont infusées à basse température pour extraire leur robe rubis naturelle et leur puissant complexe d'antioxydants (polyphénols et vitamine C), adoucies par une touche délicate de jus d'ananas frais.
-            </p>
+        ${products.map((p) => `
+          <article id="${p.id}" class="product-deep-card">
+            <div class="product-stage-box" style="background: ${p.glowColor ? `radial-gradient(circle at 50% 50%, ${p.glowColor} 0%, rgba(255,255,255,0.05) 75%)` : 'rgba(10,61,34,0.05)'};">
+              <img 
+                src="${p.bottleImage}" 
+                alt="Bouteille Nidj Juice ${p.name}" 
+                class="product-stage-img"
+                loading="lazy"
+              />
+            </div>
+            <div class="product-deep-content">
+              <span class="product-category-pill" style="background: ${p.accentColor || '#58A826'}; color: #fff;">${p.tag}</span>
+              <h2>${p.name}</h2>
+              ${p.story ? `<p class="product-story-quote">« ${p.story} »</p>` : ''}
+              <p class="editorial-body">
+                ${p.description}
+              </p>
 
-            <div class="product-specs-grid">
-              <div class="spec-item">
-                <span class="spec-item-label">Contenance</span>
-                <span class="spec-item-val">50 cl</span>
+              <div class="product-specs-grid">
+                <div class="spec-item">
+                  <span class="spec-item-label">Contenance</span>
+                  <span class="spec-item-val">${p.volume || '50 cl'}</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-item-label">Origine Fruits</span>
+                  <span class="spec-item-val">${p.origin || 'Cameroun 237'}</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-item-label">Conservation</span>
+                  <span class="spec-item-val">Entre +2°C et +6°C</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-item-label">Prix Conseillé</span>
+                  <span class="spec-item-val">${p.price || '1 000 FCFA'}</span>
+                </div>
               </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Origine Ingrédients</span>
-                <span class="spec-item-val">Cameroun 237</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Conservation</span>
-                <span class="spec-item-val">Entre +2°C et +6°C</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Prix Conseillé</span>
-                <span class="spec-item-val">1 000 FCFA</span>
+
+              <div class="hero-cta-group" style="margin-top: 20px;">
+                <a href="/saveurs/${p.id}" class="btn btn-primary">
+                  <span>Découvrir la page dédiée</span>
+                  <span class="btn-arrow-circle" aria-hidden="true">↗</span>
+                </a>
+                <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="${p.name}">
+                  <span>Commander</span>
+                </button>
+                <a href="/points-de-vente" class="btn btn-ghost">
+                  <span>Points de vente</span>
+                </a>
               </div>
             </div>
-
-            <div class="hero-cta-group" style="margin-top: 20px;">
-              <a href="/saveurs/cocktail-bissap" class="btn btn-primary">
-                <span>Découvrir la page dédiée</span>
-                <span class="btn-arrow-circle" aria-hidden="true">↗</span>
-              </a>
-              <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="Cocktail de Bissap">
-                <span>Commander</span>
-              </button>
-              <a href="/points-de-vente" class="btn btn-ghost">
-                <span>Points de vente</span>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Product 2: Jus d'Ananas Gingembre -->
-        <article id="ananas" class="product-deep-card">
-          <div class="product-stage-box ananas">
-            <img 
-              src="/assets/images/bottle-ananas.png" 
-              alt="Bouteille Nidj Juice Ananas Gingembre" 
-              class="product-stage-img"
-              loading="lazy"
-            />
-          </div>
-          <div class="product-deep-content">
-            <span class="product-category-pill pill-ananas">Énergie Pure & Tonus Naturel</span>
-            <h2>Jus d'Ananas Gingembre</h2>
-            <p class="product-story-quote">
-              « Le soleil généreux de l'ananas camerounais réveillé par la force revigorante du gingembre sauvage. »
-            </p>
-            <p class="editorial-body">
-              Pressé à partir d'ananas gorgés de soleil récoltés sur les terroirs fertiles du Cameroun, ce nectar offre une attaque ronde et fruitée immédiatement sublimée par la chaleur épicée du gingembre frais. Recommandé pour stimuler le système immunitaire, faciliter la digestion et apporter une vitalité naturelle sans coup de fatigue.
-            </p>
-
-            <div class="product-specs-grid">
-              <div class="spec-item">
-                <span class="spec-item-label">Contenance</span>
-                <span class="spec-item-val">50 cl</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Origine Fruits</span>
-                <span class="spec-item-val">Penja & Centre</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Bienfaits</span>
-                <span class="spec-item-val">Digestion & Énergie</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Prix Conseillé</span>
-                <span class="spec-item-val">1 000 FCFA</span>
-              </div>
-            </div>
-
-            <div class="hero-cta-group" style="margin-top: 20px;">
-              <a href="/saveurs/ananas-gingembre" class="btn btn-primary">
-                <span>Découvrir la page dédiée</span>
-                <span class="btn-arrow-circle" aria-hidden="true">↗</span>
-              </a>
-              <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="Ananas Gingembre">
-                <span>Commander</span>
-              </button>
-              <a href="/points-de-vente" class="btn btn-ghost">
-                <span>Points de vente</span>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Product 3: Pur Jus d'Ananas -->
-        <article id="pur-ananas" class="product-deep-card">
-          <div class="product-stage-box" style="background: radial-gradient(circle, rgba(212, 136, 6, 0.12) 0%, transparent 70%);">
-            <img 
-              src="/assets/images/bottle-ananas.png" 
-              alt="Bouteille Nidj Juice Pur Jus d'Ananas" 
-              class="product-stage-img"
-              loading="lazy"
-            />
-          </div>
-          <div class="product-deep-content">
-            <span class="product-category-pill" style="background: rgba(212, 136, 6, 0.15); color: #B57400;">Pureté Solaire 100%</span>
-            <h2>Pur Jus d'Ananas</h2>
-            <p class="product-story-quote">
-              « La quintessence du fruit pur cueilli à maturité parfaite sous le ciel tropical : une pulpe veloutée et une caresse dorée. »
-            </p>
-            <p class="editorial-body">
-              100% pur jus extrait à froid sans aucune dilution ni sucre ajouté. Récolté dans les bassins alluviaux fertiles de Penja et du Littoral, ce nectar offre une douceur soyeuse et la fraîcheur authentique de l'ananas camerounais en bouteille.
-            </p>
-
-            <div class="product-specs-grid">
-              <div class="spec-item">
-                <span class="spec-item-label">Contenance</span>
-                <span class="spec-item-val">50 cl</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Origine Fruits</span>
-                <span class="spec-item-val">Penja & Littoral</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Bienfaits</span>
-                <span class="spec-item-val">Vitamines C & Minéraux</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Prix Conseillé</span>
-                <span class="spec-item-val">1 000 FCFA</span>
-              </div>
-            </div>
-
-            <div class="hero-cta-group" style="margin-top: 20px;">
-              <a href="/saveurs/pur-ananas" class="btn btn-primary">
-                <span>Découvrir la page dédiée</span>
-                <span class="btn-arrow-circle" aria-hidden="true">↗</span>
-              </a>
-              <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="Pur Jus d'Ananas">
-                <span>Commander</span>
-              </button>
-              <a href="/points-de-vente" class="btn btn-ghost">
-                <span>Points de vente</span>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Product 4: Pastèque Orange -->
-        <article id="pasteque-orange" class="product-deep-card">
-          <div class="product-stage-box" style="background: radial-gradient(circle, rgba(230, 57, 70, 0.12) 0%, transparent 70%);">
-            <img 
-              src="/assets/images/bottle-bissap.png" 
-              alt="Bouteille Nidj Juice Pastèque Orange" 
-              class="product-stage-img"
-              loading="lazy"
-            />
-          </div>
-          <div class="product-deep-content">
-            <span class="product-category-pill" style="background: rgba(230, 57, 70, 0.15); color: #C40026;">Fraîcheur & Hydratation</span>
-            <h2>Pastèque Orange</h2>
-            <p class="product-story-quote">
-              « La fraîcheur cristalline et désaltérante de la pastèque juteuse exaltée par le peps vitaminé de l'orange dorée. »
-            </p>
-            <p class="editorial-body">
-              La rencontre ultra-désaltérante de la pastèque juteuse et de l'orange gorgée de soleil. Conçu pour apporter une sensation d'hydratation immédiate et revigorante lors des journées ensoleillées à Douala, Yaoundé et Kribi.
-            </p>
-
-            <div class="product-specs-grid">
-              <div class="spec-item">
-                <span class="spec-item-label">Contenance</span>
-                <span class="spec-item-val">50 cl</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Origine Fruits</span>
-                <span class="spec-item-val">Sud & Ouest</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Bienfaits</span>
-                <span class="spec-item-val">Hydratation & Lycopène</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-item-label">Prix Conseillé</span>
-                <span class="spec-item-val">1 000 FCFA</span>
-              </div>
-            </div>
-
-            <div class="hero-cta-group" style="margin-top: 20px;">
-              <a href="/saveurs/pasteque-orange" class="btn btn-primary">
-                <span>Découvrir la page dédiée</span>
-                <span class="btn-arrow-circle" aria-hidden="true">↗</span>
-              </a>
-              <button type="button" class="btn btn-outline order-flavor-btn" data-flavor-name="Pastèque Orange">
-                <span>Commander</span>
-              </button>
-              <a href="/points-de-vente" class="btn btn-ghost">
-                <span>Points de vente</span>
-              </a>
-            </div>
-          </div>
-        </article>
+          </article>
+        `).join('')}
 
         <!-- Product 3: Packs Découverte & Formats Événements -->
         <section id="duo" class="section">
@@ -325,16 +168,14 @@ export class FlavorsPage {
               <thead>
                 <tr>
                   <th>Paramètre / Valeur pour 100 ml</th>
-                  <th>Cocktail de Bissap</th>
-                  <th>Ananas Gingembre</th>
+                  ${products.slice(0, 2).map((p) => `<th>${p.name}</th>`).join('')}
                   <th>Standard Industriel Moyen</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td><strong>Énergie</strong></td>
-                  <td>38 kcal / 160 kJ</td>
-                  <td>46 kcal / 195 kJ</td>
+                  ${products.slice(0, 2).map((p) => `<td>${p.calories || '42 kcal'}</td>`).join('')}
                   <td>65 kcal / 275 kJ</td>
                 </tr>
                 <tr>
@@ -345,8 +186,7 @@ export class FlavorsPage {
                 </tr>
                 <tr>
                   <td><strong>Glucides (sucres naturels du fruit)</strong></td>
-                  <td>8,9 g</td>
-                  <td>11,2 g</td>
+                  ${products.slice(0, 2).map((p) => `<td>${p.sugar || '10,5 g'}</td>`).join('')}
                   <td>15,8 g (sucres raffinés ajoutés)</td>
                 </tr>
                 <tr>
@@ -357,8 +197,7 @@ export class FlavorsPage {
                 </tr>
                 <tr>
                   <td><strong>Vitamine C</strong></td>
-                  <td>18 mg (22% VNR)</td>
-                  <td>26 mg (32% VNR)</td>
+                  ${products.slice(0, 2).map((p) => `<td>${p.vitaminC || '20 mg'}</td>`).join('')}
                   <td>0 mg (détruite par surchauffe)</td>
                 </tr>
                 <tr>
@@ -369,8 +208,8 @@ export class FlavorsPage {
                 </tr>
                 <tr>
                   <td><strong>Colorants de synthèse</strong></td>
-                  <td><span style="color: #58A826; font-weight:800;">AUCUN (Couleur 100% fleur)</span></td>
-                  <td><span style="color: #58A826; font-weight:800;">AUCUN (Couleur 100% pulpe)</span></td>
+                  <td><span style="color: #58A826; font-weight:800;">AUCUN (100% naturel)</span></td>
+                  <td><span style="color: #58A826; font-weight:800;">AUCUN (100% naturel)</span></td>
                   <td>Tartrazine, Rouge Allura</td>
                 </tr>
               </tbody>
@@ -393,5 +232,19 @@ export class FlavorsPage {
         );
       });
     });
+
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.render();
+        this.bindEvents();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 }

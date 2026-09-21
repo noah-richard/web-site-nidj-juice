@@ -1,15 +1,20 @@
 /* ==========================================================================
    NIDJ JUICE — ENGAGEMENTS PAGE (/engagements)
    Corporate Social Responsibility & Sustainability (Coca-Cola / Pepsi Standard)
+   Dynamically connected in Real-Time to CMS Service
    ========================================================================== */
+
+import { cmsService } from '../services/cms.service';
 
 export class EngagementsPage {
   private element: HTMLElement;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('div');
     this.element.className = 'page page-engagements';
     this.render();
+    this.bindEvents();
   }
 
   public getElement(): HTMLElement {
@@ -17,6 +22,8 @@ export class EngagementsPage {
   }
 
   private render(): void {
+    const engagements = cmsService.getEngagementsContent();
+
     this.element.innerHTML = `
       <!-- Page Hero Header -->
       <section class="page-hero">
@@ -29,9 +36,9 @@ export class EngagementsPage {
           </nav>
           
           <div class="page-hero-tag">RSE & Développement Durable • Société Nidjeu</div>
-          <h1 class="page-hero-title">Produire durablement, valoriser nos planteurs et préserver la nature.</h1>
+          <h1 class="page-hero-title">${engagements.heroTitle || 'Produire durablement, valoriser nos planteurs et préserver la nature.'}</h1>
           <p class="page-hero-subtitle">
-            Chaque gorgée de Nidj Juice s'inscrit dans un engagement sociétal et environnemental fort : circuits courts, zéro chimie, rémunération juste de nos coopératives camerounaises et recyclage actif de nos contenants.
+            ${engagements.heroSubtitle || "Chaque gorgée de Nidj Juice s'inscrit dans un engagement sociétal et environnemental fort : circuits courts, zéro chimie, rémunération juste de nos coopératives camerounaises et recyclage actif de nos contenants."}
           </p>
         </div>
       </section>
@@ -55,8 +62,8 @@ export class EngagementsPage {
         <!-- 4 Key Impact Stat Cards -->
         <div class="stat-pillars-grid">
           <div class="stat-pillar-card">
-            <div class="stat-pillar-number">100%</div>
-            <div class="stat-pillar-title">Terroir Camerounais</div>
+            <div class="stat-pillar-number">${engagements.localImpactNum || '100%'}</div>
+            <div class="stat-pillar-title">${engagements.localImpactLabel || 'Terroir Camerounais'}</div>
             <div class="stat-pillar-desc">Fruits et fleurs cultivés exclusivement par nos agriculteurs partenaires locaux.</div>
           </div>
           <div class="stat-pillar-card">
@@ -80,12 +87,12 @@ export class EngagementsPage {
         <section id="filieres" class="editorial-split-grid">
           <div class="editorial-text-box">
             <span class="page-hero-tag">Circuits Courts</span>
-            <h2>Filières d'approvisionnement équitable</h2>
+            <h2>${engagements.filieresTitle || "Filières d'approvisionnement équitable"}</h2>
             <p class="editorial-lead">
               Donner un pouvoir économique réel aux producteurs de nos campagnes.
             </p>
             <p class="editorial-body">
-              Au lieu de passer par des intermédiaires spéculatifs, la <strong>Société Nidjeu</strong> contractualise directement avec les groupements de producteurs d'ananas de la région du Littoral et les cultivateurs traditionnels de calices d'hibiscus du Grand Nord et de l'Ouest.
+              ${engagements.filieresDesc || "Au lieu de passer par des intermédiaires spéculatifs, la Société Nidjeu contractualise directement avec les groupements de producteurs d'ananas de la région du Littoral et les cultivateurs traditionnels de calices d'hibiscus du Grand Nord et de l'Ouest."}
             </p>
             <p class="editorial-body">
               Cette approche garantit un prix d'achat supérieur au cours moyen du marché, assurant la stabilité financière des exploitations familiales et stimulant une agriculture de qualité.
@@ -136,12 +143,12 @@ export class EngagementsPage {
         <section id="recyclage" class="editorial-split-grid">
           <div class="editorial-text-box">
             <span class="page-hero-tag">Écologie & Zéro Déchet</span>
-            <h2>Programme de recyclage et consigne responsable</h2>
+            <h2>${engagements.ecoTitle || 'Programme de recyclage et consigne responsable'}</h2>
             <p class="editorial-lead">
               Agir concrètement pour la propreté de nos villes à Douala, Yaoundé et Kribi.
             </p>
             <p class="editorial-body">
-              Chaque bouteille <strong>Nidj Juice</strong> est conçue à partir de matériaux 100% recyclables. En partenariat avec les supermarchés et boutiques dépositaires, nous mettons en place des bacs de collecte dédiés permettant de récupérer les bouteilles usagées afin de les réintégrer dans les filières de valorisation plastique et verre au Cameroun.
+              ${engagements.ecoDesc || "Chaque bouteille Nidj Juice est conçue à partir de matériaux 100% recyclables. En partenariat avec les supermarchés et boutiques dépositaires, nous mettons en place des bacs de collecte dédiés permettant de récupérer les bouteilles usagées afin de les réintégrer dans les filières de valorisation plastique et verre au Cameroun."}
             </p>
             <p class="editorial-body">
               Rapporter vos bouteilles vides dans un point de vente agréé vous donne droit à des remises sur vos prochains achats !
@@ -186,5 +193,20 @@ export class EngagementsPage {
 
       </div>
     `;
+  }
+
+  private bindEvents(): void {
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.render();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 }

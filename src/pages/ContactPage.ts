@@ -1,12 +1,14 @@
 /* ==========================================================================
    NIDJ JUICE — CONTACT PAGE (/contact)
-   Consumer & Corporate Contact Portal with Interactive FAQ
+   Consumer & Corporate Contact Portal with Interactive Dynamic FAQ
+   Dynamically connected in Real-Time to CMS Service
    ========================================================================== */
 
-import { OFFICIAL_CONTACT } from '../data/stores.data';
+import { cmsService } from '../services/cms.service';
 
 export class ContactPage {
   private element: HTMLElement;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('div');
@@ -20,6 +22,10 @@ export class ContactPage {
   }
 
   private render(): void {
+    const settings = cmsService.getSettings();
+    const faqs = cmsService.getFaqs();
+    const whatsappClean = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '237677426612';
+
     this.element.innerHTML = `
       <!-- Page Hero Header -->
       <section class="page-hero">
@@ -31,7 +37,7 @@ export class ContactPage {
             <span>Contact</span>
           </nav>
           
-          <div class="page-hero-tag">Service Consommateurs & Siège • Société Nidjeu</div>
+          <div class="page-hero-tag">Service Consommateurs & Siège • ${settings.companyName}</div>
           <h1 class="page-hero-title">Comment pouvons-nous vous aider aujourd'hui ?</h1>
           <p class="page-hero-subtitle">
             Une question sur nos ingrédients ? Une commande personnalisée ? Notre équipe camerounaise est à votre écoute du lundi au samedi de 8h à 18h.
@@ -51,7 +57,7 @@ export class ContactPage {
             <div class="stat-pillar-title">Hotline WhatsApp Directe</div>
             <div class="stat-pillar-desc" style="margin-bottom: 16px;">Réponse instantanée pour commandes rapides et livraisons.</div>
             <a 
-              href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu,%20j'ai%20une%20question%20sur%20Nidj%20Juice." 
+              href="https://wa.me/${whatsappClean}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu,%20j'ai%20une%20question%20sur%20Nidj%20Juice." 
               target="_blank" 
               rel="noopener noreferrer" 
               class="btn btn-primary"
@@ -67,11 +73,11 @@ export class ContactPage {
             <div class="stat-pillar-title">Téléphone & Service Client</div>
             <div class="stat-pillar-desc" style="margin-bottom: 16px;">Appelez notre standard au Cameroun pour vos réservations.</div>
             <a 
-              href="tel:+237699000000" 
+              href="tel:${settings.phoneDisplay.replace(/\s+/g, '')}" 
               class="btn btn-outline"
               style="padding: 8px 18px; font-size: 0.8rem;"
             >
-              <span>${OFFICIAL_CONTACT.phoneDisplay}</span>
+              <span>${settings.phoneDisplay}</span>
             </a>
           </div>
 
@@ -81,11 +87,11 @@ export class ContactPage {
             <div class="stat-pillar-title">Courrier Électronique</div>
             <div class="stat-pillar-desc" style="margin-bottom: 16px;">Pour les partenariats institutionnels et candidatures.</div>
             <a 
-              href="mailto:${OFFICIAL_CONTACT.email}" 
+              href="mailto:${settings.email}" 
               class="btn btn-outline"
               style="padding: 8px 18px; font-size: 0.8rem;"
             >
-              <span>${OFFICIAL_CONTACT.email}</span>
+              <span>${settings.email}</span>
             </a>
           </div>
 
@@ -125,26 +131,25 @@ export class ContactPage {
 
               <div class="form-group">
                 <label class="form-label" for="contactMsg">Votre Message *</label>
-                <textarea id="contactMsg" class="form-control" rows="4" placeholder="Comment pouvons-nous vous renseigner ?" required></textarea>
+                <textarea id="contactMsg" class="form-control" rows="4" placeholder="Bonjour, je souhaiterais en savoir plus sur..." required></textarea>
               </div>
 
-              <button type="submit" class="btn btn-primary w-full" style="width: 100%; padding: 14px;">
-                <span>Envoyer le Message</span>
+              <button type="submit" class="btn btn-primary w-full" style="justify-content: center;">
+                <span>Transmettre via WhatsApp</span>
                 <span class="btn-arrow-circle">→</span>
               </button>
             </form>
           </div>
 
-          <!-- Offices & Headquarters info -->
-          <div class="editorial-text-box">
-            <span class="page-hero-tag">Implantation</span>
-            <h2>Siège Social & Ateliers</h2>
+          <div class="editorial-media-box" style="padding: var(--space-8); background: #FFFFFF; border-radius: var(--radius-xl); border: 1px solid rgba(10,61,34,0.08); box-shadow: var(--shadow-sm);">
+            <span class="page-hero-tag">Siège Social & Coordonnées</span>
+            <h3 style="margin-top: 8px; margin-bottom: 16px;">Nos Bureaux au Cameroun</h3>
             
-            <div style="margin-top: 20px;">
-              <h4 style="color: var(--color-brand-deep-green); margin-bottom: 4px;">Atelier & Direction Douala</h4>
-              <p class="editorial-body">
-                Société Nidjeu, Zone industrielle & commerciale, Douala, Région du Littoral, Cameroun.<br />
-                Ouvert du lundi au vendredi de 8h00 à 18h00, samedi de 8h00 à 13h00.
+            <div style="font-size: 0.95rem; color: var(--text-color); line-height: 1.7;">
+              <h4 style="color: var(--color-brand-deep-green); margin-bottom: 4px;">Siège Direction Générale — Douala</h4>
+              <p class="editorial-body" style="margin-bottom: 16px;">
+                ${settings.headquarters}<br />
+                Ateliers d'embouteillage, laboratoire de contrôle qualité et direction commerciale.
               </p>
 
               <h4 style="color: var(--color-brand-deep-green); margin-bottom: 4px; margin-top: 16px;">Antenne de Liaison Yaoundé</h4>
@@ -168,47 +173,17 @@ export class ContactPage {
           </div>
 
           <div class="faq-accordion">
-            
-            <div class="faq-item is-open">
-              <button type="button" class="faq-trigger">
-                <span>Combien de temps se conservent les jus Nidj Juice ?</span>
-                <span class="faq-chevron">▾</span>
-              </button>
-              <div class="faq-content">
-                Nos jus étant 100% naturels sans aucun conservateur chimique, ils doivent être conservés au frais entre +2°C et +6°C. Une fois ouverts, nous vous conseillons de les consommer dans les 48 heures pour profiter de toute la vivacité des vitamines et des arômes de fruits frais.
+            ${faqs.map((faq, idx) => `
+              <div class="faq-item ${idx === 0 ? 'is-open' : ''}" data-faq-id="${faq.id}">
+                <button type="button" class="faq-trigger">
+                  <span>${faq.question}</span>
+                  <span class="faq-chevron">▾</span>
+                </button>
+                <div class="faq-content">
+                  ${faq.answer}
+                </div>
               </div>
-            </div>
-
-            <div class="faq-item">
-              <button type="button" class="faq-trigger">
-                <span>Les jus contiennent-ils du sucre ajouté ?</span>
-                <span class="faq-chevron">▾</span>
-              </button>
-              <div class="faq-content">
-                Non ! La saveur douce et généreuse de nos nectars provient exclusivement du jus naturel des ananas mûris au soleil camerounais et des arômes intenses des fleurs d'hibiscus et du gingembre sauvage. Aucun sucre raffiné ni sirop de maïs n'est ajouté.
-              </div>
-            </div>
-
-            <div class="faq-item">
-              <button type="button" class="faq-trigger">
-                <span>Puis-je commander pour un mariage ou une cérémonie ?</span>
-                <span class="faq-chevron">▾</span>
-              </button>
-              <div class="faq-content">
-                Absolument. Nous disposons d'offres événementielles par cartons de 12 et 24 bouteilles avec tarif dégressif. Nous assurons la livraison directement sur le lieu de votre réception dans des bacs isothermes avec glace pour un service parfait.
-              </div>
-            </div>
-
-            <div class="faq-item">
-              <button type="button" class="faq-trigger">
-                <span>Quels sont les délais de livraison à Douala et Yaoundé ?</span>
-                <span class="faq-chevron">▾</span>
-              </button>
-              <div class="faq-content">
-                Pour les commandes passées avant 12h, nous assurons la livraison le jour même à Douala et Yaoundé. Pour les autres villes (Bafoussam, Kribi), un délai de 24h est appliqué pour préserver l'intégrité de la chaîne du froid.
-              </div>
-            </div>
-
+            `).join('')}
           </div>
         </section>
 
@@ -230,15 +205,31 @@ export class ContactPage {
     const form = this.element.querySelector('#consumerContactForm') as HTMLFormElement;
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
+      const settings = cmsService.getSettings();
+      const whatsappClean = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '237677426612';
       const name = (this.element.querySelector('#contactName') as HTMLInputElement).value;
       const phone = (this.element.querySelector('#contactPhone') as HTMLInputElement).value;
       const subject = (this.element.querySelector('#contactSubject') as HTMLSelectElement).value;
       const msg = (this.element.querySelector('#contactMsg') as HTMLTextAreaElement).value;
 
-      const message = `Bonjour Société Nidjeu,\n\nNom : ${name}\nTéléphone : ${phone}\nObjet : ${subject}\n\nMessage : ${msg}`;
-      const waUrl = `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      const message = `Bonjour ${settings.companyName},\n\nNom : ${name}\nTéléphone : ${phone}\nObjet : ${subject}\n\nMessage : ${msg}`;
+      const waUrl = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(message)}`;
 
       window.open(waUrl, '_blank');
     });
+
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.render();
+        this.bindEvents();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 }

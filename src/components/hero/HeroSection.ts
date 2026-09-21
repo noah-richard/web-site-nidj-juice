@@ -5,9 +5,9 @@
    interactive auto-swipe slider with progress indicator & touch support.
    ========================================================================== */
 
-import { FLAVORS_DATA } from '../../data/flavors.data';
 import { themeController } from '../../features/theme-controller';
 import { audioController } from '../../features/audio-controller';
+import { cmsService } from '../../services/cms.service';
 import type { FlavorId } from '../../types/product.types';
 
 export class HeroSection {
@@ -17,6 +17,7 @@ export class HeroSection {
   private readonly autoPlayInterval: number = 5000; // 5 seconds per flavor slide
   private isPaused: boolean = false;
   private unsubscribeTheme: (() => void) | null = null;
+  private unsubscribeCms: (() => void) | null = null;
   private touchStartX: number = 0;
   private touchStartY: number = 0;
 
@@ -34,8 +35,12 @@ export class HeroSection {
   }
 
   private render(): void {
-    const activeFlavor = FLAVORS_DATA.find((f) => f.id === this.currentFlavorId) || FLAVORS_DATA[0];
     const isBissap = this.currentFlavorId === 'bissap';
+    const heroContent = cmsService.getHeroContent();
+    const products = cmsService.getProducts();
+    const bissapProd = products.find((p) => p.id === 'cocktail-bissap' || p.id === 'bissap') || products[0];
+    const ananasProd = products.find((p) => p.id === 'ananas-gingembre' || p.id === 'ananas') || products[1] || products[0];
+    const activeFlavor = isBissap ? bissapProd : ananasProd;
 
     this.element.innerHTML = `
       <div class="hero-container container">
@@ -53,15 +58,15 @@ export class HeroSection {
           <!-- Split Two-Tone Big Typography with Accessible SEO Brand Name -->
           <h1 class="hero-title">
             <span class="sr-only">Nidj Juice — </span>
-            <span class="hero-title-word1" id="heroWord1">${isBissap ? 'Cocktail.' : 'Ananas.'}</span>
-            <span class="hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}" id="heroWord2">${isBissap ? 'Bissap' : 'Gingembre'}</span>
+            <span class="hero-title-word1" id="heroWord1">${isBissap ? (heroContent.titleWord1 || 'Cocktail.') : 'Ananas.'}</span>
+            <span class="hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}" id="heroWord2">${isBissap ? (heroContent.titleWord2 || 'Bissap') : 'Gingembre'}</span>
           </h1>
 
-          <p class="hero-subtitle">
-            Jus 100% naturels pour un mode de vie sain et énergisant
+          <p class="hero-subtitle" id="heroSubtitle">
+            ${heroContent.subtitle || 'Jus 100% naturels pour un mode de vie sain et énergisant'}
           </p>
           <p class="hero-description" id="heroFlavorDesc">
-            ${activeFlavor.description}
+            ${activeFlavor?.description || heroContent.description}
           </p>
 
           <!-- Buttons matching mockup -->
@@ -91,7 +96,7 @@ export class HeroSection {
                   <path d="M12 6c-3 0-5 2.5-5 5 0 3 3 5 5 7 2-2 5-4 5-7 0-2.5-2-5-5-5z"></path>
                 </svg>
               </div>
-              <span class="trust-badge-label">Ingrédients naturels</span>
+              <span class="trust-badge-label" id="heroBadge1">${heroContent.badge1 || 'Ingrédients naturels'}</span>
             </div>
 
             <div class="trust-badge-item">
@@ -101,7 +106,7 @@ export class HeroSection {
                   <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                 </svg>
               </div>
-              <span class="trust-badge-label">Sans colorant ni conservateur</span>
+              <span class="trust-badge-label" id="heroBadge2">${heroContent.badge2 || 'Sans colorant ni conservateur'}</span>
             </div>
 
             <div class="trust-badge-item">
@@ -110,7 +115,7 @@ export class HeroSection {
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
                 </svg>
               </div>
-              <span class="trust-badge-label">Société Nidjeu • Cameroun</span>
+              <span class="trust-badge-label" id="heroBadge3">${heroContent.badge3 || 'Société Nidjeu • Cameroun'}</span>
             </div>
 
           </div>
@@ -134,8 +139,8 @@ export class HeroSection {
           <!-- Floating Bottle with 3D Tilt -->
           <div class="hero-bottle-stage" id="bottleStage">
             <img 
-              src="${activeFlavor.bottleImage}" 
-              alt="Bouteille Nidj Juice ${activeFlavor.name}" 
+              src="${activeFlavor?.bottleImage || (isBissap ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png')}" 
+              alt="Bouteille Nidj Juice ${activeFlavor?.name || ''}" 
               class="hero-bottle-main"
               id="heroBottleImg"
             />
@@ -253,6 +258,27 @@ export class HeroSection {
       this.currentFlavorId = newFlavor;
       this.updateView(newFlavor);
     });
+
+    // Subscribe to CMS real-time updates
+    this.unsubscribeCms = cmsService.onDataChanged(() => {
+      this.updateView(this.currentFlavorId);
+      this.refreshCmsTexts();
+    });
+  }
+
+  private refreshCmsTexts(): void {
+    const heroContent = cmsService.getHeroContent();
+    const sub = this.element.querySelector('#heroSubtitle');
+    if (sub) sub.textContent = heroContent.subtitle || 'Jus 100% naturels pour un mode de vie sain et énergisant';
+
+    const b1 = this.element.querySelector('#heroBadge1');
+    if (b1) b1.textContent = heroContent.badge1 || 'Ingrédients naturels';
+
+    const b2 = this.element.querySelector('#heroBadge2');
+    if (b2) b2.textContent = heroContent.badge2 || 'Sans colorant ni conservateur';
+
+    const b3 = this.element.querySelector('#heroBadge3');
+    if (b3) b3.textContent = heroContent.badge3 || 'Société Nidjeu • Cameroun';
   }
 
   private handleVisibilityChange = (): void => {
@@ -304,8 +330,12 @@ export class HeroSection {
   }
 
   private updateView(flavorId: FlavorId): void {
-    const flavor = FLAVORS_DATA.find((f) => f.id === flavorId) || FLAVORS_DATA[0];
     const isBissap = flavorId === 'bissap';
+    const products = cmsService.getProducts();
+    const bissapProd = products.find((p) => p.id === 'cocktail-bissap' || p.id === 'bissap') || products[0];
+    const ananasProd = products.find((p) => p.id === 'ananas-gingembre' || p.id === 'ananas') || products[1] || products[0];
+    const flavor = isBissap ? bissapProd : ananasProd;
+    const heroContent = cmsService.getHeroContent();
 
     // Update Counter
     const activeIdx = this.element.querySelector('.active-idx');
@@ -322,9 +352,9 @@ export class HeroSection {
       headline.style.opacity = '0.3';
       headline.style.transform = 'translateY(6px)';
       setTimeout(() => {
-        if (word1) word1.textContent = isBissap ? 'Cocktail.' : 'Ananas.';
+        if (word1) word1.textContent = isBissap ? (heroContent.titleWord1 || 'Cocktail.') : 'Ananas.';
         if (word2) {
-          word2.textContent = isBissap ? 'Bissap' : 'Gingembre';
+          word2.textContent = isBissap ? (heroContent.titleWord2 || 'Bissap') : 'Gingembre';
           word2.className = `hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}`;
         }
         headline.style.opacity = '1';
@@ -336,7 +366,7 @@ export class HeroSection {
       desc.style.transition = 'opacity 0.2s ease';
       desc.style.opacity = '0.3';
       setTimeout(() => {
-        desc.textContent = flavor.description;
+        desc.textContent = flavor?.description || heroContent.description;
         desc.style.opacity = '1';
       }, 150);
     }
@@ -350,8 +380,8 @@ export class HeroSection {
       bottle.style.opacity = '0';
       bottle.style.transform = 'scale(0.92) translateY(18px)';
       setTimeout(() => {
-        bottle.src = flavor.bottleImage;
-        bottle.alt = `Bouteille Nidj Juice ${flavor.name}`;
+        bottle.src = flavor?.bottleImage || (isBissap ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png');
+        bottle.alt = `Bouteille Nidj Juice ${flavor?.name || ''}`;
         bottle.style.opacity = '1';
         bottle.style.transform = 'scale(1) translateY(0)';
       }, 200);
@@ -390,6 +420,10 @@ export class HeroSection {
     if (this.unsubscribeTheme) {
       this.unsubscribeTheme();
       this.unsubscribeTheme = null;
+    }
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
     }
   }
 }

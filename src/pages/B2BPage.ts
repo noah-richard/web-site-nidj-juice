@@ -3,7 +3,7 @@
    Dedicated Portal for Wholesalers, Retailers, Cafés, Hotels & Supermarkets
    ========================================================================== */
 
-import { OFFICIAL_CONTACT } from '../data/stores.data';
+import { cmsService } from '../services/cms.service';
 
 export class B2BPage {
   private element: HTMLElement;
@@ -142,7 +142,7 @@ export class B2BPage {
             <div style="margin-top: 20px; text-align: center;">
               <span style="font-size: 0.8rem; color: var(--text-muted);">Ou contact direct : </span>
               <a 
-                href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu,%20je%20souhaite%20ouvrir%20un%20compte%20professionnel%20distributeur." 
+                href="https://wa.me/${cmsService.getSettings().whatsappNumber}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu,%20je%20souhaite%20ouvrir%20un%20compte%20professionnel%20distributeur." 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 style="color: var(--color-brand-green); font-weight: 700; text-decoration: none;"
@@ -162,14 +162,16 @@ export class B2BPage {
     const form = this.element.querySelector('#b2bInquiryForm') as HTMLFormElement;
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
+      const settings = cmsService.getSettings();
+      const whatsappClean = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '237677426612';
       const company = (this.element.querySelector('#b2bCompany') as HTMLInputElement).value;
       const city = (this.element.querySelector('#b2bCity') as HTMLSelectElement).value;
       const name = (this.element.querySelector('#b2bContactName') as HTMLInputElement).value;
       const phone = (this.element.querySelector('#b2bPhone') as HTMLInputElement).value;
       const volume = (this.element.querySelector('#b2bVolume') as HTMLSelectElement).value;
 
-      const message = `Bonjour Société Nidjeu, je souhaite devenir distributeur agréé Nidj Juice.\n\nÉtablissement : ${company}\nVille : ${city}\nResponsable : ${name}\nTéléphone : ${phone}\nVolume prévisionnel : ${volume}`;
-      const waUrl = `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      const message = `Bonjour ${settings.companyName}, je souhaite devenir distributeur agréé ${settings.brandName}.\n\nÉtablissement : ${company}\nVille : ${city}\nResponsable : ${name}\nTéléphone : ${phone}\nVolume prévisionnel : ${volume}`;
+      const waUrl = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(message)}`;
 
       window.open(waUrl, '_blank');
     });
