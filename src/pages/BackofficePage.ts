@@ -1,7 +1,7 @@
 /* ==========================================================================
    NIDJ JUICE — ENTERPRISE BACKOFFICE CMS (/nidj-juice-backoffice)
-   Full-Featured Corporate Administration Dashboard & Content Management System
-   Allows real-time editing of Products, Pages, Media, Stores & Settings.
+   Agency-Standard Administration Studio & Content Management Platform
+   Exact Brand Color Match • 100% Vector Iconography • Bespoke Architecture
    ========================================================================== */
 
 import { cmsService, type FaqItem } from '../services/cms.service';
@@ -10,6 +10,33 @@ import type { StoreLocation, VideoReel } from '../types/product.types';
 import type { GalleryItem } from '../data/gallery.data';
 
 type BackofficeTab = 'overview' | 'products' | 'pages' | 'gallery' | 'reels' | 'stores' | 'settings';
+
+/* --- Vector Icons (Agency Grade • Lucide / Feather Style) --- */
+const BO_ICONS = {
+  grid: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+  bottle: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3H9z"></path><path d="M10 6v3a4 4 0 0 1-2 3.46V20a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-7.54A4 4 0 0 1 14 9V6"></path></svg>`,
+  fileText: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
+  image: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
+  film: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>`,
+  mapPin: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
+  settings: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
+  external: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
+  download: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`,
+  upload: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`,
+  refresh: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
+  logout: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
+  plus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+  edit: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+  trash: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+  check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+  phone: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`,
+  lock: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+  sparkles: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`,
+  close: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+  eye: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`,
+  camera: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`,
+  layers: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`
+};
 
 export class BackofficePage {
   private element: HTMLElement;
@@ -35,15 +62,17 @@ export class BackofficePage {
   }
 
   // =========================================================================
-  // 1. SECURITY / AUTHENTICATION GATE
+  // 1. SECURITY / AUTHENTICATION GATE (LIGHT AGENCY AESTHETIC)
   // =========================================================================
   private renderAuthGate(): void {
     this.element.innerHTML = `
-      <div class="bo-auth-screen">
-        <div class="bo-auth-box">
+      <div class="bo-auth-container">
+        <div class="bo-auth-card">
           <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="bo-auth-logo" />
-          <h2 class="bo-auth-title">Panneau d'Administration</h2>
-          <p class="bo-auth-desc">Société Nidjeu • Système de Gestion de Contenu (CMS)</p>
+          <h1 class="bo-auth-title">Espace Administration</h1>
+          <p class="bo-auth-desc">
+            Société Nidjeu • Système de gestion et pilotage officiel de la marque <strong>Nidj Juice</strong> au Cameroun.
+          </p>
 
           <form id="boLoginForm" class="bo-form">
             <div class="bo-form-group">
@@ -51,30 +80,32 @@ export class BackofficePage {
               <input 
                 type="password" 
                 id="boAuthPassword" 
-                class="bo-input text-center" 
-                placeholder="Code secret ou PIN" 
+                class="bo-input" 
+                placeholder="Entrez votre mot de passe" 
                 autocomplete="current-password"
                 required
+                style="text-align: center; font-size: 15px; letter-spacing: 0.1em;"
               />
             </div>
 
-            <button type="submit" class="bo-btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;">
+            <button type="submit" class="bo-btn-primary" style="width: 100%; justify-content: center; margin-top: 6px;">
+              ${BO_ICONS.lock}
               <span>Déverrouiller l'accès</span>
-              <span>→</span>
             </button>
           </form>
 
-          <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--bo-border);">
-            <p style="font-size: 12px; color: var(--bo-text-dim); margin-bottom: 8px;">
-              Accès immédiat pour la révision du projet :
+          <div class="bo-quick-unlock-card">
+            <p style="font-size: 12px; color: var(--bo-forest); font-weight: 600; margin: 0 0 10px 0;">
+              Accès rapide pour la démonstration client :
             </p>
             <button type="button" class="bo-quick-unlock-btn" id="boQuickUnlockBtn">
-              ⚡ Déverrouillage Instantané Administrateur (1-Clic)
+              ${BO_ICONS.sparkles}
+              <span>Déverrouillage Instantané (1-Clic)</span>
             </button>
           </div>
 
-          <div style="margin-top: 20px;">
-            <a href="/" class="bo-btn-backup" style="text-decoration: none;">
+          <div style="margin-top: 22px;">
+            <a href="/" class="bo-btn-secondary" style="font-size: 12.5px; padding: 8px 14px; text-decoration: none;">
               ← Retourner au site public
             </a>
           </div>
@@ -90,7 +121,7 @@ export class BackofficePage {
       if (pwd === 'admin' || pwd === '237' || pwd === '2370' || pwd === 'nidjeu' || pwd.length >= 3) {
         cmsService.setAuthenticated(true, true);
         this.render();
-        this.showToast('Bienvenue sur le panneau d\'administration Société Nidjeu', 'success');
+        this.showToast('Bienvenue sur le panneau de gestion Société Nidjeu', 'success');
       } else {
         this.showToast('Code d\'accès incorrect', 'error');
       }
@@ -105,7 +136,7 @@ export class BackofficePage {
   }
 
   // =========================================================================
-  // 2. MAIN DASHBOARD RENDERER
+  // 2. MAIN DASHBOARD RENDERER (STUDIO TOPBAR + SIDEBAR)
   // =========================================================================
   private renderDashboard(): void {
     const products = cmsService.getProducts();
@@ -117,31 +148,52 @@ export class BackofficePage {
       <!-- Top Corporate App Bar -->
       <header class="bo-header">
         <div class="bo-header-left">
-          <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="bo-logo" />
+          <a href="/" class="bo-logo-wrap" title="Aller à l'accueil du site">
+            <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="bo-logo" />
+          </a>
+          <div class="bo-header-divider"></div>
           <div class="bo-brand-title">
-            <span>CMS Société Nidjeu</span>
-            <span class="bo-env-badge">Production • Cameroun</span>
+            <div class="bo-brand-name">
+              <span>Société Nidjeu</span>
+              <span class="bo-brand-badge">Backoffice CMS</span>
+            </div>
+            <span class="bo-brand-sub">Site Officiel • Cameroun</span>
           </div>
         </div>
 
         <div class="bo-header-right">
-          <a href="/" class="bo-btn-link-site" title="Ouvrir le site public">
+          <a href="/" class="bo-btn-public-site" target="_blank" title="Ouvrir le site public dans un nouvel onglet">
             <span>Voir le site</span>
-            <span>↗</span>
+            ${BO_ICONS.external}
           </a>
-          <button type="button" class="bo-btn-backup" id="boExportBtn" title="Télécharger une sauvegarde complète en JSON">
-            <span>💾 Exporter Backup</span>
+
+          <button type="button" class="bo-action-pill" id="boExportBtn" title="Télécharger une sauvegarde complète en JSON">
+            ${BO_ICONS.download}
+            <span>Exporter Backup</span>
           </button>
-          <label class="bo-btn-backup" title="Restaurer une sauvegarde JSON" style="margin: 0; cursor: pointer;">
-            <span>📂 Importer Backup</span>
+
+          <label class="bo-action-pill" title="Restaurer une sauvegarde JSON" style="margin: 0; cursor: pointer;">
+            ${BO_ICONS.upload}
+            <span>Importer Backup</span>
             <input type="file" id="boImportFileInput" accept=".json" style="display: none;" />
           </label>
-          <button type="button" class="bo-btn-backup" id="boResetBtn" title="Rétablir les contenus par défaut">
-            <span>🔄 Réinitialiser</span>
+
+          <button type="button" class="bo-action-pill danger" id="boResetBtn" title="Rétablir les contenus par défaut">
+            ${BO_ICONS.refresh}
+            <span>Réinitialiser</span>
           </button>
-          <button type="button" class="bo-btn-logout" id="boLogoutBtn" title="Quitter la session">
-            <span>Déconnexion</span>
-          </button>
+
+          <!-- User Chip -->
+          <div class="bo-user-chip">
+            <div class="bo-user-avatar">SN</div>
+            <div class="bo-user-meta">
+              <span class="bo-user-name">Administrateur</span>
+              <span class="bo-user-role">Direction</span>
+            </div>
+            <button type="button" class="bo-logout-btn" id="boLogoutBtn" title="Fermer la session administrateur">
+              ${BO_ICONS.logout}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -150,62 +202,77 @@ export class BackofficePage {
         
         <!-- Sidebar Navigation -->
         <aside class="bo-sidebar">
-          <div class="bo-nav-heading">Gestion & Contenus</div>
           
-          <button type="button" class="bo-nav-item ${this.currentTab === 'overview' ? 'is-active' : ''}" data-tab="overview">
-            <div class="bo-nav-item-inner">
-              <span class="bo-nav-icon">📊</span>
-              <span>Tableau de Bord</span>
-            </div>
-          </button>
+          <div class="bo-nav-section">
+            <div class="bo-nav-heading">Gestion & Contenus</div>
+            
+            <button type="button" class="bo-nav-item ${this.currentTab === 'overview' ? 'is-active' : ''}" data-tab="overview">
+              <div class="bo-nav-item-inner">
+                <span class="bo-nav-icon">${BO_ICONS.grid}</span>
+                <span>Vue d'Ensemble</span>
+              </div>
+            </button>
 
-          <button type="button" class="bo-nav-item ${this.currentTab === 'products' ? 'is-active' : ''}" data-tab="products">
-            <div class="bo-nav-item-inner">
-              <span class="bo-nav-icon">🍹</span>
-              <span>Saveurs & Nectars</span>
-            </div>
-            <span class="bo-nav-badge">${products.length}</span>
-          </button>
+            <button type="button" class="bo-nav-item ${this.currentTab === 'products' ? 'is-active' : ''}" data-tab="products">
+              <div class="bo-nav-item-inner">
+                <span class="bo-nav-icon">${BO_ICONS.bottle}</span>
+                <span>Saveurs & Nectars</span>
+              </div>
+              <span class="bo-nav-badge">${products.length}</span>
+            </button>
 
-          <button type="button" class="bo-nav-item ${this.currentTab === 'pages' ? 'is-active' : ''}" data-tab="pages">
-            <div class="bo-nav-item-inner">
-              <span class="bo-nav-icon">📄</span>
-              <span>Pages & Textes</span>
-            </div>
-          </button>
+            <button type="button" class="bo-nav-item ${this.currentTab === 'pages' ? 'is-active' : ''}" data-tab="pages">
+              <div class="bo-nav-item-inner">
+                <span class="bo-nav-icon">${BO_ICONS.fileText}</span>
+                <span>Pages & Textes</span>
+              </div>
+            </button>
 
-          <button type="button" class="bo-nav-item ${this.currentTab === 'gallery' ? 'is-active' : ''}" data-tab="gallery">
-            <div class="bo-nav-item-inner">
-              <span class="bo-nav-icon">📸</span>
-              <span>Galerie & Événements</span>
-            </div>
-            <span class="bo-nav-badge">${gallery.length}</span>
-          </button>
+            <button type="button" class="bo-nav-item ${this.currentTab === 'gallery' ? 'is-active' : ''}" data-tab="gallery">
+              <div class="bo-nav-item-inner">
+                <span class="bo-nav-icon">${BO_ICONS.image}</span>
+                <span>Galerie Événements</span>
+              </div>
+              <span class="bo-nav-badge">${gallery.length}</span>
+            </button>
 
-          <button type="button" class="bo-nav-item ${this.currentTab === 'reels' ? 'is-active' : ''}" data-tab="reels">
-            <div class="bo-nav-item-inner">
-              <span class="bo-nav-icon">🎬</span>
-              <span>Vidéos & Reels</span>
-            </div>
-            <span class="bo-nav-badge">${reels.length}</span>
-          </button>
+            <button type="button" class="bo-nav-item ${this.currentTab === 'reels' ? 'is-active' : ''}" data-tab="reels">
+              <div class="bo-nav-item-inner">
+                <span class="bo-nav-icon">${BO_ICONS.film}</span>
+                <span>Vidéos & Reels</span>
+              </div>
+              <span class="bo-nav-badge">${reels.length}</span>
+            </button>
 
-          <button type="button" class="bo-nav-item ${this.currentTab === 'stores' ? 'is-active' : ''}" data-tab="stores">
-            <div class="bo-nav-item-inner">
-              <span class="bo-nav-icon">📍</span>
-              <span>Points de Vente</span>
-            </div>
-            <span class="bo-nav-badge">${stores.length}</span>
-          </button>
+            <button type="button" class="bo-nav-item ${this.currentTab === 'stores' ? 'is-active' : ''}" data-tab="stores">
+              <div class="bo-nav-item-inner">
+                <span class="bo-nav-icon">${BO_ICONS.mapPin}</span>
+                <span>Points de Vente</span>
+              </div>
+              <span class="bo-nav-badge">${stores.length}</span>
+            </button>
+          </div>
 
-          <div class="bo-nav-heading" style="margin-top: 16px;">Configuration</div>
+          <div class="bo-nav-section">
+            <div class="bo-nav-heading">Configuration & Système</div>
 
-          <button type="button" class="bo-nav-item ${this.currentTab === 'settings' ? 'is-active' : ''}" data-tab="settings">
-            <div class="bo-nav-item-inner">
-              <span class="bo-nav-icon">⚙️</span>
-              <span>Paramètres & Contact</span>
+            <button type="button" class="bo-nav-item ${this.currentTab === 'settings' ? 'is-active' : ''}" data-tab="settings">
+              <div class="bo-nav-item-inner">
+                <span class="bo-nav-icon">${BO_ICONS.settings}</span>
+                <span>Paramètres & Contact</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Live Indicator Box -->
+          <div class="bo-sidebar-footer">
+            <div class="bo-status-dot"></div>
+            <div class="bo-status-info">
+              <span class="bo-status-title">Système Opérationnel</span>
+              <span class="bo-status-sub">Synchronisation live active</span>
             </div>
-          </button>
+          </div>
+
         </aside>
 
         <!-- Main Dynamic Workspace -->
@@ -249,7 +316,7 @@ export class BackofficePage {
   }
 
   // -------------------------------------------------------------------------
-  // TAB: OVERVIEW / DASHBOARD
+  // TAB: OVERVIEW / DASHBOARD (AGENCY KPI DASHBOARD)
   // -------------------------------------------------------------------------
   private renderOverviewTab(): string {
     const products = cmsService.getProducts();
@@ -261,101 +328,141 @@ export class BackofficePage {
       <div class="bo-page-header">
         <div class="bo-page-title-group">
           <h1>Vue d'Ensemble & Métriques</h1>
-          <p class="bo-page-subtitle">État en direct du site officiel Nidj Juice et de ses modules de contenu</p>
+          <p class="bo-page-subtitle">État en direct du site officiel Nidj Juice, catalogue des saveurs et réseau de distribution</p>
         </div>
         <div class="bo-page-actions">
           <button type="button" class="bo-btn-primary" id="boQuickAddProductBtn">
-            <span>+ Ajouter une Saveur</span>
+            ${BO_ICONS.plus}
+            <span>Ajouter une Saveur</span>
           </button>
           <button type="button" class="bo-btn-secondary" id="boQuickAddStoreBtn">
-            <span>+ Ajouter un Point de Vente</span>
+            ${BO_ICONS.plus}
+            <span>Ajouter un Point de Vente</span>
           </button>
         </div>
       </div>
 
-      <!-- Stats Grid -->
+      <!-- Agency KPI Stats Grid -->
       <div class="bo-stats-grid">
         <div class="bo-stat-card">
-          <div class="bo-stat-header">
+          <div class="bo-stat-top">
             <span class="bo-stat-label">Saveurs Actives</span>
-            <div class="bo-stat-icon-wrap">🍹</div>
+            <div class="bo-stat-icon-wrap">${BO_ICONS.bottle}</div>
           </div>
           <div class="bo-stat-number">${products.length}</div>
-          <div class="bo-stat-desc">Collection officielle 100% naturelle</div>
+          <div class="bo-stat-pill">
+            <span class="bo-stat-pill-dot"></span>
+            <span>100% Nectars Purs</span>
+          </div>
         </div>
 
         <div class="bo-stat-card">
-          <div class="bo-stat-header">
+          <div class="bo-stat-top">
             <span class="bo-stat-label">Points de Vente</span>
-            <div class="bo-stat-icon-wrap">📍</div>
+            <div class="bo-stat-icon-wrap amber">${BO_ICONS.mapPin}</div>
           </div>
           <div class="bo-stat-number">${stores.length}</div>
-          <div class="bo-stat-desc">Douala, Yaoundé, Bafoussam, Kribi</div>
+          <div class="bo-stat-pill">
+            <span class="bo-stat-pill-dot" style="background: var(--bo-ananas);"></span>
+            <span>Douala, Yaoundé, Bafoussam, Kribi</span>
+          </div>
         </div>
 
         <div class="bo-stat-card">
-          <div class="bo-stat-header">
+          <div class="bo-stat-top">
             <span class="bo-stat-label">Moments en Galerie</span>
-            <div class="bo-stat-icon-wrap">📸</div>
+            <div class="bo-stat-icon-wrap ruby">${BO_ICONS.image}</div>
           </div>
           <div class="bo-stat-number">${gallery.length}</div>
-          <div class="bo-stat-desc">Salons, dégustations et consommateurs</div>
+          <div class="bo-stat-pill">
+            <span class="bo-stat-pill-dot" style="background: var(--bo-bissap);"></span>
+            <span>Dégustations & Salons</span>
+          </div>
         </div>
 
         <div class="bo-stat-card">
-          <div class="bo-stat-header">
+          <div class="bo-stat-top">
             <span class="bo-stat-label">Hotline Commandes</span>
-            <div class="bo-stat-icon-wrap">💬</div>
+            <div class="bo-stat-icon-wrap blue">${BO_ICONS.phone}</div>
           </div>
-          <div class="bo-stat-number" style="font-size: 19px;">${settings.phoneDisplay}</div>
-          <div class="bo-stat-desc">Liaison WhatsApp active (+237)</div>
+          <div class="bo-stat-number" style="font-size: 20px;">${settings.phoneDisplay}</div>
+          <div class="bo-stat-pill">
+            <span class="bo-stat-pill-dot" style="background: var(--bo-blue);"></span>
+            <span>Liaison WhatsApp Directe</span>
+          </div>
         </div>
       </div>
 
-      <!-- Quick Summary Cards -->
+      <!-- Product Catalog Overview Card -->
       <div class="bo-card">
         <div class="bo-card-header">
-          <h2 class="bo-card-title">🍹 Catalogue des Saveurs Actuelles</h2>
-          <button type="button" class="bo-btn-secondary" data-goto-tab="products">Gérer le Catalogue →</button>
-        </div>
-        <div class="bo-product-cards-grid">
-          ${products
-            .map(
-              (p) => `
-            <div class="bo-item-card">
-              <div class="bo-item-top">
-                <div class="bo-item-img-box">
-                  <img src="${p.bottleImage}" alt="${p.name}" class="bo-item-img" />
-                </div>
-                <div class="bo-item-info">
-                  <div class="bo-item-badge" style="color: ${p.accentColor};">${p.category || 'Collection'}</div>
-                  <h3 class="bo-item-name">${p.name}</h3>
-                  <p class="bo-item-desc">${p.subtitle}</p>
-                </div>
-              </div>
-              <div class="bo-item-footer">
-                <span style="font-size: 11.5px; font-weight: 700; color: var(--bo-text-muted);">
-                  ${(p.formats || []).length} formats disponibles
-                </span>
-                <button type="button" class="bo-btn-edit" data-edit-product="${p.id}">
-                  Modifier
-                </button>
-              </div>
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon">${BO_ICONS.bottle}</div>
+            <div>
+              <h2 class="bo-card-title">Catalogue des Saveurs Actuelles</h2>
+              <p class="bo-card-subtitle">Collection officielle commercialisée au Cameroun</p>
             </div>
-          `
-            )
-            .join('')}
+          </div>
+          <button type="button" class="bo-btn-secondary" data-goto-tab="products">
+            <span>Gérer le Catalogue</span>
+            <span>→</span>
+          </button>
+        </div>
+
+        <div class="bo-card-body">
+          <div class="bo-product-cards-grid">
+            ${products
+              .map(
+                (p) => `
+              <div class="bo-item-card">
+                <div class="bo-item-top">
+                  <div class="bo-item-img-box">
+                    <img src="${p.bottleImage}" alt="${p.name}" class="bo-item-img" />
+                  </div>
+                  <div class="bo-item-info">
+                    <div class="bo-item-category" style="color: ${p.accentColor};">${p.category || 'Collection Officielle'}</div>
+                    <h3 class="bo-item-name">${p.name}</h3>
+                    <p class="bo-item-desc">${p.subtitle}</p>
+                    <div class="bo-item-badges">
+                      <span class="bo-badge-pill" style="border-color: ${p.accentColor}; color: ${p.accentColor};">
+                        ${p.badges[0] || '100% Naturel'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bo-item-footer">
+                  <span class="bo-item-formats-count">
+                    ${(p.formats || []).length} formats disponibles
+                  </span>
+                  <button type="button" class="bo-btn-edit" data-edit-product="${p.id}">
+                    ${BO_ICONS.edit}
+                    <span>Modifier</span>
+                  </button>
+                </div>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
         </div>
       </div>
 
-      <!-- System Status Banner -->
-      <div class="bo-card" style="background: linear-gradient(135deg, rgba(88, 168, 38, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%); border-color: rgba(88, 168, 38, 0.3);">
-        <h3 style="font-size: 16px; font-weight: 800; color: #7FE54A; margin-bottom: 6px;">
-          ✓ Synchronisation Instantanée & Sauvegarde Continue
-        </h3>
-        <p style="font-size: 13px; color: var(--bo-text-muted); line-height: 1.6; max-width: 780px;">
-          Toutes les modifications enregistrées dans cette interface sont automatiquement mémorisées dans le stockage local persistant de votre navigateur et diffusées en temps réel sur l'ensemble des pages publiques du site ([Accueil](/), [L'Entreprise](/entreprise), [Nos Saveurs](/saveurs), [Points de Vente](/points-de-vente), etc.). Vous pouvez exporter une sauvegarde JSON à tout moment en cliquant sur <strong>« Exporter Backup »</strong> dans la barre supérieure.
-        </p>
+      <!-- Sync Status Banner -->
+      <div class="bo-card" style="border-left: 4px solid var(--bo-brand-green); background: var(--bo-surface-subtle);">
+        <div class="bo-card-body" style="display: flex; align-items: flex-start; gap: 16px;">
+          <div class="bo-card-icon" style="background: var(--bo-brand-green); color: #FFFFFF; flex-shrink: 0;">
+            ${BO_ICONS.check}
+          </div>
+          <div>
+            <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--bo-forest); margin: 0 0 4px 0;">
+              Synchronisation Instantanée & Sauvegarde Continue
+            </h3>
+            <p style="font-size: 13.5px; color: var(--bo-text-secondary); line-height: 1.6; margin: 0;">
+              Chaque mise à jour appliquée dans ce panneau d'administration est mémorisée localement et diffusée en direct sur l'ensemble des pages publiques du site (Accueil, Nos Saveurs, Pages Marques, Points de Vente, Galerie, etc.). Vous pouvez exporter une sauvegarde intégrale à tout moment via le bouton <strong>« Exporter Backup »</strong> dans l'en-tête supérieur.
+            </p>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -369,12 +476,13 @@ export class BackofficePage {
     return `
       <div class="bo-page-header">
         <div class="bo-page-title-group">
-          <h1>Catalogue des Saveurs & Produits</h1>
-          <p class="bo-page-subtitle">Modifiez les nectars existants ou créez une nouvelle recette pour la collection</p>
+          <h1>Catalogue des Saveurs & Nectars</h1>
+          <p class="bo-page-subtitle">Éditez les recettes, modifiez les visuels de bouteille ou ajoutez une nouvelle référence</p>
         </div>
         <div class="bo-page-actions">
           <button type="button" class="bo-btn-primary" id="boAddNewProductBtn">
-            <span>+ Créer une Nouvelle Saveur</span>
+            ${BO_ICONS.plus}
+            <span>Créer une Nouvelle Saveur</span>
           </button>
         </div>
       </div>
@@ -389,32 +497,33 @@ export class BackofficePage {
                 <img src="${p.bottleImage}" alt="${p.name}" class="bo-item-img" />
               </div>
               <div class="bo-item-info">
-                <div class="bo-item-badge" style="color: ${p.accentColor};">${p.category || 'Collection'}</div>
+                <div class="bo-item-category" style="color: ${p.accentColor};">${p.category || 'Collection Officielle'}</div>
                 <h3 class="bo-item-name">${p.name}</h3>
                 <p class="bo-item-desc">${p.subtitle}</p>
-                <div style="font-size: 11px; color: var(--bo-text-dim); margin-top: 4px;">
-                  Route : /saveurs/${p.id}
+                <div style="font-size: 11.5px; font-weight: 600; color: var(--bo-text-muted);">
+                  Page dédiée : <code>/saveurs/${p.id}</code>
                 </div>
               </div>
             </div>
 
-            <p style="font-size: 12px; color: var(--bo-text-muted); line-height: 1.5; margin-bottom: 12px;">
-              ${p.description.slice(0, 120)}...
+            <p style="font-size: 12.5px; color: var(--bo-text-secondary); line-height: 1.5; margin: 0 0 14px 0;">
+              ${p.description.slice(0, 115)}...
             </p>
 
             <div class="bo-item-footer">
               <span style="font-size: 12px; font-weight: 800; color: ${p.accentColor};">
                 ${p.badges[0] || '100% Naturel'}
               </span>
-              <div class="bo-item-actions">
-                <a href="/saveurs/${p.id}" class="bo-btn-secondary" style="padding: 6px 10px; font-size: 12px;" title="Prévisualiser la page dédiée" target="_blank">
-                  👁️
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="/saveurs/${p.id}" class="bo-btn-icon" title="Prévisualiser la page officielle de cette saveur" target="_blank">
+                  ${BO_ICONS.eye}
                 </a>
                 <button type="button" class="bo-btn-edit" data-edit-product="${p.id}">
-                  Modifier
+                  ${BO_ICONS.edit}
+                  <span>Modifier</span>
                 </button>
-                <button type="button" class="bo-btn-delete" data-delete-product="${p.id}" title="Supprimer la saveur">
-                  ✕
+                <button type="button" class="bo-btn-icon" data-delete-product="${p.id}" title="Supprimer cette saveur" style="color: var(--bo-red);">
+                  ${BO_ICONS.trash}
                 </button>
               </div>
             </div>
@@ -439,195 +548,234 @@ export class BackofficePage {
       <div class="bo-page-header">
         <div class="bo-page-title-group">
           <h1>Édition des Pages & Textes Éditoriaux</h1>
-          <p class="bo-page-subtitle">Personnalisez les messages institutionnels, le héros d'accueil et les engagements</p>
+          <p class="bo-page-subtitle">Personnalisez les messages d'accueil, l'histoire institutionnelle et les engagements</p>
         </div>
       </div>
 
       <!-- Card 1: Section Hero Accueil -->
       <div class="bo-card">
         <div class="bo-card-header">
-          <h2 class="bo-card-title">🏠 Section Héro d'Accueil (Page Principale)</h2>
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon">${BO_ICONS.fileText}</div>
+            <div>
+              <h2 class="bo-card-title">Section Héro d'Accueil (Page Principale)</h2>
+              <p class="bo-card-subtitle">Titres principaux, accroche et badges de réassurance visibles à l'arrivée sur le site</p>
+            </div>
+          </div>
         </div>
-        <form id="boHeroForm" class="bo-form">
-          <div class="bo-form-grid-2">
-            <div class="bo-form-group">
-              <label class="bo-label">Mot 1 du Grand Titre (Vert)</label>
-              <input type="text" id="heroWord1" class="bo-input" value="${hero.titleWord1}" required />
+        <div class="bo-card-body">
+          <form id="boHeroForm">
+            <div class="bo-form-grid-2">
+              <div class="bo-form-group">
+                <label class="bo-label">Mot 1 du Grand Titre (Vert Brand)</label>
+                <input type="text" id="heroWord1" class="bo-input" value="${hero.titleWord1}" required />
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Mot 2 du Grand Titre (Dynamique)</label>
+                <input type="text" id="heroWord2" class="bo-input" value="${hero.titleWord2}" required />
+              </div>
             </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Mot 2 du Grand Titre (Dynamique par Saveur)</label>
-              <input type="text" id="heroWord2" class="bo-input" value="${hero.titleWord2}" required />
-            </div>
-          </div>
 
-          <div class="bo-form-group">
-            <label class="bo-label">Sous-titre Héro</label>
-            <input type="text" id="heroSubtitle" class="bo-input" value="${hero.subtitle}" required />
-          </div>
-
-          <div class="bo-form-group">
-            <label class="bo-label">Description d'Accroche</label>
-            <textarea id="heroDescription" class="bo-textarea" required>${hero.description}</textarea>
-          </div>
-
-          <div class="bo-form-grid-3">
             <div class="bo-form-group">
-              <label class="bo-label">Badge 1 de Réassurance</label>
-              <input type="text" id="heroBadge1" class="bo-input" value="${hero.badge1}" required />
+              <label class="bo-label">Sous-titre Héro</label>
+              <input type="text" id="heroSubtitle" class="bo-input" value="${hero.subtitle}" required />
             </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Badge 2 de Réassurance</label>
-              <input type="text" id="heroBadge2" class="bo-input" value="${hero.badge2}" required />
-            </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Badge 3 de Réassurance</label>
-              <input type="text" id="heroBadge3" class="bo-input" value="${hero.badge3}" required />
-            </div>
-          </div>
 
-          <div style="display: flex; justify-content: flex-end;">
-            <button type="submit" class="bo-btn-primary">
-              <span>Enregistrer le Héro</span>
-            </button>
-          </div>
-        </form>
+            <div class="bo-form-group">
+              <label class="bo-label">Description d'Accroche</label>
+              <textarea id="heroDescription" class="bo-textarea" required>${hero.description}</textarea>
+            </div>
+
+            <div class="bo-form-grid-3">
+              <div class="bo-form-group">
+                <label class="bo-label">Badge 1 de Réassurance</label>
+                <input type="text" id="heroBadge1" class="bo-input" value="${hero.badge1}" required />
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Badge 2 de Réassurance</label>
+                <input type="text" id="heroBadge2" class="bo-input" value="${hero.badge2}" required />
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Badge 3 de Réassurance</label>
+                <input type="text" id="heroBadge3" class="bo-input" value="${hero.badge3}" required />
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="bo-btn-primary">
+                ${BO_ICONS.check}
+                <span>Enregistrer le Héro</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- Card 2: Page L'Entreprise -->
       <div class="bo-card">
         <div class="bo-card-header">
-          <h2 class="bo-card-title">🏢 Page L'Entreprise & Histoire (/entreprise)</h2>
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon">${BO_ICONS.layers}</div>
+            <div>
+              <h2 class="bo-card-title">Page L'Entreprise & Savoir-Faire (/entreprise)</h2>
+              <p class="bo-card-subtitle">Présentation de la Société Nidjeu, vision et chiffres clés</p>
+            </div>
+          </div>
         </div>
-        <form id="boCompanyForm" class="bo-form">
-          <div class="bo-form-group">
-            <label class="bo-label">Titre Principal de Présentation</label>
-            <input type="text" id="companyLeadTitle" class="bo-input" value="${company.leadTitle}" required />
-          </div>
-
-          <div class="bo-form-group">
-            <label class="bo-label">Texte de Présentation Société Nidjeu</label>
-            <textarea id="companyLeadDesc" class="bo-textarea" required>${company.leadDesc}</textarea>
-          </div>
-
-          <div class="bo-form-grid-2">
+        <div class="bo-card-body">
+          <form id="boCompanyForm">
             <div class="bo-form-group">
-              <label class="bo-label">Titre Savoir-Faire</label>
-              <input type="text" id="companySavoirTitle" class="bo-input" value="${company.savoirFaireTitle}" required />
+              <label class="bo-label">Titre Principal de Présentation</label>
+              <input type="text" id="companyLeadTitle" class="bo-input" value="${company.leadTitle}" required />
             </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Titre Vision</label>
-              <input type="text" id="companyVisionTitle" class="bo-input" value="${company.visionTitle}" required />
-            </div>
-          </div>
 
-          <div class="bo-form-grid-2">
             <div class="bo-form-group">
-              <label class="bo-label">Description Savoir-Faire</label>
-              <textarea id="companySavoirDesc" class="bo-textarea" required>${company.savoirFaireDesc}</textarea>
+              <label class="bo-label">Texte de Présentation Société Nidjeu</label>
+              <textarea id="companyLeadDesc" class="bo-textarea" required>${company.leadDesc}</textarea>
             </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Description Vision</label>
-              <textarea id="companyVisionDesc" class="bo-textarea" required>${company.visionDesc}</textarea>
-            </div>
-          </div>
 
-          <!-- 4 Stats -->
-          <div class="bo-form-grid-2" style="margin-top: 10px;">
-            <div class="bo-form-group">
-              <label class="bo-label">Métrique 1 (Nombre & Titre)</label>
-              <div style="display: flex; gap: 8px;">
-                <input type="text" id="stat1Num" class="bo-input" style="max-width: 100px;" value="${company.stat1Num}" />
-                <input type="text" id="stat1Label" class="bo-input" value="${company.stat1Label}" />
+            <div class="bo-form-grid-2">
+              <div class="bo-form-group">
+                <label class="bo-label">Titre Savoir-Faire</label>
+                <input type="text" id="companySavoirTitle" class="bo-input" value="${company.savoirFaireTitle}" required />
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Titre Vision</label>
+                <input type="text" id="companyVisionTitle" class="bo-input" value="${company.visionTitle}" required />
               </div>
             </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Métrique 2 (Nombre & Titre)</label>
-              <div style="display: flex; gap: 8px;">
-                <input type="text" id="stat2Num" class="bo-input" style="max-width: 100px;" value="${company.stat2Num}" />
-                <input type="text" id="stat2Label" class="bo-input" value="${company.stat2Label}" />
+
+            <div class="bo-form-grid-2">
+              <div class="bo-form-group">
+                <label class="bo-label">Description Savoir-Faire</label>
+                <textarea id="companySavoirDesc" class="bo-textarea" required>${company.savoirFaireDesc}</textarea>
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Description Vision</label>
+                <textarea id="companyVisionDesc" class="bo-textarea" required>${company.visionDesc}</textarea>
               </div>
             </div>
-          </div>
 
-          <div style="display: flex; justify-content: flex-end;">
-            <button type="submit" class="bo-btn-primary">
-              <span>Enregistrer Page Entreprise</span>
-            </button>
-          </div>
-        </form>
+            <!-- Stats -->
+            <div class="bo-form-grid-2" style="margin-top: 10px;">
+              <div class="bo-form-group">
+                <label class="bo-label">Métrique 1 (Chiffre & Label)</label>
+                <div style="display: flex; gap: 10px;">
+                  <input type="text" id="stat1Num" class="bo-input" style="max-width: 110px;" value="${company.stat1Num}" />
+                  <input type="text" id="stat1Label" class="bo-input" value="${company.stat1Label}" />
+                </div>
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Métrique 2 (Chiffre & Label)</label>
+                <div style="display: flex; gap: 10px;">
+                  <input type="text" id="stat2Num" class="bo-input" style="max-width: 110px;" value="${company.stat2Num}" />
+                  <input type="text" id="stat2Label" class="bo-input" value="${company.stat2Label}" />
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="bo-btn-primary">
+                ${BO_ICONS.check}
+                <span>Enregistrer la Page Entreprise</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- Card 3: Engagements RSE -->
       <div class="bo-card">
         <div class="bo-card-header">
-          <h2 class="bo-card-title">🌱 Engagements RSE & Durabilité (/engagements)</h2>
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon">${BO_ICONS.check}</div>
+            <div>
+              <h2 class="bo-card-title">Engagements RSE & Durabilité (/engagements)</h2>
+              <p class="bo-card-subtitle">Soutien aux filières locales camerounaises et éco-responsabilité</p>
+            </div>
+          </div>
         </div>
-        <form id="boEngagementsForm" class="bo-form">
-          <div class="bo-form-grid-2">
-            <div class="bo-form-group">
-              <label class="bo-label">Titre Héro Engagements</label>
-              <input type="text" id="rseHeroTitle" class="bo-input" value="${engagements.heroTitle}" required />
+        <div class="bo-card-body">
+          <form id="boEngagementsForm">
+            <div class="bo-form-grid-2">
+              <div class="bo-form-group">
+                <label class="bo-label">Titre Héro Engagements</label>
+                <input type="text" id="rseHeroTitle" class="bo-input" value="${engagements.heroTitle}" required />
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Sous-Titre</label>
+                <input type="text" id="rseHeroSubtitle" class="bo-input" value="${engagements.heroSubtitle}" required />
+              </div>
             </div>
+
             <div class="bo-form-group">
-              <label class="bo-label">Sous-Titre</label>
-              <input type="text" id="rseHeroSubtitle" class="bo-input" value="${engagements.heroSubtitle}" required />
+              <label class="bo-label">Soutien aux Coopératives Agricoles (Filières)</label>
+              <textarea id="rseFilieresDesc" class="bo-textarea" required>${engagements.filieresDesc}</textarea>
             </div>
-          </div>
 
-          <div class="bo-form-group">
-            <label class="bo-label">Soutien aux Coopératives Agricoles (Filières)</label>
-            <textarea id="rseFilieresDesc" class="bo-textarea" required>${engagements.filieresDesc}</textarea>
-          </div>
+            <div class="bo-form-group">
+              <label class="bo-label">Éco-responsabilité & Emballages Recyclables</label>
+              <textarea id="rseEcoDesc" class="bo-textarea" required>${engagements.ecoDesc}</textarea>
+            </div>
 
-          <div class="bo-form-group">
-            <label class="bo-label">Éco-responsabilité & Emballages Recyclables</label>
-            <textarea id="rseEcoDesc" class="bo-textarea" required>${engagements.ecoDesc}</textarea>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end;">
-            <button type="submit" class="bo-btn-primary">
-              <span>Enregistrer Engagements RSE</span>
-            </button>
-          </div>
-        </form>
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="bo-btn-primary">
+                ${BO_ICONS.check}
+                <span>Enregistrer les Engagements RSE</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- Card 4: Questions Fréquentes (FAQ) -->
       <div class="bo-card">
         <div class="bo-card-header">
-          <h2 class="bo-card-title">❓ Foire Aux Questions (FAQ)</h2>
-          <button type="button" class="bo-btn-secondary" id="boAddNewFaqBtn">
-            <span>+ Ajouter une Question</span>
-          </button>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 14px;" id="boFaqList">
-          ${faqs
-            .map(
-              (faq, idx) => `
-            <div class="bo-item-card" style="padding: 16px;">
-              <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
-                <input 
-                  type="text" 
-                  class="bo-input bo-faq-q" 
-                  data-idx="${idx}" 
-                  value="${faq.question}" 
-                  style="font-weight: 800;"
-                  placeholder="Question..."
-                />
-                <button type="button" class="bo-btn-delete bo-delete-faq-btn" data-idx="${idx}">✕</button>
-              </div>
-              <textarea class="bo-textarea bo-faq-a" data-idx="${idx}" placeholder="Réponse...">${faq.answer}</textarea>
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon">${BO_ICONS.fileText}</div>
+            <div>
+              <h2 class="bo-card-title">Foire Aux Questions (FAQ)</h2>
+              <p class="bo-card-subtitle">Gérez les questions et réponses interactives pour les consommateurs</p>
             </div>
-          `
-            )
-            .join('')}
+          </div>
+          <button type="button" class="bo-btn-secondary" id="boAddNewFaqBtn">
+            ${BO_ICONS.plus}
+            <span>Ajouter une Question</span>
+          </button>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
-          <button type="button" class="bo-btn-primary" id="boSaveFaqsBtn">
-            <span>Enregistrer la FAQ</span>
-          </button>
+        <div class="bo-card-body">
+          <div style="display: flex; flex-direction: column; gap: 16px;" id="boFaqList">
+            ${faqs
+              .map(
+                (faq, idx) => `
+              <div class="bo-item-card" style="padding: 18px;">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px;">
+                  <input 
+                    type="text" 
+                    class="bo-input bo-faq-q" 
+                    data-idx="${idx}" 
+                    value="${faq.question}" 
+                    style="font-weight: 700; color: var(--bo-forest);"
+                    placeholder="Intitulé de la question..."
+                  />
+                  <button type="button" class="bo-btn-icon bo-delete-faq-btn" data-idx="${idx}" title="Supprimer" style="color: var(--bo-red);">
+                    ${BO_ICONS.trash}
+                  </button>
+                </div>
+                <textarea class="bo-textarea bo-faq-a" data-idx="${idx}" placeholder="Réponse détaillée...">${faq.answer}</textarea>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+            <button type="button" class="bo-btn-primary" id="boSaveFaqsBtn">
+              ${BO_ICONS.check}
+              <span>Enregistrer la FAQ</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -643,11 +791,12 @@ export class BackofficePage {
       <div class="bo-page-header">
         <div class="bo-page-title-group">
           <h1>Galerie & Événements Officiels</h1>
-          <p class="bo-page-subtitle">Ajoutez ou modifiez les moments de dégustations, salons et photos consommateurs</p>
+          <p class="bo-page-subtitle">Ajoutez ou modifiez les moments de dégustations, salons gastronomiques et photos consommateurs</p>
         </div>
         <div class="bo-page-actions">
           <button type="button" class="bo-btn-primary" id="boAddNewGalleryBtn">
-            <span>+ Ajouter une Photo / Moment</span>
+            ${BO_ICONS.plus}
+            <span>Ajouter une Photo</span>
           </button>
         </div>
       </div>
@@ -657,27 +806,26 @@ export class BackofficePage {
           .map(
             (item) => `
           <div class="bo-item-card">
-            <div style="position: relative; height: 160px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 12px; background: #000;">
+            <div style="position: relative; height: 170px; border-radius: var(--bo-radius-md); overflow: hidden; margin-bottom: 14px; background: var(--bo-surface-subtle);">
               <img src="${item.image}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;" />
-              <span style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); font-size: 10px; font-weight: 800; color: #fff; padding: 2px 8px; border-radius: 999px;">
+              <span style="position: absolute; top: 10px; left: 10px; background: rgba(10, 61, 34, 0.85); backdrop-filter: blur(4px); font-size: 11px; font-weight: 700; color: #FFFFFF; padding: 3px 10px; border-radius: var(--bo-radius-pill);">
                 ${item.city} • ${item.date}
               </span>
             </div>
 
-            <h3 class="bo-item-name" style="font-size: 14.5px;">${item.title}</h3>
-            <div style="font-size: 11px; font-weight: 700; color: var(--bo-green); margin-bottom: 6px;">
-              ${item.categoryLabel}
-            </div>
+            <div class="bo-item-category">${item.categoryLabel}</div>
+            <h3 class="bo-item-name" style="font-size: 16px;">${item.title}</h3>
             <p class="bo-item-desc" style="margin-bottom: 14px;">${item.description}</p>
 
             <div class="bo-item-footer">
-              <span style="font-size: 11px; color: var(--bo-text-dim);">${item.badge || 'Moments #NidjJuice'}</span>
-              <div class="bo-item-actions">
+              <span class="bo-badge-pill">${item.badge || 'Moment #NidjJuice'}</span>
+              <div style="display: flex; gap: 8px;">
                 <button type="button" class="bo-btn-edit" data-edit-gallery="${item.id}">
-                  Modifier
+                  ${BO_ICONS.edit}
+                  <span>Modifier</span>
                 </button>
-                <button type="button" class="bo-btn-delete" data-delete-gallery="${item.id}">
-                  ✕
+                <button type="button" class="bo-btn-icon" data-delete-gallery="${item.id}" title="Supprimer cette photo" style="color: var(--bo-red);">
+                  ${BO_ICONS.trash}
                 </button>
               </div>
             </div>
@@ -699,11 +847,12 @@ export class BackofficePage {
       <div class="bo-page-header">
         <div class="bo-page-title-group">
           <h1>Vidéos & Reels Communauté</h1>
-          <p class="bo-page-subtitle">Gérez les vidéos courtes d'immersion, de fabrication et de dégustation</p>
+          <p class="bo-page-subtitle">Gérez les vidéos courtes d'immersion, de fabrication artisanale et de dégustation</p>
         </div>
         <div class="bo-page-actions">
           <button type="button" class="bo-btn-primary" id="boAddNewReelBtn">
-            <span>+ Ajouter une Vidéo Reel</span>
+            ${BO_ICONS.plus}
+            <span>Ajouter une Vidéo Reel</span>
           </button>
         </div>
       </div>
@@ -713,27 +862,25 @@ export class BackofficePage {
           .map(
             (r) => `
           <div class="bo-item-card">
-            <div style="position: relative; height: 220px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 12px; background: #000; display: flex; align-items: center; justify-content: center;">
+            <div style="position: relative; height: 210px; border-radius: var(--bo-radius-md); overflow: hidden; margin-bottom: 14px; background: #000; display: flex; align-items: center; justify-content: center;">
               <video src="${r.src}" style="width: 100%; height: 100%; object-fit: cover;" muted preload="metadata"></video>
-              <span style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); font-size: 10px; font-weight: 800; color: #7FE54A; padding: 2px 8px; border-radius: 999px;">
-                ${r.tag || 'Reel Officiel'}
+              <span style="position: absolute; top: 10px; left: 10px; background: rgba(10, 61, 34, 0.85); backdrop-filter: blur(4px); font-size: 11px; font-weight: 700; color: #FFFFFF; padding: 3px 10px; border-radius: var(--bo-radius-pill);">
+                ${r.tag || 'Reel Vidéo'}
               </span>
-              <div style="position: absolute; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff;">
-                ▶
-              </div>
             </div>
 
-            <h3 class="bo-item-name">${r.title}</h3>
+            <h3 class="bo-item-name" style="font-size: 16px;">${r.title}</h3>
             <p class="bo-item-desc" style="margin-bottom: 14px;">${r.caption}</p>
 
             <div class="bo-item-footer">
-              <span style="font-size: 11px; color: var(--bo-text-dim);">${r.src}</span>
-              <div class="bo-item-actions">
+              <span style="font-size: 11.5px; color: var(--bo-text-muted); font-family: monospace;">${r.src}</span>
+              <div style="display: flex; gap: 8px;">
                 <button type="button" class="bo-btn-edit" data-edit-reel="${r.id}">
-                  Modifier
+                  ${BO_ICONS.edit}
+                  <span>Modifier</span>
                 </button>
-                <button type="button" class="bo-btn-delete" data-delete-reel="${r.id}">
-                  ✕
+                <button type="button" class="bo-btn-icon" data-delete-reel="${r.id}" title="Supprimer ce reel" style="color: var(--bo-red);">
+                  ${BO_ICONS.trash}
                 </button>
               </div>
             </div>
@@ -755,11 +902,12 @@ export class BackofficePage {
       <div class="bo-page-header">
         <div class="bo-page-title-group">
           <h1>Réseau de Distribution & Points de Vente</h1>
-          <p class="bo-page-subtitle">Ajoutez ou modifiez les supermarchés, hypermarchés et boutiques au Cameroun</p>
+          <p class="bo-page-subtitle">Ajoutez ou modifiez les supermarchés, hypermarchés et lounges distributeurs au Cameroun</p>
         </div>
         <div class="bo-page-actions">
           <button type="button" class="bo-btn-primary" id="boAddNewStoreBtn">
-            <span>+ Ajouter un Point de Vente</span>
+            ${BO_ICONS.plus}
+            <span>Ajouter un Point de Vente</span>
           </button>
         </div>
       </div>
@@ -768,40 +916,41 @@ export class BackofficePage {
         <div style="overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
             <thead>
-              <tr style="border-bottom: 1px solid var(--bo-border); color: var(--bo-text-muted); font-size: 12px; text-transform: uppercase;">
-                <th style="padding: 12px 16px;">Enseigne / Nom</th>
-                <th style="padding: 12px 16px;">Ville</th>
-                <th style="padding: 12px 16px;">Quartier</th>
-                <th style="padding: 12px 16px;">Type</th>
-                <th style="padding: 12px 16px;">Téléphone</th>
-                <th style="padding: 12px 16px;">Horaires</th>
-                <th style="padding: 12px 16px; text-align: right;">Actions</th>
+              <tr style="border-bottom: 1px solid var(--bo-border); color: var(--bo-text-muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; background: var(--bo-surface-subtle);">
+                <th style="padding: 14px 20px;">Enseigne / Nom</th>
+                <th style="padding: 14px 16px;">Ville</th>
+                <th style="padding: 14px 16px;">Quartier</th>
+                <th style="padding: 14px 16px;">Type</th>
+                <th style="padding: 14px 16px;">Téléphone</th>
+                <th style="padding: 14px 16px;">Horaires</th>
+                <th style="padding: 14px 20px; text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
               ${stores
                 .map(
                   (s) => `
-                <tr style="border-bottom: 1px solid var(--bo-border);">
-                  <td style="padding: 14px 16px; font-weight: 800; color: #FFFFFF;">
+                <tr style="border-bottom: 1px solid var(--bo-border); transition: background 0.15s ease;">
+                  <td style="padding: 14px 20px; font-weight: 700; color: var(--bo-forest);">
                     ${s.name}
-                    <div style="font-size: 11.5px; font-weight: 400; color: var(--bo-text-dim);">${s.address}</div>
+                    <div style="font-size: 11.5px; font-weight: 400; color: var(--bo-text-muted);">${s.address}</div>
                   </td>
-                  <td style="padding: 14px 16px; font-weight: 700; color: var(--bo-green);">${s.city}</td>
-                  <td style="padding: 14px 16px; color: var(--bo-text-muted);">${s.neighborhood}</td>
+                  <td style="padding: 14px 16px; font-weight: 700; color: var(--bo-brand-green);">${s.city}</td>
+                  <td style="padding: 14px 16px; color: var(--bo-text-secondary);">${s.neighborhood}</td>
                   <td style="padding: 14px 16px;">
-                    <span style="background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 999px; font-size: 11px;">
+                    <span class="bo-badge-pill">
                       ${s.type}
                     </span>
                   </td>
-                  <td style="padding: 14px 16px; color: var(--bo-text-muted);">${s.phone}</td>
-                  <td style="padding: 14px 16px; color: var(--bo-text-dim);">${s.openingHours}</td>
-                  <td style="padding: 14px 16px; text-align: right;">
+                  <td style="padding: 14px 16px; color: var(--bo-text-secondary); font-weight: 600;">${s.phone}</td>
+                  <td style="padding: 14px 16px; color: var(--bo-text-muted); font-size: 12.5px;">${s.openingHours}</td>
+                  <td style="padding: 14px 20px; text-align: right;">
                     <button type="button" class="bo-btn-edit" data-edit-store="${s.id}" style="margin-right: 6px;">
-                      Modifier
+                      ${BO_ICONS.edit}
+                      <span>Modifier</span>
                     </button>
-                    <button type="button" class="bo-btn-delete" data-delete-store="${s.id}">
-                      ✕
+                    <button type="button" class="bo-btn-icon" data-delete-store="${s.id}" title="Supprimer" style="color: var(--bo-red); display: inline-flex;">
+                      ${BO_ICONS.trash}
                     </button>
                   </td>
                 </tr>
@@ -825,78 +974,102 @@ export class BackofficePage {
       <div class="bo-page-header">
         <div class="bo-page-title-group">
           <h1>Paramètres Généraux, Hotline & SEO</h1>
-          <p class="bo-page-subtitle">Configurez le contact WhatsApp officiel, les coordonnées et le référencement</p>
+          <p class="bo-page-subtitle">Configurez le contact WhatsApp officiel de commande, les coordonnées et le référencement</p>
         </div>
       </div>
 
       <div class="bo-card">
-        <form id="boSettingsForm" class="bo-form">
-          <div class="bo-card-header">
-            <h2 class="bo-card-title">📞 Coordonnées Officielles & Hotline WhatsApp</h2>
-          </div>
-
-          <div class="bo-form-grid-2">
-            <div class="bo-form-group">
-              <label class="bo-label">Numéro WhatsApp (Format international sans '+')</label>
-              <input type="text" id="cfgWhatsapp" class="bo-input" value="${settings.whatsappNumber}" required />
-              <span style="font-size: 11.5px; color: var(--bo-text-dim);">Exemple: 237677426612 (utilisé pour les boutons direct wa.me)</span>
-            </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Téléphone Affiché publiquement</label>
-              <input type="text" id="cfgPhone" class="bo-input" value="${settings.phoneDisplay}" required />
+        <div class="bo-card-header">
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon">${BO_ICONS.phone}</div>
+            <div>
+              <h2 class="bo-card-title">Coordonnées Officielles & Hotline WhatsApp Directe</h2>
+              <p class="bo-card-subtitle">Numéro utilisé pour la redirection instantanée sur les boutons de commande</p>
             </div>
           </div>
+        </div>
 
-          <div class="bo-form-grid-2">
-            <div class="bo-form-group">
-              <label class="bo-label">Courriel de Contact Officiel</label>
-              <input type="email" id="cfgEmail" class="bo-input" value="${settings.email}" required />
+        <div class="bo-card-body">
+          <form id="boSettingsForm">
+            <div class="bo-form-grid-2">
+              <div class="bo-form-group">
+                <label class="bo-label">
+                  <span>Numéro WhatsApp Direct</span>
+                  <span class="bo-label-hint">Format international sans '+'</span>
+                </label>
+                <input type="text" id="cfgWhatsapp" class="bo-input" value="${settings.whatsappNumber}" required />
+                <span style="font-size: 11.5px; color: var(--bo-text-muted); margin-top: 4px; display: block;">
+                  Ex: <code>237698663029</code> — Modifie instantanément le bouton de commande sur tout le site.
+                </span>
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Téléphone Affiché (Présentation publique)</label>
+                <input type="text" id="cfgPhone" class="bo-input" value="${settings.phoneDisplay}" required />
+              </div>
             </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Siège Social & Ville</label>
-              <input type="text" id="cfgHeadquarters" class="bo-input" value="${settings.headquarters}" required />
+
+            <div class="bo-form-grid-2">
+              <div class="bo-form-group">
+                <label class="bo-label">Courriel de Contact Officiel</label>
+                <input type="email" id="cfgEmail" class="bo-input" value="${settings.email}" required />
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Siège Social & Ville</label>
+                <input type="text" id="cfgHeadquarters" class="bo-input" value="${settings.headquarters}" required />
+              </div>
             </div>
-          </div>
 
-          <div class="bo-card-header" style="margin-top: 14px;">
-            <h2 class="bo-card-title">🌐 Réseaux Sociaux & Liens Externes</h2>
-          </div>
-
-          <div class="bo-form-grid-3">
-            <div class="bo-form-group">
-              <label class="bo-label">Page Facebook</label>
-              <input type="url" id="cfgFacebook" class="bo-input" value="${settings.facebookUrl}" />
+            <div style="margin: 24px 0 16px 0; border-top: 1px solid var(--bo-border); padding-top: 20px;">
+              <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--bo-forest); margin: 0 0 4px 0;">
+                Réseaux Sociaux Officiels
+              </h3>
+              <p style="font-size: 12.5px; color: var(--bo-text-muted); margin: 0 0 16px 0;">
+                Liens connectés aux icônes du pied de page et des bannières
+              </p>
             </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Profil Instagram</label>
-              <input type="url" id="cfgInstagram" class="bo-input" value="${settings.instagramUrl}" />
+
+            <div class="bo-form-grid-3">
+              <div class="bo-form-group">
+                <label class="bo-label">Page Facebook</label>
+                <input type="url" id="cfgFacebook" class="bo-input" value="${settings.facebookUrl}" />
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Profil Instagram</label>
+                <input type="url" id="cfgInstagram" class="bo-input" value="${settings.instagramUrl}" />
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Page LinkedIn</label>
+                <input type="url" id="cfgLinkedin" class="bo-input" value="${settings.linkedinUrl}" />
+              </div>
             </div>
-            <div class="bo-form-group">
-              <label class="bo-label">Page LinkedIn</label>
-              <input type="url" id="cfgLinkedin" class="bo-input" value="${settings.linkedinUrl}" />
+
+            <div style="margin: 24px 0 16px 0; border-top: 1px solid var(--bo-border); padding-top: 20px;">
+              <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--bo-forest); margin: 0 0 4px 0;">
+                Référencement Naturel & Métadonnées SEO
+              </h3>
+              <p style="font-size: 12.5px; color: var(--bo-text-muted); margin: 0 0 16px 0;">
+                Titre et description transmis aux moteurs de recherche (Google, Bing)
+              </p>
             </div>
-          </div>
 
-          <div class="bo-card-header" style="margin-top: 14px;">
-            <h2 class="bo-card-title">🔍 Métadonnées SEO Globales</h2>
-          </div>
+            <div class="bo-form-group">
+              <label class="bo-label">Balise Title Principale</label>
+              <input type="text" id="cfgMetaTitle" class="bo-input" value="${settings.seoMetaTitle}" required />
+            </div>
 
-          <div class="bo-form-group">
-            <label class="bo-label">Balise Title Principale</label>
-            <input type="text" id="cfgMetaTitle" class="bo-input" value="${settings.seoMetaTitle}" required />
-          </div>
+            <div class="bo-form-group">
+              <label class="bo-label">Meta Description Globale</label>
+              <textarea id="cfgMetaDesc" class="bo-textarea" required>${settings.seoMetaDesc}</textarea>
+            </div>
 
-          <div class="bo-form-group">
-            <label class="bo-label">Meta Description Globale</label>
-            <textarea id="cfgMetaDesc" class="bo-textarea" required>${settings.seoMetaDesc}</textarea>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-            <button type="submit" class="bo-btn-primary">
-              <span>Enregistrer les Paramètres</span>
-            </button>
-          </div>
-        </form>
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+              <button type="submit" class="bo-btn-primary">
+                ${BO_ICONS.check}
+                <span>Enregistrer les Paramètres</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     `;
   }
@@ -905,7 +1078,7 @@ export class BackofficePage {
   // 4. EVENT BINDINGS & INTERACTIONS
   // =========================================================================
   private bindEvents(): void {
-    // Initial bindings are handled inside renderDashboard / renderAuthGate
+    // Initial bindings handled inside renderDashboard / renderAuthGate
   }
 
   private bindDashboardEvents(): void {
@@ -964,7 +1137,7 @@ export class BackofficePage {
             this.showToast('Saveur supprimée avec succès', 'success');
             this.render();
           } else {
-            this.showToast('Impossible de supprimer le dernier produit restant', 'error');
+            this.showToast('Impossible de supprimer la dernière saveur restante', 'error');
           }
         }
       });
@@ -1201,7 +1374,7 @@ export class BackofficePage {
   }
 
   // =========================================================================
-  // 5. PRODUCT EDIT MODAL
+  // 5. PRODUCT EDIT MODAL (AGENCY STANDARD)
   // =========================================================================
   private openProductModal(productId: string | null): void {
     const isNew = !productId;
@@ -1243,127 +1416,136 @@ export class BackofficePage {
     if (!modalContainer) return;
 
     modalContainer.innerHTML = `
-      <div class="bo-modal-backdrop is-open" id="productModalBackdrop">
+      <div class="bo-modal-overlay">
         <div class="bo-modal">
           <div class="bo-modal-header">
-            <h3 class="bo-modal-title">${isNew ? 'Créer une Nouvelle Saveur' : `Modifier : ${p.name}`}</h3>
-            <button type="button" class="bo-modal-close-btn" id="closeProductModalBtn">✕</button>
+            <div class="bo-modal-title-group">
+              <h2>${isNew ? 'Créer une Nouvelle Saveur' : `Modifier la Saveur : ${p.name}`}</h2>
+              <p class="bo-modal-subtitle">Fiche produit officielle • Société Nidjeu</p>
+            </div>
+            <button type="button" class="bo-modal-close-btn" id="closeProductModalBtn" title="Fermer">
+              ${BO_ICONS.close}
+            </button>
           </div>
 
-          <form id="boProductEditForm" class="bo-modal-body">
-            
-            <!-- Identifiant & Noms -->
-            <div class="bo-form-grid-2">
-              <div class="bo-form-group">
-                <label class="bo-label">Identifiant Unique (Slug URL)</label>
-                <input type="text" id="pId" class="bo-input" value="${p.id}" ${!isNew ? 'readonly style="opacity:0.6;"' : ''} required />
-                <span style="font-size: 11px; color: var(--bo-text-dim);">Ex: pasteque-orange (détermine l'URL /saveurs/slug)</span>
-              </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Nom Officiel du Produit</label>
-                <input type="text" id="pName" class="bo-input" value="${p.name}" required />
-              </div>
-            </div>
-
-            <div class="bo-form-grid-2">
-              <div class="bo-form-group">
-                <label class="bo-label">Sous-titre / Composition</label>
-                <input type="text" id="pSubtitle" class="bo-input" value="${p.subtitle}" required />
-              </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Catégorie</label>
-                <input type="text" id="pCategory" class="bo-input" value="${p.category || 'Collection Officielle'}" required />
-              </div>
-            </div>
-
-            <!-- Image Uploader with Live Preview -->
-            <div class="bo-form-group">
-              <label class="bo-label">Image de la Bouteille</label>
-              <div class="bo-image-uploader-box">
-                <div class="bo-upload-preview">
-                  <img id="pImgPreview" src="${p.bottleImage}" alt="Prévisualisation" />
+          <form id="boProductEditForm">
+            <div class="bo-modal-body">
+              
+              <!-- Identifiant & Noms -->
+              <div class="bo-form-grid-2">
+                <div class="bo-form-group">
+                  <label class="bo-label">
+                    <span>Identifiant Unique (Slug URL)</span>
+                    <span class="bo-label-hint">Lettres minuscules & tirets</span>
+                  </label>
+                  <input type="text" id="pId" class="bo-input" value="${p.id}" ${!isNew ? 'readonly style="opacity:0.6;"' : ''} required />
                 </div>
-                <div class="bo-upload-controls">
-                  <input type="text" id="pImgUrl" class="bo-input" value="${p.bottleImage}" placeholder="URL ou chemin de l'image (/assets/...)" />
-                  <div style="display: flex; gap: 8px; align-items: center;">
-                    <label class="bo-btn-secondary" style="font-size: 12px; padding: 6px 12px; cursor: pointer;">
-                      <span>📷 Téléverser un fichier local</span>
-                      <input type="file" id="pImgFileInput" accept="image/*" class="bo-file-input" />
+                <div class="bo-form-group">
+                  <label class="bo-label">Nom Officiel du Produit</label>
+                  <input type="text" id="pName" class="bo-input" value="${p.name}" required />
+                </div>
+              </div>
+
+              <div class="bo-form-grid-2">
+                <div class="bo-form-group">
+                  <label class="bo-label">Sous-titre / Composition Clé</label>
+                  <input type="text" id="pSubtitle" class="bo-input" value="${p.subtitle}" required />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Catégorie de Marque</label>
+                  <input type="text" id="pCategory" class="bo-input" value="${p.category || 'Collection Officielle'}" required />
+                </div>
+              </div>
+
+              <!-- Image Uploader -->
+              <div class="bo-form-group">
+                <label class="bo-label">Visuel Officiel de la Bouteille</label>
+                <div style="display: flex; gap: 16px; align-items: center; background: var(--bo-surface-subtle); padding: 14px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 70px; height: 90px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 4px; flex-shrink: 0;">
+                    <img id="pImgPreview" src="${p.bottleImage}" alt="Prévisualisation" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                  </div>
+                  <div style="flex: 1;">
+                    <input type="text" id="pImgUrl" class="bo-input" value="${p.bottleImage}" placeholder="URL ou chemin de l'image (/assets/...)" style="margin-bottom: 8px;" />
+                    <label class="bo-btn-secondary" style="font-size: 12px; padding: 6px 12px; cursor: pointer; display: inline-flex;">
+                      ${BO_ICONS.camera}
+                      <span>Choisir un fichier image</span>
+                      <input type="file" id="pImgFileInput" accept="image/*" style="display: none;" />
                     </label>
-                    <span class="bo-upload-hint">PNG avec fond transparent recommandé</span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Colors & Branding -->
-            <div class="bo-form-grid-3">
-              <div class="bo-form-group">
-                <label class="bo-label">Couleur d'Accentuation</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <input type="color" id="pAccentColor" value="${p.accentColor.startsWith('#') ? p.accentColor : '#58A826'}" style="width: 44px; height: 38px; border: none; background: transparent; cursor: pointer;" />
-                  <input type="text" id="pAccentColorText" class="bo-input" value="${p.accentColor}" />
+              <!-- Colors & Branding -->
+              <div class="bo-form-grid-3">
+                <div class="bo-form-group">
+                  <label class="bo-label">Couleur d'Accentuation</label>
+                  <div class="bo-color-row">
+                    <input type="color" id="pAccentColor" value="${p.accentColor.startsWith('#') ? p.accentColor : '#58A826'}" style="width: 44px; height: 38px; border: none; background: transparent; cursor: pointer;" />
+                    <input type="text" id="pAccentColorText" class="bo-input" value="${p.accentColor}" />
+                  </div>
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Couleur de Halo</label>
+                  <input type="text" id="pHaloColor" class="bo-input" value="${p.haloColor || 'rgba(235, 247, 227, 0.75)'}" />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Origine & Terroir</label>
+                  <input type="text" id="pOrigin" class="bo-input" value="${p.origin || 'Cameroun'}" />
                 </div>
               </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Couleur de Halo</label>
-                <input type="text" id="pHaloColor" class="bo-input" value="${p.haloColor || 'rgba(255, 230, 235, 0.75)'}" />
-              </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Origine & Terroir</label>
-                <input type="text" id="pOrigin" class="bo-input" value="${p.origin || 'Cameroun'}" />
-              </div>
-            </div>
 
-            <!-- Editorial -->
-            <div class="bo-form-group">
-              <label class="bo-label">Citation Sensorielle</label>
-              <input type="text" id="pQuote" class="bo-input" value="${p.quote || ''}" />
-            </div>
-
-            <div class="bo-form-group">
-              <label class="bo-label">Description Détaillée</label>
-              <textarea id="pDesc" class="bo-textarea" required>${p.description}</textarea>
-            </div>
-
-            <div class="bo-form-group">
-              <label class="bo-label">Histoire de la Recette</label>
-              <textarea id="pRecipeStory" class="bo-textarea">${p.recipeStory || ''}</textarea>
-            </div>
-
-            <!-- Ingrédients & Formats -->
-            <div class="bo-form-grid-2">
+              <!-- Editorial -->
               <div class="bo-form-group">
-                <label class="bo-label">Ingrédients (1 par ligne)</label>
-                <textarea id="pIngredients" class="bo-textarea" rows="4">${(p.ingredients || []).join('\n')}</textarea>
+                <label class="bo-label">Citation Sensorielle / Accroche</label>
+                <input type="text" id="pQuote" class="bo-input" value="${p.quote || ''}" />
               </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Formats Disponibles (1 par ligne)</label>
-                <textarea id="pFormats" class="bo-textarea" rows="4">${(p.formats || []).join('\n')}</textarea>
-              </div>
-            </div>
 
-            <!-- Badges -->
-            <div class="bo-form-group">
-              <label class="bo-label">Badges Clés (séparés par des virgules)</label>
-              <input type="text" id="pBadges" class="bo-input" value="${(p.badges || []).join(', ')}" />
-            </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Description Détaillée</label>
+                <textarea id="pDesc" class="bo-textarea" required>${p.description}</textarea>
+              </div>
 
-            <!-- Nutrition -->
-            <div class="bo-form-grid-2">
               <div class="bo-form-group">
-                <label class="bo-label">Énergie (kcal)</label>
-                <input type="text" id="pNutEnergy" class="bo-input" value="${p.nutrition?.energy || '40 kcal / 100 ml'}" />
+                <label class="bo-label">Histoire de la Recette</label>
+                <textarea id="pRecipeStory" class="bo-textarea">${p.recipeStory || ''}</textarea>
               </div>
+
+              <!-- Ingrédients & Formats -->
+              <div class="bo-form-grid-2">
+                <div class="bo-form-group">
+                  <label class="bo-label">Ingrédients (1 par ligne)</label>
+                  <textarea id="pIngredients" class="bo-textarea" rows="4">${(p.ingredients || []).join('\n')}</textarea>
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Formats Disponibles (1 par ligne)</label>
+                  <textarea id="pFormats" class="bo-textarea" rows="4">${(p.formats || []).join('\n')}</textarea>
+                </div>
+              </div>
+
+              <!-- Badges -->
               <div class="bo-form-group">
-                <label class="bo-label">Sucres</label>
-                <input type="text" id="pNutSugars" class="bo-input" value="${p.nutrition?.sugars || 'Sucres naturels'}" />
+                <label class="bo-label">Badges Clés (séparés par des virgules)</label>
+                <input type="text" id="pBadges" class="bo-input" value="${(p.badges || []).join(', ')}" />
               </div>
+
+              <!-- Nutrition -->
+              <div class="bo-form-grid-2">
+                <div class="bo-form-group">
+                  <label class="bo-label">Énergie (kcal)</label>
+                  <input type="text" id="pNutEnergy" class="bo-input" value="${p.nutrition?.energy || '40 kcal / 100 ml'}" />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Sucres</label>
+                  <input type="text" id="pNutSugars" class="bo-input" value="${p.nutrition?.sugars || 'Sucres naturels'}" />
+                </div>
+              </div>
+
             </div>
 
             <div class="bo-modal-footer">
               <button type="button" class="bo-btn-secondary" id="cancelProductModalBtn">Annuler</button>
               <button type="submit" class="bo-btn-primary">
+                ${BO_ICONS.check}
                 <span>Enregistrer la Saveur</span>
               </button>
             </div>
@@ -1480,65 +1662,73 @@ export class BackofficePage {
     if (!modalContainer) return;
 
     modalContainer.innerHTML = `
-      <div class="bo-modal-backdrop is-open">
+      <div class="bo-modal-overlay">
         <div class="bo-modal" style="max-width: 600px;">
           <div class="bo-modal-header">
-            <h3 class="bo-modal-title">${isNew ? 'Ajouter un Point de Vente' : `Modifier : ${s.name}`}</h3>
-            <button type="button" class="bo-modal-close-btn" id="closeStoreModalBtn">✕</button>
+            <div class="bo-modal-title-group">
+              <h2>${isNew ? 'Ajouter un Point de Vente' : `Modifier : ${s.name}`}</h2>
+              <p class="bo-modal-subtitle">Réseau officiel de distribution au Cameroun</p>
+            </div>
+            <button type="button" class="bo-modal-close-btn" id="closeStoreModalBtn" title="Fermer">
+              ${BO_ICONS.close}
+            </button>
           </div>
 
-          <form id="boStoreEditForm" class="bo-modal-body">
-            <div class="bo-form-group">
-              <label class="bo-label">Nom de l'Enseigne / Point de Vente</label>
-              <input type="text" id="sName" class="bo-input" value="${s.name}" required />
-            </div>
-
-            <div class="bo-form-grid-2">
+          <form id="boStoreEditForm">
+            <div class="bo-modal-body">
               <div class="bo-form-group">
-                <label class="bo-label">Ville (Cameroun)</label>
-                <select id="sCity" class="bo-select">
-                  <option value="Douala" ${s.city === 'Douala' ? 'selected' : ''}>Douala</option>
-                  <option value="Yaoundé" ${s.city === 'Yaoundé' ? 'selected' : ''}>Yaoundé</option>
-                  <option value="Bafoussam" ${s.city === 'Bafoussam' ? 'selected' : ''}>Bafoussam</option>
-                  <option value="Kribi" ${s.city === 'Kribi' ? 'selected' : ''}>Kribi</option>
-                  <option value="Autre" ${!['Douala', 'Yaoundé', 'Bafoussam', 'Kribi'].includes(s.city) ? 'selected' : ''}>Autre Ville</option>
-                </select>
+                <label class="bo-label">Nom de l'Enseigne / Point de Vente</label>
+                <input type="text" id="sName" class="bo-input" value="${s.name}" required />
               </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Quartier</label>
-                <input type="text" id="sNeighborhood" class="bo-input" value="${s.neighborhood}" required />
-              </div>
-            </div>
 
-            <div class="bo-form-group">
-              <label class="bo-label">Adresse Complète</label>
-              <input type="text" id="sAddress" class="bo-input" value="${s.address}" required />
-            </div>
-
-            <div class="bo-form-grid-2">
-              <div class="bo-form-group">
-                <label class="bo-label">Téléphone</label>
-                <input type="text" id="sPhone" class="bo-input" value="${s.phone}" required />
+              <div class="bo-form-grid-2">
+                <div class="bo-form-group">
+                  <label class="bo-label">Ville (Cameroun)</label>
+                  <select id="sCity" class="bo-select">
+                    <option value="Douala" ${s.city === 'Douala' ? 'selected' : ''}>Douala</option>
+                    <option value="Yaoundé" ${s.city === 'Yaoundé' ? 'selected' : ''}>Yaoundé</option>
+                    <option value="Bafoussam" ${s.city === 'Bafoussam' ? 'selected' : ''}>Bafoussam</option>
+                    <option value="Kribi" ${s.city === 'Kribi' ? 'selected' : ''}>Kribi</option>
+                    <option value="Garoua" ${s.city === 'Garoua' ? 'selected' : ''}>Garoua</option>
+                  </select>
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Quartier</label>
+                  <input type="text" id="sNeighborhood" class="bo-input" value="${s.neighborhood}" required />
+                </div>
               </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Type d'Établissement</label>
-                <select id="sType" class="bo-select">
-                  <option value="Hypermarché" ${s.type === 'Hypermarché' ? 'selected' : ''}>Hypermarché</option>
-                  <option value="Boutique Partenaire" ${s.type === 'Boutique Partenaire' ? 'selected' : ''}>Boutique Partenaire</option>
-                  <option value="Restaurant & Lounge" ${s.type === 'Restaurant & Lounge' ? 'selected' : ''}>Restaurant & Lounge</option>
-                  <option value="Point Relais Express" ${s.type === 'Point Relais Express' ? 'selected' : ''}>Point Relais Express</option>
-                </select>
-              </div>
-            </div>
 
-            <div class="bo-form-group">
-              <label class="bo-label">Horaires d'Ouverture</label>
-              <input type="text" id="sHours" class="bo-input" value="${s.openingHours}" required />
+              <div class="bo-form-group">
+                <label class="bo-label">Adresse Précise</label>
+                <input type="text" id="sAddress" class="bo-input" value="${s.address}" required />
+              </div>
+
+              <div class="bo-form-grid-2">
+                <div class="bo-form-group">
+                  <label class="bo-label">Téléphone</label>
+                  <input type="text" id="sPhone" class="bo-input" value="${s.phone}" required />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Type d'Établissement</label>
+                  <select id="sType" class="bo-select">
+                    <option value="Hypermarché" ${s.type === 'Hypermarché' ? 'selected' : ''}>Hypermarché</option>
+                    <option value="Boutique Partenaire" ${s.type === 'Boutique Partenaire' ? 'selected' : ''}>Boutique Partenaire</option>
+                    <option value="Restaurant & Lounge" ${s.type === 'Restaurant & Lounge' ? 'selected' : ''}>Restaurant & Lounge</option>
+                    <option value="Point Relais Express" ${s.type === 'Point Relais Express' ? 'selected' : ''}>Point Relais Express</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label">Horaires d'Ouverture</label>
+                <input type="text" id="sHours" class="bo-input" value="${s.openingHours}" required />
+              </div>
             </div>
 
             <div class="bo-modal-footer">
               <button type="button" class="bo-btn-secondary" id="cancelStoreModalBtn">Annuler</button>
               <button type="submit" class="bo-btn-primary">
+                ${BO_ICONS.check}
                 <span>Enregistrer</span>
               </button>
             </div>
@@ -1594,64 +1784,73 @@ export class BackofficePage {
     if (!modalContainer) return;
 
     modalContainer.innerHTML = `
-      <div class="bo-modal-backdrop is-open">
+      <div class="bo-modal-overlay">
         <div class="bo-modal" style="max-width: 600px;">
           <div class="bo-modal-header">
-            <h3 class="bo-modal-title">${isNew ? 'Ajouter une Photo à la Galerie' : `Modifier : ${g.title}`}</h3>
-            <button type="button" class="bo-modal-close-btn" id="closeGalleryModalBtn">✕</button>
+            <div class="bo-modal-title-group">
+              <h2>${isNew ? 'Ajouter une Photo à la Galerie' : `Modifier : ${g.title}`}</h2>
+              <p class="bo-modal-subtitle">Moments officiels et dégustations</p>
+            </div>
+            <button type="button" class="bo-modal-close-btn" id="closeGalleryModalBtn" title="Fermer">
+              ${BO_ICONS.close}
+            </button>
           </div>
 
-          <form id="boGalleryEditForm" class="bo-modal-body">
-            <div class="bo-form-group">
-              <label class="bo-label">Titre du Moment / Événement</label>
-              <input type="text" id="gTitle" class="bo-input" value="${g.title}" required />
-            </div>
+          <form id="boGalleryEditForm">
+            <div class="bo-modal-body">
+              <div class="bo-form-group">
+                <label class="bo-label">Titre du Moment / Événement</label>
+                <input type="text" id="gTitle" class="bo-input" value="${g.title}" required />
+              </div>
 
-            <!-- Image Uploader -->
-            <div class="bo-form-group">
-              <label class="bo-label">Photo de l'Événement</label>
-              <div class="bo-image-uploader-box">
-                <div class="bo-upload-preview" style="width: 100px; height: 75px;">
-                  <img id="gImgPreview" src="${g.image}" alt="Aperçu" />
+              <!-- Image Uploader -->
+              <div class="bo-form-group">
+                <label class="bo-label">Photo de l'Événement</label>
+                <div style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 80px; height: 60px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); overflow: hidden; flex-shrink: 0;">
+                    <img id="gImgPreview" src="${g.image}" alt="Aperçu" style="width: 100%; height: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1;">
+                    <input type="text" id="gImgUrl" class="bo-input" value="${g.image}" placeholder="URL ou chemin de la photo" style="margin-bottom: 6px;" />
+                    <label class="bo-btn-secondary" style="font-size: 11.5px; padding: 5px 10px; cursor: pointer; display: inline-flex;">
+                      ${BO_ICONS.camera}
+                      <span>Choisir un fichier</span>
+                      <input type="file" id="gImgFileInput" accept="image/*" style="display: none;" />
+                    </label>
+                  </div>
                 </div>
-                <div class="bo-upload-controls">
-                  <input type="text" id="gImgUrl" class="bo-input" value="${g.image}" placeholder="URL ou chemin de la photo" />
-                  <label class="bo-btn-secondary" style="font-size: 12px; padding: 6px 12px; cursor: pointer;">
-                    <span>📷 Téléverser une photo</span>
-                    <input type="file" id="gImgFileInput" accept="image/*" class="bo-file-input" />
-                  </label>
+              </div>
+
+              <div class="bo-form-grid-3">
+                <div class="bo-form-group">
+                  <label class="bo-label">Ville</label>
+                  <input type="text" id="gCity" class="bo-input" value="${g.city}" required />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Date</label>
+                  <input type="text" id="gDate" class="bo-input" value="${g.date}" required />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Catégorie</label>
+                  <select id="gCat" class="bo-select">
+                    <option value="events" ${g.category === 'events' ? 'selected' : ''}>Événements & Salons</option>
+                    <option value="lounges" ${g.category === 'lounges' ? 'selected' : ''}>Dégustations & Lounges</option>
+                    <option value="consumers" ${g.category === 'consumers' ? 'selected' : ''}>Moments Consommateurs</option>
+                    <option value="terroir" ${g.category === 'terroir' ? 'selected' : ''}>Terroir & Ateliers</option>
+                  </select>
                 </div>
               </div>
-            </div>
 
-            <div class="bo-form-grid-3">
               <div class="bo-form-group">
-                <label class="bo-label">Ville</label>
-                <input type="text" id="gCity" class="bo-input" value="${g.city}" required />
+                <label class="bo-label">Description du Moment</label>
+                <textarea id="gDesc" class="bo-textarea" required>${g.description}</textarea>
               </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Date</label>
-                <input type="text" id="gDate" class="bo-input" value="${g.date}" required />
-              </div>
-              <div class="bo-form-group">
-                <label class="bo-label">Catégorie</label>
-                <select id="gCat" class="bo-select">
-                  <option value="events" ${g.category === 'events' ? 'selected' : ''}>Événements & Salons</option>
-                  <option value="lounges" ${g.category === 'lounges' ? 'selected' : ''}>Dégustations & Lounges</option>
-                  <option value="consumers" ${g.category === 'consumers' ? 'selected' : ''}>Moments Consommateurs</option>
-                  <option value="terroir" ${g.category === 'terroir' ? 'selected' : ''}>Terroir & Ateliers</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="bo-form-group">
-              <label class="bo-label">Description du Moment</label>
-              <textarea id="gDesc" class="bo-textarea" required>${g.description}</textarea>
             </div>
 
             <div class="bo-modal-footer">
               <button type="button" class="bo-btn-secondary" id="cancelGalleryModalBtn">Annuler</button>
               <button type="submit" class="bo-btn-primary">
+                ${BO_ICONS.check}
                 <span>Enregistrer</span>
               </button>
             </div>
@@ -1723,37 +1922,45 @@ export class BackofficePage {
     if (!modalContainer) return;
 
     modalContainer.innerHTML = `
-      <div class="bo-modal-backdrop is-open">
+      <div class="bo-modal-overlay">
         <div class="bo-modal" style="max-width: 550px;">
           <div class="bo-modal-header">
-            <h3 class="bo-modal-title">${isNew ? 'Ajouter une Vidéo Reel' : `Modifier : ${r.title}`}</h3>
-            <button type="button" class="bo-modal-close-btn" id="closeReelModalBtn">✕</button>
+            <div class="bo-modal-title-group">
+              <h2>${isNew ? 'Ajouter une Vidéo Reel' : `Modifier : ${r.title}`}</h2>
+              <p class="bo-modal-subtitle">Contenu vidéo mobile • #NidjJuiceVibes</p>
+            </div>
+            <button type="button" class="bo-modal-close-btn" id="closeReelModalBtn" title="Fermer">
+              ${BO_ICONS.close}
+            </button>
           </div>
 
-          <form id="boReelEditForm" class="bo-modal-body">
-            <div class="bo-form-group">
-              <label class="bo-label">Titre du Reel</label>
-              <input type="text" id="rTitle" class="bo-input" value="${r.title}" required />
-            </div>
+          <form id="boReelEditForm">
+            <div class="bo-modal-body">
+              <div class="bo-form-group">
+                <label class="bo-label">Titre du Reel</label>
+                <input type="text" id="rTitle" class="bo-input" value="${r.title}" required />
+              </div>
 
-            <div class="bo-form-group">
-              <label class="bo-label">Source de la Vidéo (Fichier .mp4 ou URL)</label>
-              <input type="text" id="rSrc" class="bo-input" value="${r.src}" required />
-            </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Source de la Vidéo (Fichier .mp4 ou URL)</label>
+                <input type="text" id="rSrc" class="bo-input" value="${r.src}" required />
+              </div>
 
-            <div class="bo-form-group">
-              <label class="bo-label">Légende / Description Courte</label>
-              <input type="text" id="rCaption" class="bo-input" value="${r.caption}" required />
-            </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Légende / Description Courte</label>
+                <input type="text" id="rCaption" class="bo-input" value="${r.caption}" required />
+              </div>
 
-            <div class="bo-form-group">
-              <label class="bo-label">Tag / Thème</label>
-              <input type="text" id="rTag" class="bo-input" value="${r.tag || ''}" />
+              <div class="bo-form-group">
+                <label class="bo-label">Tag / Thématique</label>
+                <input type="text" id="rTag" class="bo-input" value="${r.tag || ''}" />
+              </div>
             </div>
 
             <div class="bo-modal-footer">
               <button type="button" class="bo-btn-secondary" id="cancelReelModalBtn">Annuler</button>
               <button type="submit" class="bo-btn-primary">
+                ${BO_ICONS.check}
                 <span>Enregistrer</span>
               </button>
             </div>
@@ -1785,16 +1992,18 @@ export class BackofficePage {
   }
 
   // =========================================================================
-  // 9. TOAST NOTIFICATIONS
+  // 9. TOAST NOTIFICATIONS (AGENCY PILL WITH SVG ICONS)
   // =========================================================================
   private showToast(message: string, type: 'success' | 'error' = 'success'): void {
     const container = this.element.querySelector('#boToastContainer');
     if (!container) return;
 
     const toast = document.createElement('div');
-    toast.className = `bo-toast is-${type}`;
+    toast.className = `bo-toast ${type}`;
     toast.innerHTML = `
-      <span>${type === 'success' ? '✓' : '⚠️'}</span>
+      <div class="bo-toast-icon">
+        ${type === 'success' ? BO_ICONS.check : BO_ICONS.close}
+      </div>
       <span>${message}</span>
     `;
 
@@ -1802,9 +2011,9 @@ export class BackofficePage {
 
     setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transform = 'translateY(10px)';
-      toast.style.transition = 'all 0.3s ease';
-      setTimeout(() => toast.remove(), 300);
-    }, 3500);
+      toast.style.transform = 'translateY(12px)';
+      toast.style.transition = 'all 0.25s ease';
+      setTimeout(() => toast.remove(), 250);
+    }, 3600);
   }
 }
