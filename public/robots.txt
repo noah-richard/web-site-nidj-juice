@@ -6,4 +6,4 @@ Allow: /assets/images/
 Allow: /assets/videos/
 
 # Sitemaps
-Sitemap: https://nidjjuice.com/sitemap.xml
+Sitemap: https://nidjeu.com/sitemap.xml
