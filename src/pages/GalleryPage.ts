@@ -5,6 +5,7 @@
 
 import { GALLERY_CATEGORIES, GALLERY_ITEMS, type GalleryCategory, type GalleryItem } from '../data/gallery.data';
 import { OFFICIAL_CONTACT } from '../data/stores.data';
+import { cmsService } from '../services/cms.service';
 
 export class GalleryPage {
   private element: HTMLElement;
@@ -27,10 +28,11 @@ export class GalleryPage {
   }
 
   private getFilteredItems(): GalleryItem[] {
+    const items = cmsService.getGalleryItems();
     if (this.currentCategory === 'all') {
-      return GALLERY_ITEMS;
+      return items;
     }
-    return GALLERY_ITEMS.filter((item) => item.category === this.currentCategory);
+    return items.filter((item) => item.category === this.currentCategory);
   }
 
   private render(): void {

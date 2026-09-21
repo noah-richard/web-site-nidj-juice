@@ -6,6 +6,7 @@
 import { OFFICIAL_CONTACT } from '../../data/stores.data';
 import { themeController } from '../../features/theme-controller';
 import { audioController } from '../../features/audio-controller';
+import { cmsService } from '../../services/cms.service';
 
 export class OrderModal {
   private element: HTMLElement;
@@ -230,7 +231,9 @@ export class OrderModal {
       message += `\n_Message généré depuis le site officiel Nidj Juice (Société Nidjeu)_`;
 
       const encodedMsg = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodedMsg}`;
+      const settings = cmsService.getSettings();
+      const whatsappNum = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : OFFICIAL_CONTACT.whatsappNumber;
+      const whatsappUrl = `https://wa.me/${whatsappNum}?text=${encodedMsg}`;
 
       window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       this.close();

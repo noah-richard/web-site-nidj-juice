@@ -16,6 +16,7 @@
 @import './styles/modal.css';
 @import './styles/footer.css';
 @import './styles/pages.css';
+@import './styles/backoffice.css';
 
 /* Subtle Ambient Canvas */
 .ambient-canvas {

@@ -3,8 +3,9 @@
    Interactive directory for Douala, Yaoundé, Bafoussam, Kribi + B2B Inquiries
    ========================================================================== */
 
-import { STORE_LOCATIONS, OFFICIAL_CONTACT } from '../../data/stores.data';
+import { OFFICIAL_CONTACT } from '../../data/stores.data';
 import type { StoreLocation } from '../../types/product.types';
+import { cmsService } from '../../services/cms.service';
 
 export class StoreLocator {
   private element: HTMLElement;
@@ -24,7 +25,8 @@ export class StoreLocator {
   }
 
   private getFilteredStores(): StoreLocation[] {
-    return STORE_LOCATIONS.filter((store) => {
+    const allStores = cmsService.getStores();
+    return allStores.filter((store) => {
       const matchCity = this.currentCityFilter === 'all' || store.city.toLowerCase() === this.currentCityFilter.toLowerCase();
       const matchQuery =
         !this.searchQuery ||

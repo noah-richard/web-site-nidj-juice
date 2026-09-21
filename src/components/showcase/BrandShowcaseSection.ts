@@ -3,10 +3,10 @@
    Clean full-width conveyor stage with centered header and editorial panel
    ========================================================================== */
 
-import { SHOWCASE_PRODUCTS } from '../../data/showcase.data';
 import { InfiniteCarousel } from './InfiniteCarousel';
 import { ShowcaseInfo } from './ShowcaseInfo';
 import { ShowcaseControls } from './ShowcaseControls';
+import { cmsService } from '../../services/cms.service';
 
 export class BrandShowcaseSection {
   private element: HTMLElement;
@@ -20,8 +20,10 @@ export class BrandShowcaseSection {
     this.element.className = 'section brand-showcase-section';
     this.element.setAttribute('aria-label', 'Laissez-vous tenter par nos saveurs');
 
+    const products = cmsService.getProducts();
+
     this.infoPanel = new ShowcaseInfo();
-    this.controls = new ShowcaseControls(SHOWCASE_PRODUCTS.length, {
+    this.controls = new ShowcaseControls(products.length, {
       onPrev: () => this.carousel?.prev(),
       onNext: () => this.carousel?.next(),
       onSelectIndex: (idx) => this.carousel?.selectProductIndex(idx)
@@ -85,15 +87,17 @@ export class BrandShowcaseSection {
       editorialMount.appendChild(this.infoPanel.element);
     }
 
+    const products = cmsService.getProducts();
+
     // Set first product in editorial panel
-    if (SHOWCASE_PRODUCTS.length > 0) {
-      this.infoPanel.updateProduct(SHOWCASE_PRODUCTS[0]);
+    if (products.length > 0) {
+      this.infoPanel.updateProduct(products[0]);
     }
 
     // Initialize Infinite Carousel on full-width viewport
     const viewport = this.element.querySelector('#showcaseViewport') as HTMLElement;
     if (viewport) {
-      this.carousel = new InfiniteCarousel(viewport, SHOWCASE_PRODUCTS, {
+      this.carousel = new InfiniteCarousel(viewport, products, {
         onActiveChange: (product, index) => {
           this.infoPanel.updateProduct(product);
           this.controls.setActiveIndex(index);

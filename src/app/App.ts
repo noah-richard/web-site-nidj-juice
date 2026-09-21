@@ -19,6 +19,7 @@ import { B2BPage } from '../pages/B2BPage';
 import { ContactPage } from '../pages/ContactPage';
 import { GalleryPage } from '../pages/GalleryPage';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
+import { BackofficePage } from '../pages/BackofficePage';
 
 export class App {
   private root: HTMLElement;
@@ -87,6 +88,22 @@ export class App {
       this.currentPageInstance.destroy();
     }
 
+    const isBackoffice = path === '/nidj-juice-backoffice';
+
+    if (isBackoffice) {
+      if (this.header) this.header.getElement().style.display = 'none';
+      if (this.footer) this.footer.getElement().style.display = 'none';
+      const canvasEl = document.getElementById('ambientCanvas');
+      if (canvasEl) canvasEl.style.display = 'none';
+      this.ambientCanvas?.stop();
+    } else {
+      if (this.header) this.header.getElement().style.display = '';
+      if (this.footer) this.footer.getElement().style.display = '';
+      const canvasEl = document.getElementById('ambientCanvas');
+      if (canvasEl) canvasEl.style.display = '';
+      this.ambientCanvas?.start();
+    }
+
     this.mainElement.style.opacity = '0';
 
     setTimeout(() => {
@@ -99,27 +116,30 @@ export class App {
         pageComponent = new ProductDetailPage(path);
       } else {
         switch (path) {
+          case '/nidj-juice-backoffice':
+            pageComponent = new BackofficePage();
+            break;
           case '/entreprise':
             pageComponent = new CompanyPage();
             break;
           case '/saveurs':
             pageComponent = new FlavorsPage();
             break;
-        case '/engagements':
-          pageComponent = new EngagementsPage();
-          break;
-        case '/points-de-vente':
-          pageComponent = new LocationsPage();
-          break;
-        case '/b2b':
-          pageComponent = new B2BPage();
-          break;
-        case '/contact':
-          pageComponent = new ContactPage();
-          break;
-        case '/galerie':
-          pageComponent = new GalleryPage();
-          break;
+          case '/engagements':
+            pageComponent = new EngagementsPage();
+            break;
+          case '/points-de-vente':
+            pageComponent = new LocationsPage();
+            break;
+          case '/b2b':
+            pageComponent = new B2BPage();
+            break;
+          case '/contact':
+            pageComponent = new ContactPage();
+            break;
+          case '/galerie':
+            pageComponent = new GalleryPage();
+            break;
           case '/':
           default:
             pageComponent = new HomePage();

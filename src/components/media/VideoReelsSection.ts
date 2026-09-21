@@ -3,7 +3,8 @@
    Authentic mobile reels highlighting the bottling and lifestyle in Cameroon
    ========================================================================== */
 
-import { VIDEO_REELS } from '../../data/flavors.data';
+import { cmsService } from '../../services/cms.service';
+import type { VideoReel } from '../../types/product.types';
 
 export class VideoReelsSection {
   private element: HTMLElement;
@@ -21,6 +22,8 @@ export class VideoReelsSection {
   }
 
   private render(): void {
+    const reels: VideoReel[] = cmsService.getVideoReels();
+
     this.element.innerHTML = `
       <div class="container">
         
@@ -35,7 +38,7 @@ export class VideoReelsSection {
         </div>
 
         <div class="reels-grid">
-          ${VIDEO_REELS.map((reel) => `
+          ${reels.map((reel: VideoReel) => `
             <div class="reel-card" data-reel-id="${reel.id}">
               <div class="reel-video-wrapper">
                 <video 

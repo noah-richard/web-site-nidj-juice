@@ -8,6 +8,7 @@ import { SHOWCASE_PRODUCTS } from '../data/showcase.data';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
 import { OFFICIAL_CONTACT } from '../data/stores.data';
 import { audioController } from '../features/audio-controller';
+import { cmsService } from '../services/cms.service';
 
 export class ProductDetailPage {
   private element: HTMLElement;
@@ -19,15 +20,16 @@ export class ProductDetailPage {
 
     // Find product or fallback to first
     const cleanId = productId.replace(/^\/saveurs\//, '').replace(/\/$/, '');
-    let matched = SHOWCASE_PRODUCTS.find((p) => p.id === cleanId);
+    const products = cmsService.getProducts();
+    let matched = products.find((p) => p.id === cleanId);
     
     // Support aliases
     if (!matched) {
-      if (cleanId === 'bissap') matched = SHOWCASE_PRODUCTS.find((p) => p.id === 'cocktail-bissap');
-      if (cleanId === 'ananas') matched = SHOWCASE_PRODUCTS.find((p) => p.id === 'ananas-gingembre');
+      if (cleanId === 'bissap') matched = products.find((p) => p.id === 'cocktail-bissap');
+      if (cleanId === 'ananas') matched = products.find((p) => p.id === 'ananas-gingembre');
     }
     
-    this.product = matched || SHOWCASE_PRODUCTS[0];
+    this.product = matched || products[0] || SHOWCASE_PRODUCTS[0];
 
     this.render();
     this.bindEvents();
@@ -39,12 +41,15 @@ export class ProductDetailPage {
 
   private render(): void {
     const p = this.product;
+    const settings = cmsService.getSettings();
+    const whatsappNum = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : OFFICIAL_CONTACT.whatsappNumber;
     const whatsappMsg = encodeURIComponent(
       `Bonjour Société Nidjeu, je souhaite commander la saveur officielle ${p.name} (100% naturel). Pourriez-vous m'indiquer la disponibilité et les tarifs ?`
     );
 
     // Other flavors in the collection
-    const otherProducts = SHOWCASE_PRODUCTS.filter((item) => item.id !== p.id);
+    const allProducts = cmsService.getProducts();
+    const otherProducts = allProducts.filter((item) => item.id !== p.id);
 
     this.element.innerHTML = `
       <!-- Product Hero Experience -->
@@ -83,7 +88,7 @@ export class ProductDetailPage {
               <!-- Action CTAs -->
               <div class="product-hero-actions">
                 <a 
-                  href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${whatsappMsg}" 
+                  href="https://wa.me/${whatsappNum}?text=${whatsappMsg}" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   class="btn btn-primary btn-product-order"

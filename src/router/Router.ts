@@ -15,7 +15,8 @@ export type RoutePath =
   | '/points-de-vente'
   | '/b2b'
   | '/contact'
-  | '/galerie';
+  | '/galerie'
+  | '/nidj-juice-backoffice';
 
 export interface RouteInfo {
   path: RoutePath;
@@ -71,6 +72,10 @@ export const ROUTES_METADATA: Record<RoutePath, { title: string; description: st
   '/galerie': {
     title: 'Galerie & Événements — Dégustations & Moments Consommateurs | Nidj Juice',
     description: 'Revivez nos dégustations officielles, salons gastronomiques et les moments partagés par nos consommateurs à Douala, Yaoundé et Kribi.'
+  },
+  '/nidj-juice-backoffice': {
+    title: 'Panneau d’Administration CMS — Société Nidjeu | Nidj Juice Backoffice',
+    description: 'Interface de gestion et administration du site officiel Société Nidjeu / Nidj Juice.'
   }
 };
 
@@ -154,6 +159,8 @@ export class Router {
       path = '/engagements';
     } else if (rawPath === '/evenements' || rawPath === '/moments' || rawPath === '/gallery') {
       path = '/galerie';
+    } else if (rawPath === '/admin' || rawPath === '/backoffice' || rawPath === '/dashboard') {
+      path = '/nidj-juice-backoffice';
     } else if (rawPath in ROUTES_METADATA) {
       path = rawPath as RoutePath;
     } else {
@@ -189,6 +196,8 @@ export class Router {
       normalized = '/engagements';
     } else if (rawPath === '/evenements' || rawPath === '/moments' || rawPath === '/gallery') {
       normalized = '/galerie';
+    } else if (rawPath === '/admin' || rawPath === '/backoffice' || rawPath === '/dashboard') {
+      normalized = '/nidj-juice-backoffice';
     } else if (rawPath in ROUTES_METADATA) {
       normalized = rawPath as RoutePath;
     } else {
