@@ -1,0 +1,220 @@
+/* ==========================================================================
+   NIDJ JUICE — ASSORTMENT / FLAVORS STYLES (MOCKUP COMPLIANT)
+   Horizontal 3-card layout: Circular halos, floating fruits, pill CTAs & dots
+   ========================================================================== */
+
+.assortment-section {
+  padding-top: var(--space-12);
+  padding-bottom: var(--space-20);
+  background-color: var(--bg-page);
+}
+
+.assortment-cards-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .assortment-cards-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+.assortment-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+.assortment-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Halos */
+.card-halo {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  z-index: 0;
+  transition: transform var(--duration-slow) ease;
+}
+
+.assortment-card:hover .card-halo {
+  transform: translateX(-50%) scale(1.08);
+}
+
+.halo-ananas {
+  background: #E8F5DF;
+}
+
+.halo-bissap {
+  background: #FFE8EF;
+}
+
+.halo-duo {
+  background: #FFF1DB;
+}
+
+/* Visual Stage with Floating Fruits */
+.card-visual-stage {
+  position: relative;
+  z-index: 1;
+  height: 310px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-6);
+}
+
+.assortment-bottle-img {
+  max-height: 280px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 25px rgba(22, 43, 29, 0.18));
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+.assortment-card:hover .assortment-bottle-img {
+  transform: scale(1.06) rotate(-2deg);
+}
+
+/* Duo Double Bottle Stage */
+.duo-stage {
+  position: relative;
+}
+
+.duo-stage .bottle-left {
+  position: absolute;
+  left: 18%;
+  transform: rotate(-8deg) scale(0.88);
+  z-index: 1;
+}
+
+.duo-stage .bottle-right {
+  position: absolute;
+  right: 18%;
+  transform: rotate(6deg);
+  z-index: 2;
+}
+
+.assortment-card:hover .duo-stage .bottle-left {
+  transform: rotate(-12deg) scale(0.92);
+}
+
+.assortment-card:hover .duo-stage .bottle-right {
+  transform: rotate(8deg) scale(1.05);
+}
+
+/* Floating Fruit Micro Badges */
+.floating-fruit {
+  position: absolute;
+  font-size: 1.8rem;
+  z-index: 2;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+  animation: float-fruit 4s ease-in-out infinite alternate;
+}
+
+.fruit-1 {
+  top: 15%;
+  left: 12%;
+}
+
+.fruit-2 {
+  bottom: 18%;
+  right: 12%;
+  animation-delay: 1.5s;
+}
+
+@keyframes float-fruit {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-10px) rotate(8deg); }
+}
+
+/* Action Pill Buttons matching Mockup */
+.card-action-box {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-pill-flavor {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.btn-pill-ananas {
+  background-color: var(--color-brand-green);
+  box-shadow: 0 6px 18px rgba(88, 168, 38, 0.35);
+}
+
+.btn-pill-ananas:hover {
+  background-color: var(--color-brand-green-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(88, 168, 38, 0.45);
+}
+
+.btn-pill-bissap {
+  background-color: var(--flavor-bissap-secondary);
+  box-shadow: 0 6px 18px rgba(230, 42, 94, 0.35);
+}
+
+.btn-pill-bissap:hover {
+  background-color: var(--flavor-bissap-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(196, 0, 62, 0.45);
+}
+
+.btn-pill-duo {
+  background-color: var(--flavor-ananas-primary);
+  box-shadow: 0 6px 18px rgba(224, 135, 0, 0.35);
+}
+
+.btn-pill-duo:hover {
+  background-color: #C27400;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(224, 135, 0, 0.45);
+}
+
+/* Pagination Dots */
+.assortment-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.assortment-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #D5DDD3;
+}
+
+.assortment-dots .dot.is-active {
+  width: 24px;
+  border-radius: var(--radius-pill);
+  background: var(--color-brand-green);
+}

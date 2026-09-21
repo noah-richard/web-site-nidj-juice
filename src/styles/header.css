@@ -1,0 +1,790 @@
+/* ==========================================================================
+   NIDJ JUICE — CORPORATE HEADER & MEGA-MENU (COCA-COLA STYLE)
+   High-End FMCG Standard • Precision Typography • Animated Gliding Underline
+   ========================================================================== */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-header);
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.site-header.is-scrolled {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.site-header.mega-open,
+.site-header.search-open {
+  background: #FFFFFF;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.header-main-bar {
+  height: 74px;
+  display: flex;
+  align-items: center;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ==========================================================================
+   LEFT: BRAND IDENTITY (THE NIDJ JUICE COMPANY) + REGION PILL
+   ========================================================================== */
+.header-brand-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.brand-logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 6px;
+}
+
+.brand-company-prefix,
+.brand-company-suffix {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: #111111;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1100px) {
+  .brand-company-prefix,
+  .brand-company-suffix {
+    display: none;
+  }
+}
+
+.brand-logo-img {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.25s var(--ease-spring);
+}
+
+.brand-logo-link:hover .brand-logo-img {
+  transform: scale(1.03);
+}
+
+/* Country Selector Pill (Like Coca-Cola's region pill) */
+.region-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid #D9D9D9;
+  background: #FDFDFD;
+  color: #111111;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.region-pill:hover {
+  background: #F2F2F2;
+  border-color: #BDBDBD;
+  transform: translateY(-1px);
+}
+
+.globe-icon {
+  color: #444444;
+}
+
+.region-code {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   CENTER: CORPORATE DESKTOP NAVIGATION & GLIDING UNDERLINE
+   ========================================================================== */
+.desktop-nav {
+  display: none;
+  position: relative;
+  height: 74px;
+}
+
+@media (min-width: 992px) {
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    height: 74px;
+  }
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  height: 74px;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 74px;
+}
+
+.nav-link {
+  color: #111111;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 700;
+  text-decoration: none;
+  height: 74px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-item:hover .nav-link,
+.nav-link:hover {
+  color: var(--color-brand-green);
+}
+
+.external-arrow {
+  font-size: 12px;
+  font-weight: 800;
+  color: #888888;
+  margin-left: 2px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover .external-arrow {
+  color: var(--color-brand-green);
+  transform: translate(2px, -2px);
+}
+
+/* The Coca-Cola Solid Underline Indicator */
+.nav-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #111111;
+  border-radius: 2px 2px 0 0;
+  opacity: 0;
+  transform: translateX(0);
+  width: 0;
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   RIGHT: SEARCH CIRCLE + HOTLINE + ORDER CTA
+   ========================================================================== */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Circular Search Button (Coca-Cola Style) */
+.icon-circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-spring), background 0.2s ease;
+}
+
+.search-trigger-btn {
+  background: #000000;
+  color: #FFFFFF;
+}
+
+.search-trigger-btn:hover {
+  background: #262626;
+  transform: scale(1.07);
+}
+
+.hotline-btn {
+  background: #E8ECE6;
+  color: #0A3D22;
+  text-decoration: none;
+}
+
+.hotline-btn:hover {
+  background: #25D366;
+  color: #FFFFFF;
+  transform: scale(1.07);
+}
+
+.header-cta-btn {
+  display: none;
+  padding: 9px 20px;
+  font-size: 13.5px;
+  border-radius: 999px;
+}
+
+@media (min-width: 640px) {
+  .header-cta-btn {
+    display: inline-flex;
+  }
+}
+
+/* Mobile Hamburger Button */
+.mobile-menu-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: #F0F4EE;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 9px;
+  transition: background 0.2s ease;
+}
+
+@media (min-width: 992px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+}
+
+.mobile-menu-btn span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #111111;
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   MEGA-MENU FLYOUT PANELS (COCA-COLA STYLE — FLOATING COMPACT CARD)
+   ========================================================================== */
+.mega-menu-wrapper {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  width: min(1040px, calc(100vw - 32px));
+  max-width: 1040px;
+  background: #FFFFFF;
+  border-radius: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.22s;
+  z-index: 99;
+}
+
+/* Invisible hit-bridge: guarantees zero empty space between nav and dropdown */
+.mega-menu-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: transparent;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+.mega-menu-wrapper.is-open {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mega-panel {
+  display: none;
+  padding: 24px 28px;
+}
+
+.mega-panel.is-active {
+  display: block;
+}
+
+.mega-container {
+  display: grid;
+  grid-template-columns: 390px 1fr 220px;
+  gap: 28px;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+@media (max-width: 1040px) {
+  .mega-container {
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+  }
+  .mega-column-stats,
+  .mega-column-products {
+    display: none;
+  }
+}
+
+/* 1. Feature Showcase Card (Coca-Cola Style Left Section) */
+.mega-card-feature {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: #F8F9FA;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #E8EAED;
+}
+
+.mega-card-img-box {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.mega-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.mega-card-feature:hover .mega-card-img {
+  transform: scale(1.06);
+}
+
+.mega-card-content {
+  flex: 1;
+}
+
+.mega-card-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: #111111;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.mega-card-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.48;
+  color: #555555;
+  margin-bottom: 12px;
+}
+
+.mega-action-pill-btn {
+  background: #000000;
+  color: #FFFFFF;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.mega-action-pill-btn:hover {
+  background: var(--color-brand-green);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+.mega-action-pill-btn .btn-arrow {
+  transition: transform 0.2s ease;
+}
+
+.mega-action-pill-btn:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* 2. Middle Corporate Links Column */
+.mega-column-links {
+  border-left: 1px solid #EBECEE;
+  padding-left: 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.mega-links-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mega-link-item {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #222222;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.mega-link-item:hover {
+  color: var(--color-brand-green);
+  transform: translateX(6px);
+}
+
+.mega-link-item .chevron {
+  font-size: 16px;
+  color: #A0A4A8;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.mega-link-item:hover .chevron {
+  color: var(--color-brand-green);
+  transform: translateX(3px);
+}
+
+/* 3. Right Corporate Stats / Highlights */
+.mega-column-stats {
+  border-left: 1px solid #EBECEE;
+  padding-left: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+}
+
+.mega-stat-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-brand-dark-forest);
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: #111111;
+  margin-top: 2px;
+}
+
+.stat-sub {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  color: #777777;
+}
+
+/* Product Teasers for Marques */
+.mega-column-products {
+  border-left: 1px solid #EBECEE;
+  padding-left: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+.flavor-mini-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #F8FAF7;
+  border: 1px solid #E6ECE4;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.flavor-mini-card:hover {
+  background: #EEF4EB;
+  transform: translateX(4px);
+}
+
+.mini-bottle-img {
+  width: 32px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.mini-card-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.mini-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.mini-tag.ruby { color: #C4003E; }
+.mini-tag.gold { color: #E08700; }
+
+.mini-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.mini-price {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-brand-green);
+  margin-top: 1px;
+}
+
+/* ==========================================================================
+   INTERACTIVE SEARCH FLYOUT PANEL
+   ========================================================================== */
+.header-search-flyout {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E2E4E8;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+  padding: 24px 0 28px 0;
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 98;
+}
+
+.header-search-flyout.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.search-input-box {
+  display: flex;
+  align-items: center;
+  background: #F4F6F4;
+  border-radius: 999px;
+  padding: 8px 20px;
+  border: 1.5px solid #E2E8E0;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.search-input-box:focus-within {
+  border-color: #111111;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+.search-icon-input {
+  color: #666666;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+#headerSearchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: #111111;
+  outline: none;
+}
+
+.close-search-btn {
+  background: transparent;
+  border: none;
+  color: #777777;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  transition: color 0.2s ease;
+}
+
+.close-search-btn:hover {
+  color: #111111;
+}
+
+.search-quick-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding-left: 12px;
+  flex-wrap: wrap;
+}
+
+.tag-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #777777;
+}
+
+.search-tag-chip {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111111;
+  background: #F0F4EE;
+  padding: 4px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.search-tag-chip:hover {
+  background: var(--color-brand-green);
+  color: #FFFFFF;
+}
+
+/* Dim Backdrop — Disabled so the dropdown floats gently without blocking the rest of the page */
+.header-dim-backdrop {
+  display: none !important;
+}
+
+/* ==========================================================================
+   MOBILE DRAWER
+   ========================================================================== */
+.mobile-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.mobile-drawer.is-open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.mobile-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 25, 16, 0.45);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity var(--duration-normal) ease;
+}
+
+.mobile-drawer.is-open .mobile-drawer-backdrop {
+  opacity: 1;
+}
+
+.mobile-drawer-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 84%;
+  max-width: 360px;
+  background: #FFFFFF;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: translateX(100%);
+  transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+.mobile-drawer.is-open .mobile-drawer-content {
+  transform: translateX(0);
+}
+
+.mobile-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid #EEF2EC;
+}
+
+.close-drawer-btn {
+  background: #F0F4EE;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-headline);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.mobile-nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.mobile-nav-link {
+  color: var(--text-headline);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mobile-nav-link:hover {
+  color: var(--color-brand-green);
+}
+
+.mobile-drawer-footer .w-full {
+  width: 100%;
+}

@@ -1,0 +1,125 @@
+/* ==========================================================================
+   NIDJ JUICE — DESIGN SYSTEM TOKENS (LIGHT & EDITORIAL ARCHITECTURE)
+   Harmonized with official Eco-Fruits beverage mock-up
+   ========================================================================== */
+
+:root {
+  /* --- Core Brand Colors (Nidjeu Cameroon) --- */
+  --color-brand-green: #58A826;
+  --color-brand-green-hover: #47901C;
+  --color-brand-green-glow: rgba(88, 168, 38, 0.35);
+  --color-brand-green-light: #EBF7E3;
+  
+  --color-brand-deep-green: #0A3D22;
+  --color-brand-forest: #0D4728;
+  
+  /* --- Flavor Palettes --- */
+  /* Bissap Theme */
+  --flavor-bissap-primary: #C4003E;
+  --flavor-bissap-secondary: #E62A5E;
+  --flavor-bissap-glow: rgba(196, 0, 62, 0.3);
+  --flavor-bissap-light: #FFF0F4;
+  --flavor-bissap-banner: linear-gradient(135deg, #CF3D65 0%, #DF5E7D 50%, #EF87A0 100%);
+  
+  /* Ananas Theme */
+  --flavor-ananas-primary: #E08700;
+  --flavor-ananas-secondary: #F59E0B;
+  --flavor-ananas-glow: rgba(224, 135, 0, 0.3);
+  --flavor-ananas-light: #FFF8EB;
+  --flavor-ananas-banner: linear-gradient(135deg, #DE8200 0%, #F5A524 50%, #FBCA68 100%);
+
+  /* --- Dynamic Theme Assignments (Default: Bissap) --- */
+  --theme-accent-1: #58A826;
+  --theme-accent-2: #C4003E;
+  --theme-flavor-name-color: #C4003E;
+  --theme-light-circle: #FFE6ED;
+  --theme-promo-banner: var(--flavor-bissap-banner);
+
+  /* --- Backgrounds & Surfaces (Crisp Light Theme) --- */
+  --bg-page: #F8FAF6;
+  --bg-surface-card: #FFFFFF;
+  --bg-surface-soft: #EEF4EB;
+  --bg-surface-muted: #F2F5F0;
+  
+  /* --- Text & Contrast --- */
+  --text-headline: #162B1D;
+  --text-headline-secondary: #2B4734;
+  --text-body: #4F6354;
+  --text-muted: #7E9283;
+  --text-on-dark: #FFFFFF;
+  --text-on-light: #162B1D;
+
+  /* --- Typography --- */
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* --- Fluid Typography Scale --- */
+  --text-xs: clamp(0.75rem, 0.72rem + 0.2vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.84rem + 0.25vw, 0.975rem);
+  --text-base: clamp(1rem, 0.95rem + 0.3vw, 1.1rem);
+  --text-lg: clamp(1.125rem, 1.05rem + 0.4vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.15rem + 0.6vw, 1.45rem);
+  --text-2xl: clamp(1.5rem, 1.35rem + 0.8vw, 1.85rem);
+  --text-3xl: clamp(1.85rem, 1.6rem + 1.2vw, 2.35rem);
+  --text-4xl: clamp(2.35rem, 2rem + 1.8vw, 3.25rem);
+  --text-hero: clamp(3.2rem, 2.6rem + 4.5vw, 6.2rem);
+
+  /* --- Spacing --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* --- Layout & Radii --- */
+  --container-max-width: 1240px;
+  --container-padding: clamp(1.25rem, 4vw, 2.5rem);
+  --header-height: 88px;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 36px;
+  --radius-pill: 9999px;
+
+  /* --- Soft Natural Shadows --- */
+  --shadow-subtle: 0 4px 20px rgba(18, 43, 25, 0.05);
+  --shadow-card: 0 10px 30px rgba(18, 43, 25, 0.08);
+  --shadow-hover: 0 20px 40px rgba(18, 43, 25, 0.12);
+  --shadow-bottle: 0 25px 50px rgba(22, 43, 29, 0.22);
+  --shadow-btn-green: 0 8px 22px rgba(88, 168, 38, 0.38);
+
+  /* --- Motion --- */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-normal: 280ms;
+  --duration-slow: 600ms;
+
+  --z-header: 100;
+  --z-modal: 1000;
+}
+
+/* Dynamic Flavor Theme: Ananas */
+body[data-theme="ananas"] {
+  --theme-accent-1: #58A826;
+  --theme-accent-2: #E08700;
+  --theme-flavor-name-color: #E08700;
+  --theme-light-circle: #FFF0D6;
+  --theme-promo-banner: var(--flavor-ananas-banner);
+}
+
+/* Dynamic Flavor Theme: Bissap */
+body[data-theme="bissap"] {
+  --theme-accent-1: #58A826;
+  --theme-accent-2: #C4003E;
+  --theme-flavor-name-color: #C4003E;
+  --theme-light-circle: #FFE6ED;
+  --theme-promo-banner: var(--flavor-bissap-banner);
+}

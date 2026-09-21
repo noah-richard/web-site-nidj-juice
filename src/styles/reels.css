@@ -1,0 +1,169 @@
+/* ==========================================================================
+   NIDJ JUICE — VIDEO REELS & COMMUNITY COMPONENT STYLES
+   ========================================================================== */
+
+.reels-section {
+  background: var(--bg-surface-soft);
+  padding-top: var(--space-12);
+  padding-bottom: var(--space-16);
+}
+
+.reels-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .reels-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .reels-grid {
+    grid-template-columns: 1fr 1fr 1.2fr;
+  }
+}
+
+.reel-card {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  height: 480px;
+  box-shadow: 0 15px 35px rgba(18, 43, 25, 0.12);
+  border: 1px solid rgba(22, 43, 29, 0.08);
+  cursor: pointer;
+  background: #000;
+}
+
+.reel-video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reel-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-5);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.4) 100%);
+  pointer-events: none;
+}
+
+.reel-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.reel-tag {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.reel-mute-btn {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.reel-mute-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.reel-mute-btn.is-unmuted {
+  background: var(--color-brand-green);
+  border-color: var(--color-brand-green);
+}
+
+.reel-play-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  opacity: 0;
+  transition: opacity var(--duration-fast) ease;
+  pointer-events: none;
+}
+
+.reel-info {
+  pointer-events: auto;
+}
+
+.reel-title {
+  font-size: var(--text-base);
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+
+.reel-caption {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Community CTA Card */
+.reel-community-card {
+  border-radius: var(--radius-xl);
+  background: #FFFFFF;
+  border: 1px solid rgba(88, 168, 38, 0.25);
+  box-shadow: 0 10px 30px rgba(18, 43, 25, 0.06);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.community-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+}
+
+.community-title {
+  font-size: var(--text-2xl);
+  color: var(--text-headline);
+  margin-bottom: var(--space-3);
+}
+
+.community-desc {
+  font-size: var(--text-sm);
+  color: var(--text-body);
+  margin-bottom: var(--space-6);
+  max-width: 340px;
+}

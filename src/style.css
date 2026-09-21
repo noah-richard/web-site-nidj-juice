@@ -1,0 +1,29 @@
+/* ==========================================================================
+   NIDJ JUICE — MASTER STYLESHEET ENTRY POINT
+   Aggregated Architecture • Light Beverage Aesthetic (Mockup Compliant)
+   ========================================================================== */
+
+@import './tokens/tokens.css';
+@import './tokens/base.css';
+@import './styles/header.css';
+@import './styles/hero.css';
+@import './styles/story.css';
+@import './styles/flavors.css';
+@import './styles/showcase.css';
+@import './styles/promo.css';
+@import './styles/reels.css';
+@import './styles/locator.css';
+@import './styles/modal.css';
+@import './styles/footer.css';
+
+/* Subtle Ambient Canvas */
+.ambient-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+}

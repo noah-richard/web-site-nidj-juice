@@ -1,0 +1,132 @@
+/* ==========================================================================
+   NIDJ JUICE — PROMO ORDER BANNER STYLES (MOCKUP COMPLIANT)
+   Horizontal fruit/berry banner with embedded form
+   ========================================================================== */
+
+.promo-banner-section {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-20);
+  background-color: var(--bg-page);
+}
+
+.promo-banner-card {
+  position: relative;
+  background: linear-gradient(135deg, #D44265 0%, #E65A7C 55%, #F48AA4 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(212, 66, 101, 0.28);
+}
+
+@media (min-width: 992px) {
+  .promo-banner-card {
+    padding: var(--space-12) var(--space-12);
+  }
+}
+
+.promo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: var(--space-8);
+  position: relative;
+  z-index: 2;
+}
+
+@media (min-width: 992px) {
+  .promo-grid {
+    grid-template-columns: 1.1fr 0.9fr 1.3fr;
+    gap: var(--space-6);
+  }
+}
+
+/* Left Content */
+.promo-title {
+  font-size: var(--text-3xl);
+  color: #FFFFFF;
+  line-height: 1.15;
+  margin-bottom: var(--space-3);
+}
+
+.promo-title strong {
+  font-weight: 900;
+  display: block;
+}
+
+.promo-desc {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+/* Center Visual */
+.promo-visual {
+  position: relative;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.promo-splash-img {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  object-fit: contain;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.promo-bottle-img {
+  height: 240px;
+  width: auto;
+  object-fit: contain;
+  transform: rotate(-10deg);
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.3));
+  position: relative;
+  z-index: 2;
+}
+
+/* Right Form */
+.promo-inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.promo-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 14px 22px;
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  color: var(--text-headline);
+  outline: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  transition: transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+}
+
+.promo-input::placeholder {
+  color: #9AA89D;
+}
+
+.promo-input:focus {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.promo-submit-btn {
+  margin-top: 4px;
+  padding: 14px 24px;
+  background-color: var(--color-brand-green);
+  color: #FFFFFF;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.promo-submit-btn:hover {
+  background-color: var(--color-brand-green-hover);
+  transform: translateY(-2px);
+}

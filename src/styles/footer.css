@@ -1,0 +1,134 @@
+/* ==========================================================================
+   NIDJ JUICE — FOOTER STYLES (MOCKUP COMPLIANT)
+   Wavy organic curve & deep forest green #0A3D22
+   ========================================================================== */
+
+.site-footer {
+  position: relative;
+  background-color: var(--bg-page);
+  padding: 0;
+  margin-top: var(--space-8);
+}
+
+.footer-wave-top {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.footer-wave-top svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.footer-main-body {
+  background-color: var(--color-brand-deep-green);
+  color: #FFFFFF;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+.footer-columns-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-10);
+  margin-bottom: var(--space-10);
+}
+
+@media (min-width: 768px) {
+  .footer-columns-grid {
+    grid-template-columns: 1.4fr 1fr 1.2fr;
+    gap: var(--space-8);
+  }
+}
+
+.footer-logo-img {
+  height: 54px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: var(--space-4);
+  filter: brightness(1.1);
+}
+
+.footer-brand-text {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
+  max-width: 320px;
+  margin-bottom: var(--space-6);
+}
+
+.footer-social-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-social-pill {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: all var(--duration-fast) ease;
+}
+
+.footer-social-pill:hover {
+  background: var(--color-brand-green);
+  border-color: var(--color-brand-green);
+  transform: translateY(-2px);
+}
+
+/* Titles */
+.footer-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: var(--space-4);
+  letter-spacing: 0.05em;
+}
+
+.footer-nav-list, .footer-contacts-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-nav-link, .footer-contact-link {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color var(--duration-fast) ease;
+}
+
+.footer-nav-link:hover, .footer-contact-link:hover {
+  color: #7FE54A;
+}
+
+.footer-contact-item {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Copyright Bar */
+.footer-copyright-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: var(--space-6);
+  text-align: center;
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.6);
+}

@@ -1,0 +1,268 @@
+/* ==========================================================================
+   NIDJ JUICE — HERO STYLES (MOCKUP COMPLIANT)
+   Fresh, luminous, editorial beverage layout
+   ========================================================================== */
+
+.hero-section {
+  position: relative;
+  min-height: 92vh;
+  padding-top: calc(var(--header-height) + var(--space-4));
+  padding-bottom: var(--space-12);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background-color: var(--bg-page);
+}
+
+.hero-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: var(--space-10);
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .hero-container {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: var(--space-6);
+  }
+}
+
+/* Left Content */
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  z-index: 2;
+}
+
+/* Top Counter: 01 —— 02 / */
+.hero-counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-brand-green);
+  margin-bottom: var(--space-3);
+  letter-spacing: 0.05em;
+}
+
+.counter-line {
+  display: inline-block;
+  width: 32px;
+  height: 1.5px;
+  background: var(--color-brand-green);
+  border-radius: 2px;
+}
+
+.total-idx {
+  color: var(--text-muted);
+}
+
+/* Split Big Display Typography */
+.hero-title {
+  font-size: var(--text-hero);
+  line-height: 0.95;
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.03em;
+}
+
+.hero-title-word1 {
+  display: block;
+  color: var(--color-brand-green);
+}
+
+.hero-title-word2 {
+  display: block;
+  transition: color var(--duration-slow) var(--ease-smooth);
+}
+
+.hero-title-word2.color-bissap {
+  color: var(--flavor-bissap-primary);
+}
+
+.hero-title-word2.color-ananas {
+  color: var(--flavor-ananas-primary);
+}
+
+.hero-subtitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text-headline);
+  margin-bottom: var(--space-2);
+}
+
+.hero-description {
+  font-size: var(--text-sm);
+  color: var(--text-body);
+  max-width: 460px;
+  line-height: 1.6;
+  margin-bottom: var(--space-8);
+}
+
+/* Hero CTA Group */
+.hero-cta-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-10);
+}
+
+.btn-discover {
+  padding: 14px 28px;
+}
+
+/* 3 Circular Trust Badges matching Mockup */
+.hero-trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid rgba(22, 43, 29, 0.08);
+  width: 100%;
+}
+
+.trust-badge-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.trust-badge-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(88, 168, 38, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-brand-green);
+  background: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(88, 168, 38, 0.08);
+}
+
+.trust-badge-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-headline);
+  max-width: 110px;
+  line-height: 1.35;
+}
+
+/* Right Column: Hero Visual Stage */
+.hero-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+}
+
+@media (min-width: 992px) {
+  .hero-visual {
+    min-height: 680px;
+  }
+}
+
+/* Circular Aura */
+.hero-circle-aura {
+  position: absolute;
+  width: 540px;
+  height: 540px;
+  border-radius: 50%;
+  background: var(--theme-light-circle);
+  opacity: 0.7;
+  filter: blur(50px);
+  z-index: 0;
+  transition: background var(--duration-slow) var(--ease-smooth);
+}
+
+/* Fruit Splash Image (Pure Pineapple & Ginger) */
+.hero-splash-bg-img {
+  position: absolute;
+  width: 580px;
+  height: 580px;
+  max-width: 95vw;
+  object-fit: contain;
+  z-index: 1;
+  pointer-events: none;
+  animation: gentle-spin 30s linear infinite;
+  transition: opacity 250ms ease;
+}
+
+@keyframes gentle-spin {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(4deg) scale(1.02); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Floating Tilted Bottle */
+.hero-bottle-stage {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(6deg);
+  transition: transform var(--duration-normal) ease-out;
+}
+
+.hero-bottle-main {
+  height: 480px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 25px 40px rgba(18, 43, 25, 0.32));
+  animation: float-bottle 5s ease-in-out infinite;
+  transition: transform 250ms var(--ease-spring), opacity 200ms ease;
+}
+
+@media (min-width: 992px) {
+  .hero-bottle-main {
+    height: 580px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .hero-bottle-main {
+    height: 620px;
+  }
+}
+
+@keyframes float-bottle {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Interactive Pagination Dots below visual */
+.hero-pagination-dots {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-6);
+}
+
+.hero-dot-btn {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #CBD5CA;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--duration-normal) var(--ease-spring);
+}
+
+.hero-dot-btn.is-active {
+  width: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--color-brand-green);
+  box-shadow: 0 2px 8px rgba(88, 168, 38, 0.4);
+}
