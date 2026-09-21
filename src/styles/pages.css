@@ -1,0 +1,578 @@
+/* ==========================================================================
+   NIDJ JUICE — DEDICATED PAGES STYLES (COCA-COLA / PEPSI FMCG STANDARD)
+   Corporate Editorial Architecture • Light Beverage Aesthetic • Responsive
+   ========================================================================== */
+
+/* Page Hero Section */
+.page-hero {
+  position: relative;
+  padding: calc(var(--space-16) + 40px) 0 var(--space-12);
+  background: linear-gradient(180deg, rgba(88, 168, 38, 0.06) 0%, rgba(255, 255, 255, 0) 100%);
+  border-bottom: 1px solid rgba(22, 43, 29, 0.06);
+  overflow: hidden;
+}
+
+.page-hero-glow {
+  position: absolute;
+  top: -120px;
+  right: 10%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(88, 168, 38, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(50px);
+}
+
+.page-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.page-breadcrumbs a {
+  color: var(--color-brand-green);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+
+.page-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  opacity: 0.5;
+}
+
+.page-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1px solid rgba(88, 168, 38, 0.25);
+  border-radius: var(--radius-pill);
+  padding: 6px 16px;
+  font-size: var(--text-xs);
+  font-weight: 800;
+  color: var(--color-brand-deep-green);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.page-hero-title {
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  font-weight: 900;
+  color: var(--text-headline);
+  line-height: 1.1;
+  max-width: 860px;
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.025em;
+}
+
+.page-hero-subtitle {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  color: var(--text-body);
+  max-width: 720px;
+  line-height: 1.6;
+}
+
+/* Sub-nav quick anchors (Coca-Cola style in-page pills) */
+.page-subnav-bar {
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(22, 43, 29, 0.08);
+  position: sticky;
+  top: 74px;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.page-subnav-list {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  list-style: none;
+  overflow-x: auto;
+  padding: 12px 0;
+  scrollbar-width: none;
+}
+
+.page-subnav-list::-webkit-scrollbar {
+  display: none;
+}
+
+.page-subnav-link {
+  display: inline-block;
+  padding: 8px 18px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-headline);
+  background: rgba(22, 43, 29, 0.04);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all var(--duration-fast) ease;
+}
+
+.page-subnav-link:hover {
+  background: var(--color-brand-green);
+  color: #FFFFFF;
+}
+
+/* Editorial Split Sections */
+.editorial-split-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+  align-items: center;
+  margin-bottom: var(--space-16);
+}
+
+@media (min-width: 900px) {
+  .editorial-split-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+  .editorial-split-grid.reverse {
+    grid-template-columns: 0.9fr 1.1fr;
+  }
+  .editorial-split-grid.reverse .editorial-media-box {
+    order: -1;
+  }
+}
+
+.editorial-text-box h2 {
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  margin-bottom: var(--space-4);
+  color: var(--text-headline);
+}
+
+.editorial-lead {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-brand-deep-green);
+  line-height: 1.6;
+  margin-bottom: var(--space-4);
+}
+
+.editorial-body {
+  font-size: 0.95rem;
+  color: var(--text-body);
+  line-height: 1.7;
+  margin-bottom: var(--space-6);
+}
+
+.editorial-media-box {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+}
+
+.editorial-img {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.editorial-media-box:hover .editorial-img {
+  transform: scale(1.04);
+}
+
+.media-caption-badge {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: rgba(22, 43, 29, 0.88);
+  backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Corporate Stat Pillars */
+.stat-pillars-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-16);
+}
+
+@media (min-width: 640px) {
+  .stat-pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stat-pillars-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-pillar-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(22, 43, 29, 0.08);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+  transition: transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+}
+
+.stat-pillar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  border-color: rgba(88, 168, 38, 0.3);
+}
+
+.stat-pillar-number {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: var(--color-brand-green);
+  line-height: 1;
+  margin-bottom: var(--space-2);
+}
+
+.stat-pillar-title {
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--text-headline);
+  margin-bottom: var(--space-2);
+}
+
+.stat-pillar-desc {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* History Timeline Component (Coca-Cola History Style) */
+.timeline-track {
+  position: relative;
+  max-width: 840px;
+  margin: 0 auto var(--space-16);
+  padding-left: 32px;
+}
+
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(88, 168, 38, 0.3);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: var(--space-8);
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -32px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-brand-green);
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 0 0 2px var(--color-brand-green);
+}
+
+.timeline-year {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 800;
+  color: var(--color-brand-green);
+  background: rgba(88, 168, 38, 0.1);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 6px;
+}
+
+.timeline-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-headline);
+  margin-bottom: 6px;
+}
+
+.timeline-desc {
+  font-size: 0.92rem;
+  color: var(--text-body);
+  line-height: 1.6;
+}
+
+/* Product In-Depth Cards (Saveurs Page) */
+.product-deep-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-2xl);
+  border: 1px solid rgba(22, 43, 29, 0.08);
+  padding: var(--space-8);
+  margin-bottom: var(--space-12);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-items: center;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.03);
+}
+
+@media (min-width: 900px) {
+  .product-deep-card {
+    grid-template-columns: 360px 1fr;
+    padding: var(--space-10);
+  }
+}
+
+.product-stage-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(88, 168, 38, 0.08) 0%, transparent 70%);
+  padding: 30px;
+  border-radius: var(--radius-xl);
+}
+
+.product-stage-box.bissap {
+  background: radial-gradient(circle, rgba(196, 0, 62, 0.1) 0%, transparent 70%);
+}
+
+.product-stage-box.ananas {
+  background: radial-gradient(circle, rgba(230, 150, 0, 0.1) 0%, transparent 70%);
+}
+
+.product-stage-img {
+  max-height: 380px;
+  width: auto;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.15));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-deep-card:hover .product-stage-img {
+  transform: translateY(-6px) scale(1.03);
+}
+
+.product-deep-content h2 {
+  font-size: var(--text-3xl);
+  font-weight: 900;
+  margin-bottom: var(--space-2);
+  color: var(--text-headline);
+}
+
+.product-category-pill {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-3);
+}
+
+.pill-bissap {
+  background: rgba(196, 0, 62, 0.12);
+  color: #C4003E;
+}
+
+.pill-ananas {
+  background: rgba(230, 150, 0, 0.15);
+  color: #B26A00;
+}
+
+.product-story-quote {
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--color-brand-deep-green);
+  border-left: 3px solid var(--color-brand-green);
+  padding-left: 14px;
+  margin-bottom: var(--space-4);
+  line-height: 1.5;
+}
+
+.product-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin: var(--space-6) 0;
+}
+
+.spec-item {
+  background: rgba(22, 43, 29, 0.03);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+}
+
+.spec-item-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.spec-item-val {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-headline);
+  margin-top: 2px;
+}
+
+/* Nutrition Transparency Table */
+.nutrition-table-wrap {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(22, 43, 29, 0.08);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+  margin-top: var(--space-12);
+}
+
+.nutrition-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.nutrition-table th,
+.nutrition-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(22, 43, 29, 0.06);
+  font-size: 0.88rem;
+}
+
+.nutrition-table th {
+  background: rgba(22, 43, 29, 0.03);
+  font-weight: 800;
+  color: var(--text-headline);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nutrition-table tr:hover td {
+  background: rgba(88, 168, 38, 0.03);
+}
+
+/* B2B Application Form */
+.b2b-form-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(22, 43, 29, 0.08);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.04);
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .form-row-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-headline);
+  margin-bottom: 6px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid rgba(22, 43, 29, 0.12);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--text-headline);
+  background: #FFFFFF;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-brand-green);
+  box-shadow: 0 0 0 3px rgba(88, 168, 38, 0.15);
+}
+
+/* Interactive Accordion for FAQs */
+.faq-accordion {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  background: #FFFFFF;
+  border: 1px solid rgba(22, 43, 29, 0.08);
+  border-radius: var(--radius-lg);
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.faq-item.is-open {
+  border-color: var(--color-brand-green);
+}
+
+.faq-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-headline);
+}
+
+.faq-chevron {
+  font-size: 1.2rem;
+  transition: transform var(--duration-normal) ease;
+}
+
+.faq-item.is-open .faq-chevron {
+  transform: rotate(180deg);
+}
+
+.faq-content {
+  display: none;
+  padding: 0 24px 20px;
+  font-size: 0.92rem;
+  color: var(--text-body);
+  line-height: 1.6;
+}
+
+.faq-item.is-open .faq-content {
+  display: block;
+}

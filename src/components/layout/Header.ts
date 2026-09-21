@@ -1,6 +1,6 @@
 /* ==========================================================================
    NIDJ JUICE — CORPORATE HEADER & ANIMATED MEGA-MENU (COCA-COLA STYLE)
-   High-End FMCG Corporate Standard • Smooth Hover Flyouts • Active Indicator
+   High-End FMCG Corporate Standard • Real Multi-Page Dedicated Routes
    ========================================================================== */
 
 import { OFFICIAL_CONTACT } from '../../data/stores.data';
@@ -34,7 +34,7 @@ export class Header {
           
           <!-- Left: Brand Logo + Region/Country Selector (Coca-Cola Style) -->
           <div class="header-brand-group">
-            <a href="#" class="brand-logo-link" aria-label="Nidj Juice — Société Nidjeu">
+            <a href="/" class="brand-logo-link" aria-label="Nidj Juice — Société Nidjeu">
               <span class="brand-company-prefix">THE</span>
               <img 
                 src="/assets/images/logo-nidj.png" 
@@ -63,40 +63,35 @@ export class Header {
               
               <!-- Tab 1: Entreprise -->
               <li class="nav-item" data-mega-target="megaEntreprise">
-                <a href="#story" class="nav-link" data-link="entreprise">
+                <a href="/entreprise" class="nav-link" data-link="entreprise">
                   Entreprise
                 </a>
               </li>
 
-              <!-- Tab 2: Marques -->
+              <!-- Tab 2: Marques & Saveurs -->
               <li class="nav-item" data-mega-target="megaMarques">
-                <a href="#flavors" class="nav-link" data-link="marques">
+                <a href="/saveurs" class="nav-link" data-link="saveurs">
                   Nos Saveurs
                 </a>
               </li>
 
               <!-- Tab 3: Engagements RSE -->
               <li class="nav-item" data-mega-target="megaEngagements">
-                <a href="#story" class="nav-link" data-link="engagements">
+                <a href="/engagements" class="nav-link" data-link="engagements">
                   Engagements
                 </a>
               </li>
 
               <!-- Tab 4: Points de vente -->
               <li class="nav-item">
-                <a href="#locator" class="nav-link" data-link="locator">
+                <a href="/points-de-vente" class="nav-link" data-link="points-de-vente">
                   Points de vente
                 </a>
               </li>
 
-              <!-- Tab 5: Partenaires & B2B (with diagonal arrow) -->
+              <!-- Tab 5: Partenaires & B2B -->
               <li class="nav-item">
-                <a 
-                  href="https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=Bonjour%20Soci%C3%A9t%C3%A9%20Nidjeu,%20je%20souhaite%20des%20informations%20B2B%20et%20revendeurs" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  class="nav-link nav-link-external"
-                >
+                <a href="/b2b" class="nav-link nav-link-external" data-link="b2b">
                   B2B & Réseau
                   <span class="external-arrow">↗</span>
                 </a>
@@ -177,7 +172,7 @@ export class Header {
         <div class="mega-panel" id="megaEntreprise" role="region" aria-label="Menu Entreprise">
           <div class="mega-container container">
             
-            <!-- Left: Feature Showcase Card (Coca-Cola Style Image + Heading + CTA) -->
+            <!-- Left: Feature Showcase Card -->
             <div class="mega-card-feature">
               <div class="mega-card-img-box">
                 <img 
@@ -192,7 +187,7 @@ export class Header {
                 <p class="mega-card-desc">
                   Depuis sa création, Société Nidjeu valorise la richesse naturelle du Cameroun à travers des nectars d'exception 100% purs. Découvrez notre vision, nos coopératives partenaires et nos procédés d'embouteillage haute exigence.
                 </p>
-                <a href="#story" class="mega-action-pill-btn">
+                <a href="/entreprise" class="mega-action-pill-btn">
                   <span>Apprendre Encore Plus</span>
                   <span class="btn-arrow">→</span>
                 </a>
@@ -202,12 +197,12 @@ export class Header {
             <!-- Center: Structured Corporate Directory -->
             <div class="mega-column-links">
               <ul class="mega-links-list">
-                <li><a href="#story" class="mega-link-item">Notre vision et notre raison d'être</a></li>
-                <li><a href="#story" class="mega-link-item">Le savoir-faire Société Nidjeu</a></li>
-                <li><a href="#story" class="mega-link-item">Direction & Gouvernance camerounaise</a></li>
-                <li><a href="#story" class="mega-link-item has-arrow"><span>Durabilité & Coopératives agricoles</span><span class="chevron">›</span></a></li>
-                <li><a href="#story" class="mega-link-item has-arrow"><span>Histoire de Nidj Juice</span><span class="chevron">›</span></a></li>
-                <li><a href="#story" class="mega-link-item has-arrow"><span>Normes de qualité et traçabilité</span><span class="chevron">›</span></a></li>
+                <li><a href="/entreprise#vision" class="mega-link-item">Notre vision et notre raison d'être</a></li>
+                <li><a href="/entreprise#savoir-faire" class="mega-link-item">Le savoir-faire Société Nidjeu</a></li>
+                <li><a href="/entreprise#gouvernance" class="mega-link-item">Direction & Gouvernance camerounaise</a></li>
+                <li><a href="/engagements#filieres" class="mega-link-item has-arrow"><span>Durabilité & Coopératives agricoles</span><span class="chevron">›</span></a></li>
+                <li><a href="/entreprise#histoire" class="mega-link-item has-arrow"><span>Histoire de Nidj Juice</span><span class="chevron">›</span></a></li>
+                <li><a href="/entreprise#qualite" class="mega-link-item has-arrow"><span>Normes de qualité et traçabilité</span><span class="chevron">›</span></a></li>
               </ul>
             </div>
 
@@ -252,7 +247,7 @@ export class Header {
                 <p class="mega-card-desc">
                   Chaque recette est élaborée à partir d'ingrédients bruts rigoureusement sélectionnés : l'infusion florale d'hibiscus royal et la fraîcheur solaire de l'ananas mûri sous le soleil du Cameroun combiné au gingembre sauvage.
                 </p>
-                <a href="#flavors" class="mega-action-pill-btn">
+                <a href="/saveurs" class="mega-action-pill-btn">
                   <span>Explorer le Catalogue</span>
                   <span class="btn-arrow">→</span>
                 </a>
@@ -262,33 +257,33 @@ export class Header {
             <!-- Center: Product Quick Links -->
             <div class="mega-column-links">
               <ul class="mega-links-list">
-                <li><a href="#flavors" class="mega-link-item">Cocktail de Bissap (Hibiscus & Ananas)</a></li>
-                <li><a href="#flavors" class="mega-link-item">Jus d’Ananas Gingembre (Vitalité Pure)</a></li>
-                <li><a href="#order" class="mega-link-item has-arrow"><span>Pack Découverte Duo 6x 50cl</span><span class="chevron">›</span></a></li>
-                <li><a href="#order" class="mega-link-item has-arrow"><span>Carton 12x Familial & Événements</span><span class="chevron">›</span></a></li>
-                <li><a href="#flavors" class="mega-link-item has-arrow"><span>Tableau de transparence nutritionnelle</span><span class="chevron">›</span></a></li>
+                <li><a href="/saveurs#bissap" class="mega-link-item">Cocktail de Bissap (Hibiscus & Ananas)</a></li>
+                <li><a href="/saveurs#ananas" class="mega-link-item">Jus d’Ananas Gingembre (Vitalité Pure)</a></li>
+                <li><a href="/saveurs#duo" class="mega-link-item has-arrow"><span>Pack Découverte Duo 6x 50cl</span><span class="chevron">›</span></a></li>
+                <li><a href="/saveurs#duo" class="mega-link-item has-arrow"><span>Carton 12x Familial & Événements</span><span class="chevron">›</span></a></li>
+                <li><a href="/saveurs#nutrition" class="mega-link-item has-arrow"><span>Tableau de transparence nutritionnelle</span><span class="chevron">›</span></a></li>
               </ul>
             </div>
 
             <!-- Right: Visual Flavor Teasers -->
             <div class="mega-column-products">
-              <div class="flavor-mini-card" data-flavor="bissap">
+              <a href="/saveurs#bissap" class="flavor-mini-card" data-flavor="bissap" style="text-decoration:none;">
                 <img src="/assets/images/bottle-bissap.png" alt="Bissap" class="mini-bottle-img" />
                 <div class="mini-card-text">
                   <span class="mini-tag ruby">Hibiscus Royal</span>
                   <span class="mini-name">Cocktail de Bissap</span>
                   <span class="mini-price">1 000 FCFA</span>
                 </div>
-              </div>
+              </a>
 
-              <div class="flavor-mini-card" data-flavor="ananas">
+              <a href="/saveurs#ananas" class="flavor-mini-card" data-flavor="ananas" style="text-decoration:none;">
                 <img src="/assets/images/bottle-ananas.png" alt="Ananas" class="mini-bottle-img" />
                 <div class="mini-card-text">
                   <span class="mini-tag gold">Énergie Terroir</span>
                   <span class="mini-name">Ananas Gingembre</span>
                   <span class="mini-price">1 000 FCFA</span>
                 </div>
-              </div>
+              </a>
             </div>
 
           </div>
@@ -312,7 +307,7 @@ export class Header {
                 <p class="mega-card-desc">
                   Notre modèle s'appuie sur le respect absolu de l'environnement : circuits courts, approvisionnement auprès des petits exploitants agricoles du Cameroun et consigne de recyclage pour un impact écologique minimal.
                 </p>
-                <a href="#story" class="mega-action-pill-btn">
+                <a href="/engagements" class="mega-action-pill-btn">
                   <span>Nos Engagements RSE</span>
                   <span class="btn-arrow">→</span>
                 </a>
@@ -321,11 +316,11 @@ export class Header {
 
             <div class="mega-column-links">
               <ul class="mega-links-list">
-                <li><a href="#story" class="mega-link-item">Filière d'approvisionnement équitable</a></li>
-                <li><a href="#story" class="mega-link-item">Zéro conservateur chimique ni OGM</a></li>
-                <li><a href="#story" class="mega-link-item">Soutien aux agriculteurs locaux</a></li>
-                <li><a href="#story" class="mega-link-item has-arrow"><span>Programme de recyclage des emballages</span><span class="chevron">›</span></a></li>
-                <li><a href="#story" class="mega-link-item has-arrow"><span>Consommation énergétique & chaîne du froid</span><span class="chevron">›</span></a></li>
+                <li><a href="/engagements#filieres" class="mega-link-item">Filière d'approvisionnement équitable</a></li>
+                <li><a href="/engagements#naturel" class="mega-link-item">Zéro conservateur chimique ni OGM</a></li>
+                <li><a href="/engagements#producteurs" class="mega-link-item">Soutien aux agriculteurs locaux</a></li>
+                <li><a href="/engagements#recyclage" class="mega-link-item has-arrow"><span>Programme de recyclage des emballages</span><span class="chevron">›</span></a></li>
+                <li><a href="/engagements#froid" class="mega-link-item has-arrow"><span>Consommation énergétique & chaîne du froid</span><span class="chevron">›</span></a></li>
               </ul>
             </div>
 
@@ -372,11 +367,11 @@ export class Header {
           </div>
           <div class="search-quick-tags">
             <span class="tag-label">Recherches populaires :</span>
-            <a href="#flavors" class="search-tag-chip">Cocktail Bissap</a>
-            <a href="#flavors" class="search-tag-chip">Ananas Gingembre</a>
-            <a href="#locator" class="search-tag-chip">Douala (Bonapriso)</a>
-            <a href="#locator" class="search-tag-chip">Yaoundé (Bastos)</a>
-            <a href="#order" class="search-tag-chip">Commande Express</a>
+            <a href="/saveurs#bissap" class="search-tag-chip">Cocktail Bissap</a>
+            <a href="/saveurs#ananas" class="search-tag-chip">Ananas Gingembre</a>
+            <a href="/points-de-vente" class="search-tag-chip">Douala (Bonapriso)</a>
+            <a href="/points-de-vente" class="search-tag-chip">Yaoundé (Bastos)</a>
+            <a href="/b2b" class="search-tag-chip">Devenir Distributeur</a>
           </div>
         </div>
       </div>
@@ -399,11 +394,13 @@ export class Header {
           </div>
           <nav class="mobile-nav">
             <ul class="mobile-nav-list">
-              <li><a href="#hero" class="mobile-nav-link">Accueil</a></li>
-              <li><a href="#story" class="mobile-nav-link">Entreprise & Histoire</a></li>
-              <li><a href="#flavors" class="mobile-nav-link">Nos Saveurs</a></li>
-              <li><a href="#locator" class="mobile-nav-link">Points de vente (Cameroun)</a></li>
-              <li><a href="#contact" class="mobile-nav-link">Contact & Hotline</a></li>
+              <li><a href="/" class="mobile-nav-link">Accueil</a></li>
+              <li><a href="/entreprise" class="mobile-nav-link">Entreprise & Histoire</a></li>
+              <li><a href="/saveurs" class="mobile-nav-link">Nos Saveurs</a></li>
+              <li><a href="/engagements" class="mobile-nav-link">Engagements RSE</a></li>
+              <li><a href="/points-de-vente" class="mobile-nav-link">Points de vente (Cameroun)</a></li>
+              <li><a href="/b2b" class="mobile-nav-link">Espace B2B & Distributeurs</a></li>
+              <li><a href="/contact" class="mobile-nav-link">Contact & Hotline</a></li>
             </ul>
           </nav>
           <div class="mobile-drawer-footer">
@@ -434,11 +431,37 @@ export class Header {
       }
     }, { passive: true });
 
-    // Handle Animated Sliding Indicator & Mega Menus (Jitter-Free Architecture)
+    // Handle Active Indicator
+    const updateActiveIndicator = () => {
+      if (!mainNavList || !navIndicator) return;
+      const currentPath = window.location.pathname;
+      const activeLink = mainNavList.querySelector(`a[href="${currentPath}"]`) as HTMLElement;
+
+      if (activeLink) {
+        const itemRect = activeLink.parentElement?.getBoundingClientRect();
+        const navRect = mainNavList.getBoundingClientRect();
+        if (itemRect) {
+          const left = itemRect.left - navRect.left;
+          const width = itemRect.width;
+          navIndicator.style.opacity = '1';
+          navIndicator.style.transform = `translateX(${left}px)`;
+          navIndicator.style.width = `${width}px`;
+        }
+      } else {
+        navIndicator.style.opacity = '0';
+      }
+    };
+
+    window.addEventListener('nidj:route-changed', () => {
+      setTimeout(updateActiveIndicator, 50);
+    });
+    setTimeout(updateActiveIndicator, 100);
+
+    // Animated Underline on hover
     if (mainNavList && navIndicator) {
       const navItems = mainNavList.querySelectorAll('.nav-item');
 
-      const updateIndicator = (el: HTMLElement) => {
+      const setIndicator = (el: HTMLElement) => {
         const itemRect = el.getBoundingClientRect();
         const navRect = mainNavList.getBoundingClientRect();
         const left = itemRect.left - navRect.left;
@@ -453,19 +476,17 @@ export class Header {
         const itemEl = item as HTMLElement;
         const targetMega = itemEl.dataset.megaTarget;
 
-        // Hover enter
         itemEl.addEventListener('mouseenter', () => {
           if (this.megaCloseTimeout) {
             clearTimeout(this.megaCloseTimeout);
             this.megaCloseTimeout = null;
           }
 
-          updateIndicator(itemEl);
+          setIndicator(itemEl);
 
           if (targetMega) {
             this.openMegaMenu(targetMega);
           } else {
-            // Delay close for items without a mega menu to prevent accidental collapses
             this.megaCloseTimeout = window.setTimeout(() => {
               this.closeAllMegaMenus();
             }, 240);
@@ -473,7 +494,6 @@ export class Header {
         });
       });
 
-      // Keep menu open when hovering inside the mega-menu itself
       if (megaWrapper) {
         megaWrapper.addEventListener('mouseenter', () => {
           if (this.megaCloseTimeout) {
@@ -483,7 +503,6 @@ export class Header {
         });
       }
 
-      // Cancel close timer whenever cursor re-enters the header
       this.element.addEventListener('mouseenter', () => {
         if (this.megaCloseTimeout) {
           clearTimeout(this.megaCloseTimeout);
@@ -491,14 +510,13 @@ export class Header {
         }
       });
 
-      // Single authoritative mouseleave on the entire header
       this.element.addEventListener('mouseleave', () => {
         if (this.megaCloseTimeout) {
           clearTimeout(this.megaCloseTimeout);
         }
         this.megaCloseTimeout = window.setTimeout(() => {
           this.closeAllMegaMenus();
-          navIndicator.style.opacity = '0';
+          updateActiveIndicator();
         }, 280);
       });
     }
@@ -538,28 +556,22 @@ export class Header {
     const closeDrawerBtn = this.element.querySelector('#closeDrawerBtn');
     const drawerBackdrop = this.element.querySelector('#drawerBackdrop');
     const drawerOrderBtn = this.element.querySelector('#mobileDrawerOrderBtn');
-    const headerOrderBtn = this.element.querySelector('#headerOrderBtn');
 
     mobileBtn?.addEventListener('click', () => this.toggleMobileMenu(true));
     closeDrawerBtn?.addEventListener('click', () => this.toggleMobileMenu(false));
     drawerBackdrop?.addEventListener('click', () => this.toggleMobileMenu(false));
 
-    const scrollToOrder = () => {
-      const orderSec = document.getElementById('order');
-      if (orderSec) {
-        orderSec.scrollIntoView({ behavior: 'smooth' });
-      }
+    drawerOrderBtn?.addEventListener('click', () => {
       this.toggleMobileMenu(false);
-      this.closeAllMegaMenus();
-    };
+      window.dispatchEvent(new CustomEvent('nidj:open-order-modal'));
+    });
 
-    headerOrderBtn?.addEventListener('click', scrollToOrder);
-    drawerOrderBtn?.addEventListener('click', scrollToOrder);
-
-    // Close menus when clicking any internal link in mega-menu
-    this.element.querySelectorAll('.mega-link-item, .mega-action-pill-btn').forEach((link) => {
+    // Close all menus upon clicking ANY link inside the header / mega-menu
+    this.element.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', () => {
         this.closeAllMegaMenus();
+        this.closeSearch();
+        this.toggleMobileMenu(false);
       });
     });
   }

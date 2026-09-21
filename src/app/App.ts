@@ -1,25 +1,31 @@
 /* ==========================================================================
-   NIDJ JUICE — APPLICATION ORCHESTRATOR
-   Assembled in exact alignment with official Eco-Fruits mock-up
+   NIDJ JUICE — APPLICATION ORCHESTRATOR & ROUTER INTEGRATION
+   FMCG Corporate Standard • Multi-Page SPA Architecture
    ========================================================================== */
 
 import { Header } from '../components/layout/Header';
-import { HeroSection } from '../components/hero/HeroSection';
-import { StorySection } from '../components/story/StorySection';
-import { BrandShowcaseSection } from '../components/showcase/BrandShowcaseSection';
-import { FlavorShowcase } from '../components/flavors/FlavorShowcase';
-import { PromoOrderBanner } from '../components/promo/PromoOrderBanner';
-import { VideoReelsSection } from '../components/media/VideoReelsSection';
-import { StoreLocator } from '../components/locator/StoreLocator';
 import { Footer } from '../components/layout/Footer';
 import { OrderModal } from '../components/order/OrderModal';
 import { AmbientCanvas } from '../features/ambient-canvas';
 import { audioController } from '../features/audio-controller';
+import { router, type RoutePath } from '../router/Router';
+
+import { HomePage } from '../pages/HomePage';
+import { CompanyPage } from '../pages/CompanyPage';
+import { FlavorsPage } from '../pages/FlavorsPage';
+import { EngagementsPage } from '../pages/EngagementsPage';
+import { LocationsPage } from '../pages/LocationsPage';
+import { B2BPage } from '../pages/B2BPage';
+import { ContactPage } from '../pages/ContactPage';
 
 export class App {
   private root: HTMLElement;
+  private header: Header | null = null;
+  private mainElement: HTMLElement | null = null;
+  private footer: Footer | null = null;
   private orderModal: OrderModal | null = null;
   private ambientCanvas: AmbientCanvas | null = null;
+  private currentPageInstance: { destroy?: () => void } | null = null;
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -28,14 +34,14 @@ export class App {
   public init(): void {
     this.root.innerHTML = '';
 
-    // 0. Skip to content accessibility link
+    // 0. Skip to content link
     const skipLink = document.createElement('a');
     skipLink.href = '#mainContent';
     skipLink.className = 'skip-to-content';
     skipLink.textContent = 'Passer directement au contenu';
     this.root.appendChild(skipLink);
 
-    // 1. Ambient Dynamic Bubble Canvas (Subtle background)
+    // 1. Ambient Dynamic Bubble Canvas
     const canvas = document.createElement('canvas');
     canvas.id = 'ambientCanvas';
     canvas.className = 'ambient-canvas';
@@ -43,43 +49,79 @@ export class App {
     this.root.appendChild(canvas);
     this.ambientCanvas = new AmbientCanvas(canvas);
 
-    // 2. Global Light Header
-    const header = new Header();
-    this.root.appendChild(header.getElement());
+    // 2. Global Light Header with Animated Mega-Menu
+    this.header = new Header();
+    this.root.appendChild(this.header.getElement());
 
-    // 3. Main Semantic Container
-    const main = document.createElement('main');
-    main.id = 'mainContent';
+    // 3. Main Dynamic Content Container
+    this.mainElement = document.createElement('main');
+    this.mainElement.id = 'mainContent';
+    this.mainElement.style.minHeight = '70vh';
+    this.mainElement.style.transition = 'opacity 0.2s ease';
+    this.root.appendChild(this.mainElement);
 
-    // 4. Feature Sections matching Mockup Hierarchy
-    const hero = new HeroSection();
-    const about = new StorySection();
-    const showcase = new BrandShowcaseSection();
-    const flavors = new FlavorShowcase();
-    const promo = new PromoOrderBanner();
-    const reels = new VideoReelsSection();
-    const locator = new StoreLocator();
+    // 4. Wavy Deep Green Footer
+    this.footer = new Footer();
+    this.root.appendChild(this.footer.getElement());
 
-    main.appendChild(hero.getElement());
-    main.appendChild(about.getElement());
-    main.appendChild(showcase.getElement());
-    main.appendChild(flavors.getElement());
-    main.appendChild(promo.getElement());
-    main.appendChild(reels.getElement());
-    main.appendChild(locator.getElement());
-
-    this.root.appendChild(main);
-
-    // 5. Wavy Deep Green Footer
-    const footer = new Footer();
-    this.root.appendChild(footer.getElement());
-
-    // 6. Conversion Order Modal
+    // 5. Conversion Order Modal
     this.orderModal = new OrderModal();
     this.root.appendChild(this.orderModal.getElement());
 
-    // 7. Global Event Orchestration
+    // 6. Global Event Orchestration
     this.bindGlobalEvents();
+
+    // 7. Initialize Router and mount initial route
+    router.init((path: RoutePath, hash: string) => {
+      this.renderRoute(path, hash);
+    });
+  }
+
+  private renderRoute(path: RoutePath, _hash: string): void {
+    if (!this.mainElement) return;
+
+    // Clean up previous page if needed
+    if (this.currentPageInstance && typeof this.currentPageInstance.destroy === 'function') {
+      this.currentPageInstance.destroy();
+    }
+
+    this.mainElement.style.opacity = '0';
+
+    setTimeout(() => {
+      if (!this.mainElement) return;
+      this.mainElement.innerHTML = '';
+
+      let pageComponent: { getElement: () => HTMLElement; destroy?: () => void };
+
+      switch (path) {
+        case '/entreprise':
+          pageComponent = new CompanyPage();
+          break;
+        case '/saveurs':
+          pageComponent = new FlavorsPage();
+          break;
+        case '/engagements':
+          pageComponent = new EngagementsPage();
+          break;
+        case '/points-de-vente':
+          pageComponent = new LocationsPage();
+          break;
+        case '/b2b':
+          pageComponent = new B2BPage();
+          break;
+        case '/contact':
+          pageComponent = new ContactPage();
+          break;
+        case '/':
+        default:
+          pageComponent = new HomePage();
+          break;
+      }
+
+      this.currentPageInstance = pageComponent;
+      this.mainElement.appendChild(pageComponent.getElement());
+      this.mainElement.style.opacity = '1';
+    }, 120);
   }
 
   private bindGlobalEvents(): void {
@@ -87,13 +129,20 @@ export class App {
       const target = e.target as HTMLElement;
 
       const orderTrigger = target.closest(
-        '#headerOrderBtn, #heroOrderBtn, #mobileDrawerOrderBtn'
+        '#headerOrderBtn, #heroOrderBtn, #mobileDrawerOrderBtn, .open-order-modal-btn'
       );
 
       if (orderTrigger) {
         audioController.playDrop();
         this.orderModal?.open();
       }
+    });
+
+    // Custom event to open order modal with prefilled flavor/store
+    window.addEventListener('nidj:open-order-modal', (e: Event) => {
+      const customEvent = e as CustomEvent<{ storeHint?: string }>;
+      audioController.playDrop();
+      this.orderModal?.open(customEvent.detail?.storeHint);
     });
   }
 

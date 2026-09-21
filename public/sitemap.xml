@@ -4,7 +4,7 @@
   <url>
     <loc>https://www.nidjeu.com/</loc>
     <lastmod>2026-09-21</lastmod>
-    <changefreq>weekly</changefreq>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://www.nidjeu.com/assets/images/bottle-bissap.png</image:loc>
@@ -18,28 +18,55 @@
     </image:image>
   </url>
   <url>
-    <loc>https://www.nidjeu.com/#flavors</loc>
+    <loc>https://www.nidjeu.com/entreprise</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.nidjeu.com/assets/images/gallery-1.webp</image:loc>
+      <image:title>Société Nidjeu — Siège et atelier d'extraction Douala</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://www.nidjeu.com/#story</loc>
+    <loc>https://www.nidjeu.com/saveurs</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://www.nidjeu.com/assets/images/bottle-bissap.png</image:loc>
+      <image:title>Cocktail de Bissap Royal</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.nidjeu.com/assets/images/bottle-ananas.png</image:loc>
+      <image:title>Jus d'Ananas Gingembre Terroir</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.nidjeu.com/engagements</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://www.nidjeu.com/assets/images/gallery-3.webp</image:loc>
+      <image:title>Engagements RSE et producteurs locaux au Cameroun</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://www.nidjeu.com/#locator</loc>
+    <loc>https://www.nidjeu.com/points-de-vente</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.nidjeu.com/#contact</loc>
+    <loc>https://www.nidjeu.com/b2b</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.nidjeu.com/contact</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
-

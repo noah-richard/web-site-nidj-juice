@@ -37,7 +37,7 @@ export class Footer {
             
             <!-- Column 1: Brand & Cameroonian Heritage -->
             <div class="footer-col-brand">
-              <a href="#" class="footer-brand-link" aria-label="Nidj Juice">
+              <a href="/" class="footer-brand-link" aria-label="Nidj Juice">
                 <img 
                   src="/assets/images/logo-nidj.png" 
                   alt="Nidj Juice — Société Nidjeu" 
@@ -76,11 +76,12 @@ export class Footer {
             <div class="footer-col-nav">
               <h3 class="footer-title">Navigation</h3>
               <ul class="footer-nav-list">
-                <li><a href="#story" class="footer-nav-link">À propos</a></li>
-                <li><a href="#flavors" class="footer-nav-link">Nos Saveurs</a></li>
-                <li><a href="#order" class="footer-nav-link">Commander</a></li>
-                <li><a href="#locator" class="footer-nav-link">Points de vente</a></li>
-                <li><a href="#reels" class="footer-nav-link">Vidéos</a></li>
+                <li><a href="/entreprise" class="footer-nav-link">L'Entreprise</a></li>
+                <li><a href="/saveurs" class="footer-nav-link">Nos Saveurs</a></li>
+                <li><a href="/engagements" class="footer-nav-link">Engagements RSE</a></li>
+                <li><a href="/points-de-vente" class="footer-nav-link">Points de vente</a></li>
+                <li><a href="/b2b" class="footer-nav-link">Espace B2B</a></li>
+                <li><a href="/contact" class="footer-nav-link">Contact & FAQ</a></li>
               </ul>
             </div>
 
