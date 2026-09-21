@@ -245,11 +245,12 @@
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-top: var(--space-6);
 }
 
 .hero-dot-btn {
+  position: relative;
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -257,12 +258,42 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: all var(--duration-normal) var(--ease-spring);
+  overflow: hidden;
+  transition: width 0.35s var(--ease-spring), border-radius 0.35s ease, background 0.25s ease;
+}
+
+.hero-dot-btn:hover {
+  background: #A3B5A1;
 }
 
 .hero-dot-btn.is-active {
-  width: 28px;
+  width: 32px;
   border-radius: var(--radius-pill);
+  background: rgba(88, 168, 38, 0.2);
+  box-shadow: 0 2px 8px rgba(88, 168, 38, 0.25);
+}
+
+.hero-dot-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
   background: var(--color-brand-green);
-  box-shadow: 0 2px 8px rgba(88, 168, 38, 0.4);
+  border-radius: var(--radius-pill);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.hero-dot-btn.is-active .hero-dot-progress-bar {
+  animation: heroDotFill 5s linear forwards;
+}
+
+.hero-section.is-paused .hero-dot-btn.is-active .hero-dot-progress-bar {
+  animation-play-state: paused;
+}
+
+@keyframes heroDotFill {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
 }

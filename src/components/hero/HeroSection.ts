@@ -1,7 +1,8 @@
 /* ==========================================================================
    NIDJ JUICE — HERO EXPERIENCE (FAITHFUL TO OFFICIAL MOCKUP)
    Editorial layout: 01/02 indicator, split display typography,
-   floating fruit splash & bottle, 3 circular trust badges, interactive dots.
+   floating fruit splash & bottle, 3 circular trust badges,
+   interactive auto-swipe slider with progress indicator & touch support.
    ========================================================================== */
 
 import { FLAVORS_DATA } from '../../data/flavors.data';
@@ -12,6 +13,12 @@ import type { FlavorId } from '../../types/product.types';
 export class HeroSection {
   private element: HTMLElement;
   private currentFlavorId: FlavorId = 'bissap';
+  private autoPlayTimer: number | null = null;
+  private readonly autoPlayInterval: number = 5000; // 5 seconds per flavor slide
+  private isPaused: boolean = false;
+  private unsubscribeTheme: (() => void) | null = null;
+  private touchStartX: number = 0;
+  private touchStartY: number = 0;
 
   constructor() {
     this.element = document.createElement('section');
@@ -19,6 +26,7 @@ export class HeroSection {
     this.element.className = 'hero-section';
     this.render();
     this.bindEvents();
+    this.startAutoPlay();
   }
 
   public getElement(): HTMLElement {
@@ -46,7 +54,7 @@ export class HeroSection {
           <h1 class="hero-title">
             <span class="sr-only">Nidj Juice — </span>
             <span class="hero-title-word1" id="heroWord1">${isBissap ? 'Cocktail.' : 'Ananas.'}</span>
-            <span class="hero-title-word2" id="heroWord2">${isBissap ? 'Bissap' : 'Gingembre'}</span>
+            <span class="hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}" id="heroWord2">${isBissap ? 'Bissap' : 'Gingembre'}</span>
           </h1>
 
           <p class="hero-subtitle">
@@ -133,7 +141,7 @@ export class HeroSection {
             />
           </div>
 
-          <!-- Interactive Pagination Dots (01 Bissap / 02 Ananas) -->
+          <!-- Interactive Auto-Swipe Pagination Dots (01 Bissap / 02 Ananas) -->
           <div class="hero-pagination-dots" role="tablist" aria-label="Changer de senteur">
             <button 
               type="button" 
@@ -141,16 +149,20 @@ export class HeroSection {
               data-flavor="bissap" 
               role="tab" 
               aria-selected="${isBissap ? 'true' : 'false'}" 
-              aria-label="Senteur Cocktail de Bissap"
-            ></button>
+              aria-label="Senteur Cocktail de Bissap (01)"
+            >
+              <span class="hero-dot-progress-bar" aria-hidden="true"></span>
+            </button>
             <button 
               type="button" 
               class="hero-dot-btn ${!isBissap ? 'is-active' : ''}" 
               data-flavor="ananas" 
               role="tab" 
               aria-selected="${!isBissap ? 'true' : 'false'}" 
-              aria-label="Senteur Jus d'Ananas Gingembre"
-            ></button>
+              aria-label="Senteur Jus d'Ananas Gingembre (02)"
+            >
+              <span class="hero-dot-progress-bar" aria-hidden="true"></span>
+            </button>
           </div>
 
         </div>
@@ -160,16 +172,60 @@ export class HeroSection {
   }
 
   private bindEvents(): void {
-    // Dot switcher
+    // Dot switcher clicks
     this.element.querySelectorAll('.hero-dot-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const flavor = (e.currentTarget as HTMLElement).dataset.flavor as FlavorId;
         if (flavor) {
-          audioController.playPop();
-          themeController.setFlavor(flavor);
+          this.switchFlavor(flavor, true);
         }
       });
     });
+
+    // Pause auto-swipe on hover so user can read or click CTAs
+    this.element.addEventListener('mouseenter', () => {
+      this.pauseAutoPlay();
+    });
+
+    this.element.addEventListener('mouseleave', () => {
+      this.resumeAutoPlay();
+    });
+
+    // Touch Swipe Gesture support for mobile & tablet users
+    this.element.addEventListener(
+      'touchstart',
+      (e: TouchEvent) => {
+        if (e.touches.length > 0) {
+          this.touchStartX = e.touches[0].clientX;
+          this.touchStartY = e.touches[0].clientY;
+          this.pauseAutoPlay();
+        }
+      },
+      { passive: true }
+    );
+
+    this.element.addEventListener(
+      'touchend',
+      (e: TouchEvent) => {
+        if (e.changedTouches.length > 0) {
+          const touchEndX = e.changedTouches[0].clientX;
+          const touchEndY = e.changedTouches[0].clientY;
+          const deltaX = touchEndX - this.touchStartX;
+          const deltaY = touchEndY - this.touchStartY;
+
+          // Detect horizontal swipe above threshold (40px)
+          if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+            const nextFlavor: FlavorId = this.currentFlavorId === 'bissap' ? 'ananas' : 'bissap';
+            this.switchFlavor(nextFlavor, true);
+          }
+          this.resumeAutoPlay();
+        }
+      },
+      { passive: true }
+    );
+
+    // Pause timer when browser tab is inactive
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
 
     // 3D Parallax on mouse move
     const wrapper = this.element.querySelector('#heroVisualWrapper') as HTMLElement;
@@ -193,10 +249,58 @@ export class HeroSection {
     }
 
     // Subscribe to theme controller
-    themeController.subscribe((newFlavor) => {
+    this.unsubscribeTheme = themeController.subscribe((newFlavor) => {
       this.currentFlavorId = newFlavor;
       this.updateView(newFlavor);
     });
+  }
+
+  private handleVisibilityChange = (): void => {
+    if (document.visibilityState === 'hidden') {
+      this.pauseAutoPlay();
+    } else {
+      this.resumeAutoPlay();
+    }
+  };
+
+  private switchFlavor(flavor: FlavorId, interactive: boolean = false): void {
+    if (interactive) {
+      audioController.playPop();
+    }
+    themeController.setFlavor(flavor);
+    this.restartAutoPlay();
+  }
+
+  private startAutoPlay(): void {
+    this.stopAutoPlay();
+    this.autoPlayTimer = window.setInterval(() => {
+      if (!this.isPaused && document.visibilityState === 'visible') {
+        const nextFlavor: FlavorId = this.currentFlavorId === 'bissap' ? 'ananas' : 'bissap';
+        themeController.setFlavor(nextFlavor);
+      }
+    }, this.autoPlayInterval);
+  }
+
+  private stopAutoPlay(): void {
+    if (this.autoPlayTimer !== null) {
+      clearInterval(this.autoPlayTimer);
+      this.autoPlayTimer = null;
+    }
+  }
+
+  private pauseAutoPlay(): void {
+    this.isPaused = true;
+    this.element.classList.add('is-paused');
+  }
+
+  private resumeAutoPlay(): void {
+    this.isPaused = false;
+    this.element.classList.remove('is-paused');
+  }
+
+  private restartAutoPlay(): void {
+    this.stopAutoPlay();
+    this.startAutoPlay();
   }
 
   private updateView(flavorId: FlavorId): void {
@@ -207,46 +311,85 @@ export class HeroSection {
     const activeIdx = this.element.querySelector('.active-idx');
     if (activeIdx) activeIdx.textContent = isBissap ? '01' : '02';
 
-    // Update Two-Tone Headline
+    // Update Two-Tone Headline with soft crossfade
     const word1 = this.element.querySelector('#heroWord1');
     const word2 = this.element.querySelector('#heroWord2');
-    const desc = this.element.querySelector('#heroFlavorDesc');
+    const headline = this.element.querySelector('.hero-title') as HTMLElement;
+    const desc = this.element.querySelector('#heroFlavorDesc') as HTMLElement;
 
-    if (word1) word1.textContent = isBissap ? 'Cocktail.' : 'Ananas.';
-    if (word2) {
-      word2.textContent = isBissap ? 'Bissap' : 'Gingembre';
-      word2.className = `hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}`;
+    if (headline) {
+      headline.style.transition = 'opacity 0.2s ease, transform 0.25s ease';
+      headline.style.opacity = '0.3';
+      headline.style.transform = 'translateY(6px)';
+      setTimeout(() => {
+        if (word1) word1.textContent = isBissap ? 'Cocktail.' : 'Ananas.';
+        if (word2) {
+          word2.textContent = isBissap ? 'Bissap' : 'Gingembre';
+          word2.className = `hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}`;
+        }
+        headline.style.opacity = '1';
+        headline.style.transform = 'translateY(0)';
+      }, 150);
     }
-    if (desc) desc.textContent = flavor.description;
 
-    // Update Bottle Image with quick transition
+    if (desc) {
+      desc.style.transition = 'opacity 0.2s ease';
+      desc.style.opacity = '0.3';
+      setTimeout(() => {
+        desc.textContent = flavor.description;
+        desc.style.opacity = '1';
+      }, 150);
+    }
+
+    // Update Bottle Image with fluid scale/slide transition
     const bottle = this.element.querySelector('#heroBottleImg') as HTMLImageElement;
     const splash = this.element.querySelector('#heroSplashImg') as HTMLImageElement;
 
     if (bottle) {
+      bottle.style.transition = 'opacity 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
       bottle.style.opacity = '0';
-      bottle.style.transform = 'scale(0.9) translateY(20px)';
+      bottle.style.transform = 'scale(0.92) translateY(18px)';
       setTimeout(() => {
         bottle.src = flavor.bottleImage;
         bottle.alt = `Bouteille Nidj Juice ${flavor.name}`;
         bottle.style.opacity = '1';
         bottle.style.transform = 'scale(1) translateY(0)';
-      }, 180);
+      }, 200);
     }
 
     if (splash) {
+      splash.style.transition = 'opacity 0.25s ease';
       splash.style.opacity = '0';
       setTimeout(() => {
         splash.src = isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png';
         splash.style.opacity = '1';
-      }, 180);
+      }, 200);
     }
 
-    // Update active dot
+    // Update active dot and reset the progress bar animation
     this.element.querySelectorAll('.hero-dot-btn').forEach((btn) => {
       const match = (btn as HTMLElement).dataset.flavor === flavorId;
       btn.classList.toggle('is-active', match);
       btn.setAttribute('aria-selected', String(match));
+
+      const bar = btn.querySelector('.hero-dot-progress-bar') as HTMLElement;
+      if (bar) {
+        // Force animation restart on active dot
+        bar.style.animation = 'none';
+        void bar.offsetHeight; // trigger reflow
+        if (match) {
+          bar.style.animation = 'heroDotFill 5s linear forwards';
+        }
+      }
     });
+  }
+
+  public destroy(): void {
+    this.stopAutoPlay();
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    if (this.unsubscribeTheme) {
+      this.unsubscribeTheme();
+      this.unsubscribeTheme = null;
+    }
   }
 }

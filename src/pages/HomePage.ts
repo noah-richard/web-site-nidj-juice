@@ -14,13 +14,14 @@ import { StoreLocator } from '../components/locator/StoreLocator';
 
 export class HomePage {
   private element: HTMLElement;
+  private hero: HeroSection;
   private showcase: BrandShowcaseSection;
 
   constructor() {
     this.element = document.createElement('div');
     this.element.className = 'page page-home';
 
-    const hero = new HeroSection();
+    this.hero = new HeroSection();
     const about = new StorySection();
     this.showcase = new BrandShowcaseSection();
     const flavors = new FlavorShowcase();
@@ -28,7 +29,7 @@ export class HomePage {
     const reels = new VideoReelsSection();
     const locator = new StoreLocator();
 
-    this.element.appendChild(hero.getElement());
+    this.element.appendChild(this.hero.getElement());
     this.element.appendChild(about.getElement());
     this.element.appendChild(this.showcase.getElement());
     this.element.appendChild(flavors.getElement());
@@ -42,6 +43,7 @@ export class HomePage {
   }
 
   public destroy(): void {
+    this.hero.destroy();
     this.showcase.destroy();
   }
 }
