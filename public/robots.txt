@@ -6,4 +6,5 @@ Allow: /assets/images/
 Allow: /assets/videos/
 
 # Sitemaps
-Sitemap: https://nidjeu.com/sitemap.xml
+Sitemap: https://www.nidjeu.com/sitemap.xml
+
