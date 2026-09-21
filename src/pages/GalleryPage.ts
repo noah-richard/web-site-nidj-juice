@@ -137,7 +137,7 @@ export class GalleryPage {
 
   private renderGalleryCards(items: GalleryItem[]): string {
     return items.map((item) => `
-      <article class="gallery-card ${item.featured ? 'featured' : ''}" data-item-id="${item.id}">
+      <article class="gallery-card" data-item-id="${item.id}">
         <div class="gallery-card-img-wrap">
           <img 
             src="${item.image}" 
