@@ -1,0 +1,9 @@
+# robots.txt for Nidj Juice (Société Nidjeu)
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /assets/images/
+Allow: /assets/videos/
+
+# Sitemaps
+Sitemap: https://nidjjuice.com/sitemap.xml

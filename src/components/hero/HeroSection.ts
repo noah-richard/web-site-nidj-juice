@@ -42,8 +42,9 @@ export class HeroSection {
             <span class="counter-num total-idx">02 /</span>
           </div>
 
-          <!-- Split Two-Tone Big Typography -->
+          <!-- Split Two-Tone Big Typography with Accessible SEO Brand Name -->
           <h1 class="hero-title">
+            <span class="sr-only">Nidj Juice — </span>
             <span class="hero-title-word1" id="heroWord1">${isBissap ? 'Cocktail.' : 'Ananas.'}</span>
             <span class="hero-title-word2" id="heroWord2">${isBissap ? 'Bissap' : 'Gingembre'}</span>
           </h1>

@@ -146,7 +146,7 @@ export class StoreLocator {
             ${store.openingHours ? `<span class="store-hours-tag">${store.openingHours}</span>` : ''}
           </div>
           
-          <h4 class="store-name">${store.name}</h4>
+          <h3 class="store-name">${store.name}</h3>
           <p class="store-address">${store.address}</p>
           
           <div class="store-contact-row">

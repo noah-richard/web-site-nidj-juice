@@ -39,6 +39,7 @@ export class FlavorShowcase {
           
           <!-- Card 1: Jus d'Ananas Gingembre -->
           <article class="assortment-card card-ananas" data-flavor-id="ananas">
+            <h3 class="sr-only">Nidj Juice — Jus d'Ananas Gingembre</h3>
             <div class="card-halo halo-ananas" aria-hidden="true"></div>
             
             <div class="card-visual-stage">
@@ -65,6 +66,7 @@ export class FlavorShowcase {
 
           <!-- Card 2: Cocktail de Bissap -->
           <article class="assortment-card card-bissap is-active" data-flavor-id="bissap">
+            <h3 class="sr-only">Nidj Juice — Cocktail de Bissap</h3>
             <div class="card-halo halo-bissap" aria-hidden="true"></div>
             
             <div class="card-visual-stage">
@@ -91,6 +93,7 @@ export class FlavorShowcase {
 
           <!-- Card 3: Pack Duo Découverte -->
           <article class="assortment-card card-duo" data-flavor-id="duo">
+            <h3 class="sr-only">Nidj Juice — Pack Découverte Duo</h3>
             <div class="card-halo halo-duo" aria-hidden="true"></div>
             
             <div class="card-visual-stage duo-stage">
