@@ -20,6 +20,7 @@ import { ContactPage } from '../pages/ContactPage';
 import { GalleryPage } from '../pages/GalleryPage';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { BackofficePage } from '../pages/BackofficePage';
+import { CustomPageView } from '../pages/CustomPageView';
 
 export class App {
   private root: HTMLElement;
@@ -88,6 +89,9 @@ export class App {
   private createPageComponent(path: RoutePath): { getElement: () => HTMLElement; destroy?: () => void } {
     if (path.startsWith('/saveurs/')) {
       return new ProductDetailPage(path);
+    }
+    if (path.startsWith('/page/')) {
+      return new CustomPageView(path);
     }
     switch (path) {
       case '/nidj-juice-backoffice':

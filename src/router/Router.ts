@@ -1,7 +1,4 @@
-/* ==========================================================================
-   NIDJ JUICE — CORPORATE SPA ROUTER (HTML5 HISTORY API)
-   Handles page routing, deep links, anchor scrolling & dynamic SEO titles
-   ========================================================================== */
+import { cmsService } from '../services/cms.service';
 
 export type RoutePath =
   | '/'
@@ -16,7 +13,8 @@ export type RoutePath =
   | '/b2b'
   | '/contact'
   | '/galerie'
-  | '/nidj-juice-backoffice';
+  | '/nidj-juice-backoffice'
+  | (string & {});
 
 export interface RouteInfo {
   path: RoutePath;
@@ -24,7 +22,7 @@ export interface RouteInfo {
   description: string;
 }
 
-export const ROUTES_METADATA: Record<RoutePath, { title: string; description: string }> = {
+export const ROUTES_METADATA: Record<string, { title: string; description: string }> = {
   '/': {
     title: 'Nidj Juice — 100% Jus Naturels Fabriqués au Cameroun | Société Nidjeu',
     description: 'Découvrez Nidj Juice, la marque référence de jus 100% naturels pressés et embouteillés au Cameroun par la Société Nidjeu.'
@@ -134,6 +132,39 @@ export class Router {
     this.handleUrlChange(window.location.pathname, window.location.hash, true);
   }
 
+  private resolveRoute(rawPath: string): RoutePath {
+    if (rawPath === '/marques' || rawPath === '/nos-saveurs') {
+      return '/saveurs';
+    } else if (rawPath === '/saveurs/bissap') {
+      return '/saveurs/cocktail-bissap';
+    } else if (rawPath === '/saveurs/ananas') {
+      return '/saveurs/ananas-gingembre';
+    } else if (rawPath === '/company' || rawPath === '/societe') {
+      return '/entreprise';
+    } else if (rawPath === '/stores' || rawPath === '/locator') {
+      return '/points-de-vente';
+    } else if (rawPath === '/rse' || rawPath === '/durabilite') {
+      return '/engagements';
+    } else if (rawPath === '/evenements' || rawPath === '/moments' || rawPath === '/gallery') {
+      return '/galerie';
+    } else if (rawPath === '/admin' || rawPath === '/backoffice' || rawPath === '/dashboard') {
+      return '/nidj-juice-backoffice';
+    } else if (rawPath.startsWith('/saveurs/')) {
+      return rawPath;
+    } else if (rawPath.startsWith('/page/')) {
+      return rawPath;
+    } else if (rawPath in ROUTES_METADATA) {
+      return rawPath;
+    }
+
+    const customPage = cmsService.getCustomPageBySlug(rawPath);
+    if (customPage) {
+      return `/page/${customPage.id}`;
+    }
+
+    return '/';
+  }
+
   public navigate(url: string): void {
     const urlObj = new URL(url, window.location.origin);
     let rawPath: string = urlObj.pathname;
@@ -144,29 +175,7 @@ export class Router {
       rawPath = rawPath.slice(0, -1);
     }
 
-    let path: RoutePath;
-    if (rawPath === '/marques' || rawPath === '/nos-saveurs') {
-      path = '/saveurs';
-    } else if (rawPath === '/saveurs/bissap') {
-      path = '/saveurs/cocktail-bissap';
-    } else if (rawPath === '/saveurs/ananas') {
-      path = '/saveurs/ananas-gingembre';
-    } else if (rawPath === '/company' || rawPath === '/societe') {
-      path = '/entreprise';
-    } else if (rawPath === '/stores' || rawPath === '/locator') {
-      path = '/points-de-vente';
-    } else if (rawPath === '/rse' || rawPath === '/durabilite') {
-      path = '/engagements';
-    } else if (rawPath === '/evenements' || rawPath === '/moments' || rawPath === '/gallery') {
-      path = '/galerie';
-    } else if (rawPath === '/admin' || rawPath === '/backoffice' || rawPath === '/dashboard') {
-      path = '/nidj-juice-backoffice';
-    } else if (rawPath in ROUTES_METADATA) {
-      path = rawPath as RoutePath;
-    } else {
-      path = '/';
-    }
-
+    const path = this.resolveRoute(rawPath);
     const fullUrl = path + hash;
     if (window.location.pathname + window.location.hash !== fullUrl) {
       window.history.pushState({}, '', fullUrl);
@@ -181,38 +190,36 @@ export class Router {
       rawPath = rawPath.slice(0, -1);
     }
 
-    let normalized: RoutePath;
-    if (rawPath === '/marques' || rawPath === '/nos-saveurs') {
-      normalized = '/saveurs';
-    } else if (rawPath === '/saveurs/bissap') {
-      normalized = '/saveurs/cocktail-bissap';
-    } else if (rawPath === '/saveurs/ananas') {
-      normalized = '/saveurs/ananas-gingembre';
-    } else if (rawPath === '/company' || rawPath === '/societe') {
-      normalized = '/entreprise';
-    } else if (rawPath === '/stores' || rawPath === '/locator') {
-      normalized = '/points-de-vente';
-    } else if (rawPath === '/rse' || rawPath === '/durabilite') {
-      normalized = '/engagements';
-    } else if (rawPath === '/evenements' || rawPath === '/moments' || rawPath === '/gallery') {
-      normalized = '/galerie';
-    } else if (rawPath === '/admin' || rawPath === '/backoffice' || rawPath === '/dashboard') {
-      normalized = '/nidj-juice-backoffice';
-    } else if (rawPath in ROUTES_METADATA) {
-      normalized = rawPath as RoutePath;
-    } else {
-      normalized = '/';
-    }
-
+    const normalized = this.resolveRoute(rawPath);
     this.currentPath = normalized;
 
-    // Update document title and meta description
-    const meta = ROUTES_METADATA[normalized] || ROUTES_METADATA['/'];
-    document.title = meta.title;
+    // Update document title and meta description dynamically
+    let title = 'Nidj Juice — 100% Jus Naturels Fabriqués au Cameroun | Société Nidjeu';
+    let description = 'Découvrez Nidj Juice, la marque référence de jus 100% naturels pressés et embouteillés au Cameroun par la Société Nidjeu.';
 
+    if (normalized.startsWith('/page/')) {
+      const customPage = cmsService.getCustomPageBySlug(normalized);
+      if (customPage) {
+        title = `${customPage.title} — Société Nidjeu | Nidj Juice`;
+        description = customPage.metaDescription || customPage.subtitle || description;
+      }
+    } else if (normalized.startsWith('/saveurs/')) {
+      const prodId = normalized.replace('/saveurs/', '');
+      const prod = cmsService.getProductById(prodId);
+      if (prod) {
+        title = `${prod.name} — ${prod.subtitle || 'Collection Officielle'} | Nidj Juice`;
+        description = prod.description || description;
+      }
+    } else if (ROUTES_METADATA[normalized]) {
+      const meta = ROUTES_METADATA[normalized];
+      title = meta.title;
+      description = meta.description;
+    }
+
+    document.title = title;
     const descEl = document.querySelector('meta[name="description"]');
     if (descEl) {
-      descEl.setAttribute('content', meta.description);
+      descEl.setAttribute('content', description);
     }
 
     // Inform App orchestrator

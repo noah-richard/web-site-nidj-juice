@@ -7,12 +7,16 @@ import { cmsService } from '../../services/cms.service';
 
 export class Footer {
   private element: HTMLElement;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('footer');
     this.element.id = 'contact';
     this.element.className = 'site-footer';
     this.render();
+    this.unsubscribeCms = cmsService.onDataChanged(() => {
+      this.render();
+    });
   }
 
   public getElement(): HTMLElement {
@@ -23,9 +27,17 @@ export class Footer {
     this.render();
   }
 
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
+  }
+
   private render(): void {
     const currentYear = new Date().getFullYear();
     const settings = cmsService.getSettings();
+    const customFooterPages = cmsService.getPublishedCustomPages().filter((p) => p.showInFooter);
 
     this.element.innerHTML = `
       <!-- Organic Wavy Curve matching Mockup -->
@@ -93,6 +105,9 @@ export class Footer {
                 <li><a href="/points-de-vente" class="footer-nav-link">Points de vente</a></li>
                 <li><a href="/b2b" class="footer-nav-link">Espace B2B</a></li>
                 <li><a href="/contact" class="footer-nav-link">Contact & FAQ</a></li>
+                ${customFooterPages.map((p) => `
+                  <li><a href="/page/${p.id}" class="footer-nav-link">${p.title}</a></li>
+                `).join('')}
               </ul>
             </div>
 

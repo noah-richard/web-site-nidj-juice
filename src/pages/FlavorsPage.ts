@@ -23,6 +23,7 @@ export class FlavorsPage {
 
   private render(): void {
     const products = cmsService.getProducts();
+    const collections = cmsService.getCollections();
     const gallery = cmsService.getGalleryItems();
 
     this.element.innerHTML = `
@@ -36,10 +37,10 @@ export class FlavorsPage {
             <span>Nos Saveurs</span>
           </nav>
           
-          <div class="page-hero-tag">Collection Officielle • 100% Nectars Purs</div>
+          <div class="page-hero-tag">Collections Officielles • 100% Nectars Purs</div>
           <h1 class="page-hero-title">L'authenticité des fruits camerounais dans chaque gorgée.</h1>
           <p class="page-hero-subtitle">
-            Sans conservateur chimique, sans colorant artificiel et sans sucre raffiné ajouté. Explorez nos recettes signatures élaborées avec passion par la Société Nidjeu.
+            Sans conservateur chimique, sans colorant artificiel et sans sucre raffiné ajouté. Explorez nos collections signatures élaborées avec passion par la Société Nidjeu.
           </p>
         </div>
       </section>
@@ -50,6 +51,9 @@ export class FlavorsPage {
           <ul class="page-subnav-list">
             ${products.map((p) => `
               <li><a href="/saveurs/${p.id}" class="page-subnav-link">${p.name}</a></li>
+            `).join('')}
+            ${collections.map((c) => `
+              <li><span class="page-subnav-link" style="opacity: 0.85; font-size: 12px; font-weight: 700; color: ${c.accentColor || 'var(--color-primary)'};">${c.name}</span></li>
             `).join('')}
             <li><a href="/saveurs#duo" class="page-subnav-link">Packs & Cartons</a></li>
             <li><a href="/saveurs#nutrition" class="page-subnav-link">Nutrition</a></li>
@@ -71,7 +75,10 @@ export class FlavorsPage {
               />
             </div>
             <div class="product-deep-content">
-              <span class="product-category-pill" style="background: ${p.accentColor || '#58A826'}; color: #fff;">${p.tag}</span>
+              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+                <span class="product-category-pill" style="background: ${p.accentColor || '#58A826'}; color: #fff;">${p.category || p.tag || 'Collection Spéciale'}</span>
+                ${p.badges && p.badges[0] ? `<span style="font-size: 11px; font-weight: 700; color: ${p.accentColor || '#58A826'}; text-transform: uppercase; letter-spacing: 0.05em;">• ${p.badges[0]}</span>` : ''}
+              </div>
               <h2>${p.name}</h2>
               ${p.story ? `<p class="product-story-quote">« ${p.story} »</p>` : ''}
               <p class="editorial-body">

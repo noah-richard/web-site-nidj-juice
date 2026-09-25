@@ -117,6 +117,14 @@ export class Header {
                 </a>
               </li>
 
+              ${cmsService.getPublishedCustomPages().filter(p => p.showInNav).map((p) => `
+                <li class="nav-item">
+                  <a href="/page/${p.id}" class="nav-link" data-link="custom-${p.id}">
+                    ${p.title.length > 22 ? p.title.slice(0, 20) + '…' : p.title}
+                  </a>
+                </li>
+              `).join('')}
+
             </ul>
 
             <!-- Sliding Indicator Bar (Coca-Cola Style Underline) -->
@@ -484,6 +492,14 @@ export class Header {
                     <span class="mobile-chevron">›</span>
                   </a>
                 </li>
+                ${cmsService.getPublishedCustomPages().filter(p => p.showInNav).map((p) => `
+                  <li>
+                    <a href="/page/${p.id}" class="mobile-nav-link">
+                      <span>${p.title}</span>
+                      <span class="mobile-chevron">›</span>
+                    </a>
+                  </li>
+                `).join('')}
               </ul>
             </nav>
 

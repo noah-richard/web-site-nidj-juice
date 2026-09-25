@@ -9,7 +9,9 @@ import { STORE_LOCATIONS, OFFICIAL_CONTACT } from '../data/stores.data';
 import { GALLERY_ITEMS, type GalleryItem } from '../data/gallery.data';
 import { VIDEO_REELS } from '../data/flavors.data';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
-import type { StoreLocation, VideoReel } from '../types/product.types';
+import type { StoreLocation, VideoReel, JuiceCollection, CmsCustomPage } from '../types/product.types';
+
+export type { JuiceCollection, CmsCustomPage };
 
 export interface HeroContent {
   titleWord1: string;
@@ -92,6 +94,8 @@ export interface CmsDatabase {
   version: number;
   lastUpdated: string;
   products: ShowcaseProduct[];
+  collections: JuiceCollection[];
+  customPages: CmsCustomPage[];
   stores: StoreLocation[];
   galleryItems: GalleryItem[];
   videoReels: VideoReel[];
@@ -180,6 +184,12 @@ export class CmsService {
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.products) && parsed.products.length > 0) {
+        if (!Array.isArray(parsed.collections) || parsed.collections.length === 0) {
+          parsed.collections = this.getDefaultCollections();
+        }
+        if (!Array.isArray(parsed.customPages) || parsed.customPages.length === 0) {
+          parsed.customPages = this.getDefaultCustomPages();
+        }
         return parsed as CmsDatabase;
       }
       return null;
@@ -209,6 +219,8 @@ export class CmsService {
       version: 1,
       lastUpdated: new Date().toISOString(),
       products: JSON.parse(JSON.stringify(SHOWCASE_PRODUCTS)),
+      collections: this.getDefaultCollections(),
+      customPages: this.getDefaultCustomPages(),
       stores: JSON.parse(JSON.stringify(STORE_LOCATIONS)),
       galleryItems: JSON.parse(JSON.stringify(GALLERY_ITEMS)),
       videoReels: JSON.parse(JSON.stringify(VIDEO_REELS)),
@@ -309,6 +321,134 @@ export class CmsService {
     };
   }
 
+  public getDefaultCollections(): JuiceCollection[] {
+    return [
+      {
+        id: 'collection-royale',
+        name: 'Collection Royale & Infusions',
+        tagline: 'Infusions nobles de calices d’hibiscus du Grand Nord & notes florales',
+        description: 'La noblesse du Bissap camerounais alliant fraîcheur vive, robe pourpre veloutée et arômes naturels captivants.',
+        accentColor: '#C4003E',
+        badge: 'Gamme Signature',
+        bannerImage: '/assets/images/bottle-bissap.png',
+        featured: true,
+        sortOrder: 1
+      },
+      {
+        id: 'collection-energie',
+        name: 'Collection Énergie & Tonus',
+        tagline: 'Ananas mûrs des terroirs et gingembre frais pressé',
+        description: 'Un cocktail revigorant et plein de caractère pour éveiller les sens et stimuler l’organisme au quotidien.',
+        accentColor: '#D97706',
+        badge: 'Tonus Actif',
+        bannerImage: '/assets/images/bottle-ananas.png',
+        featured: true,
+        sortOrder: 2
+      },
+      {
+        id: 'collection-purete',
+        name: 'Collection Pur Jus & Douceur',
+        tagline: '100% Pur jus d’ananas pressé sans compromis',
+        description: 'La douceur naturelle des ananas camerounais gorgés de soleil, sans un seul gramme de sucre raffiné ajouté.',
+        accentColor: '#EAB308',
+        badge: '100% Brut',
+        bannerImage: '/assets/images/bottle-nature.png',
+        featured: true,
+        sortOrder: 3
+      },
+      {
+        id: 'collection-fraicheur',
+        name: 'Collection Fraîcheur & Hydratation',
+        tagline: 'Pastèque juteuse et agrumes vitaminés',
+        description: 'Une hydratation pure et bienfaisante, idéale pour désaltérer les journées ensoleillées d’Afrique.',
+        accentColor: '#EA580C',
+        badge: 'Fraîcheur Intense',
+        bannerImage: '/assets/images/bottle-pasteque.png',
+        featured: false,
+        sortOrder: 4
+      }
+    ];
+  }
+
+  public getDefaultCustomPages(): CmsCustomPage[] {
+    return [
+      {
+        id: 'recettes-cocktails',
+        title: 'Cocktails & Mocktails Signatures Nidj Juice',
+        subtitle: 'Sublimez vos apéritifs, brunchs et célébrations avec nos nectars 100% camerounais',
+        metaDescription: 'Découvrez des recettes exclusives de cocktails et mocktails rafraîchissants à base de Bissap et Ananas Nidj Juice.',
+        heroBannerImage: '/assets/images/gallery-1.webp',
+        content: `
+          <div class="custom-page-intro">
+            <p class="lead-paragraph">
+              Parce que nos nectars sont 100% naturels, ils constituent une base d'une richesse aromatique incomparable pour créer des mocktails sains et des cocktails festifs uniques à partager.
+            </p>
+          </div>
+
+          <div class="recipe-card-grid">
+            <div class="recipe-card">
+              <span class="recipe-badge">Mocktail Sans Alcool</span>
+              <h3>Le Royal Bissap Spritz</h3>
+              <p>Une version revisitée du spritz sans alcool, alliant la profondeur pourpre de l'hibiscus et la fraîcheur pétillante des agrumes.</p>
+              <ul>
+                <li><strong>15 cl</strong> de Cocktail de Bissap Nidj Juice</li>
+                <li><strong>10 cl</strong> d'eau gazeuse fraîche ou tonic</li>
+                <li><strong>3 cl</strong> de jus de citron vert frais</li>
+                <li>Feuilles de menthe fraîche et glaçons</li>
+              </ul>
+            </div>
+
+            <div class="recipe-card">
+              <span class="recipe-badge">Énergie & Vitalité</span>
+              <h3>L'Ananas Ginger Glow</h3>
+              <p>Le punch fruité et vivifiant qui réveille toutes les tables lors des brunchs et réceptions conviviales.</p>
+              <ul>
+                <li><strong>20 cl</strong> de Jus Ananas Gingembre Nidj Juice</li>
+                <li><strong>5 cl</strong> de jus d'orange pressée</li>
+                <li>Une rondelle d'orange déshydratée</li>
+                <li>Zeste de citron vert râpé</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        ctaText: 'Commander nos nectars',
+        ctaLink: '/saveurs',
+        showInNav: true,
+        showInFooter: true,
+        isPublished: true,
+        lastModified: new Date().toISOString()
+      },
+      {
+        id: 'mentions-legales',
+        title: 'Mentions Légales & Charte de Qualité',
+        subtitle: 'Informations juridiques, engagements sanitaires et gouvernance Société Nidjeu',
+        metaDescription: 'Mentions légales, agréments sanitaires et politique de transparence de la Société Nidjeu et de la marque Nidj Juice.',
+        heroBannerImage: '/assets/images/gallery-2.webp',
+        content: `
+          <div class="legal-content-block">
+            <h3>1. Éditeur du Site</h3>
+            <p>Le présent site officiel est édité par la <strong>Société Nidjeu S.A.</strong>, entreprise agroalimentaire immatriculée au Registre du Commerce et du Crédit Mobilier de Douala, Cameroun.</p>
+            <p><strong>Siège social :</strong> Douala, Littoral, République du Cameroun.<br>
+            <strong>Téléphone officiel :</strong> +237 6 77 42 66 12<br>
+            <strong>Email officiel :</strong> contact@nidj-juice.cm</p>
+
+            <h3>2. Normes Agroalimentaires & Contrôle Qualité</h3>
+            <p>Tous les jus et nectars commercialisés sous la marque <strong>Nidj Juice</strong> sont fabriqués et embouteillés dans le strict respect des normes d'hygiène et de sécurité alimentaire en vigueur au Cameroun et aux standards internationaux (HACCP). Nos lignes de production subissent des contrôles microbiologiques continus garantissant l'absence totale de conservateurs chimiques de synthèse.</p>
+
+            <h3>3. Propriété Intellectuelle</h3>
+            <p>La marque « Nidj Juice », les logos, designs d'étiquettes, bouteilles et visuels présentés sur ce site sont la propriété exclusive de la Société Nidjeu. Toute reproduction totale ou partielle sans autorisation préalable écrite est formellement interdite.</p>
+          </div>
+        `,
+        ctaText: 'Nous contacter',
+        ctaLink: '/contact',
+        showInNav: false,
+        showInFooter: true,
+        isPublished: true,
+        lastModified: new Date().toISOString()
+      }
+    ];
+  }
+
   // --- Getters ---
   public getAllData(): CmsDatabase {
     return { ...this.db };
@@ -320,6 +460,27 @@ export class CmsService {
 
   public getProductById(id: string): ShowcaseProduct | undefined {
     return this.db.products.find((p) => p.id === id);
+  }
+
+  public getCollections(): JuiceCollection[] {
+    return [...(this.db.collections || [])];
+  }
+
+  public getCollectionById(id: string): JuiceCollection | undefined {
+    return (this.db.collections || []).find((c) => c.id === id);
+  }
+
+  public getCustomPages(): CmsCustomPage[] {
+    return [...(this.db.customPages || [])];
+  }
+
+  public getPublishedCustomPages(): CmsCustomPage[] {
+    return (this.db.customPages || []).filter((p) => p.isPublished);
+  }
+
+  public getCustomPageBySlug(slug: string): CmsCustomPage | undefined {
+    const clean = slug.replace(/^\/page\//, '').replace(/^\//, '');
+    return (this.db.customPages || []).find((p) => p.id === clean);
   }
 
   public getStores(): StoreLocation[] {
@@ -370,6 +531,45 @@ export class CmsService {
       return false; // Prevent deleting all products
     }
     this.db.products = this.db.products.filter((p) => p.id !== id);
+    this.persist();
+    return true;
+  }
+
+  public saveCollection(collection: JuiceCollection): void {
+    if (!this.db.collections) this.db.collections = [];
+    const idx = this.db.collections.findIndex((c) => c.id === collection.id);
+    if (idx >= 0) {
+      this.db.collections[idx] = { ...collection };
+    } else {
+      this.db.collections.push({ ...collection });
+    }
+    this.persist();
+  }
+
+  public deleteCollection(id: string): boolean {
+    if (!this.db.collections || this.db.collections.length <= 1) {
+      return false; // Prevent deleting all collections
+    }
+    this.db.collections = this.db.collections.filter((c) => c.id !== id);
+    this.persist();
+    return true;
+  }
+
+  public saveCustomPage(page: CmsCustomPage): void {
+    if (!this.db.customPages) this.db.customPages = [];
+    page.lastModified = new Date().toISOString();
+    const idx = this.db.customPages.findIndex((p) => p.id === page.id);
+    if (idx >= 0) {
+      this.db.customPages[idx] = { ...page };
+    } else {
+      this.db.customPages.push({ ...page });
+    }
+    this.persist();
+  }
+
+  public deleteCustomPage(id: string): boolean {
+    if (!this.db.customPages) return false;
+    this.db.customPages = this.db.customPages.filter((p) => p.id !== id);
     this.persist();
     return true;
   }

@@ -61,3 +61,31 @@ export interface OrderPayload {
   customerPhone: string;
   notes?: string;
 }
+
+export interface JuiceCollection {
+  id: string;
+  name: string;
+  slug?: string;
+  tagline: string;
+  description: string;
+  accentColor: string;
+  badge?: string;
+  bannerImage?: string;
+  featured?: boolean;
+  sortOrder?: number;
+}
+
+export interface CmsCustomPage {
+  id: string;
+  title: string;
+  subtitle: string;
+  metaDescription: string;
+  heroBannerImage?: string;
+  content: string;
+  ctaText?: string;
+  ctaLink?: string;
+  showInNav?: boolean;
+  showInFooter?: boolean;
+  isPublished: boolean;
+  lastModified: string;
+}
