@@ -2160,7 +2160,7 @@ export class BackofficePage {
 
     modalContainer.innerHTML = `
       <div class="bo-modal-overlay">
-        <div class="bo-modal">
+        <form class="bo-modal" id="boProductEditForm">
           <div class="bo-modal-header">
             <div class="bo-modal-title-group">
               <h2>${isNew ? 'Créer une Nouvelle Saveur' : `Modifier la Saveur : ${p.name}`}</h2>
@@ -2171,8 +2171,7 @@ export class BackofficePage {
             </button>
           </div>
 
-          <form id="boProductEditForm">
-            <div class="bo-modal-body">
+          <div class="bo-modal-body">
               
               <!-- Identifiant & Noms -->
               <div class="bo-form-grid-2">
@@ -2313,6 +2312,14 @@ export class BackofficePage {
                   <label class="bo-label">Sucres</label>
                   <input type="text" id="pNutSugars" class="bo-input" value="${p.nutrition?.sugars || 'Sucres naturels'}" />
                 </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Vitamine C</label>
+                  <input type="text" id="pNutVitC" class="bo-input" value="${p.nutrition?.vitaminC || 'Riche en vitamine C naturelle'}" />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">Antioxydants</label>
+                  <input type="text" id="pNutAntiOx" class="bo-input" value="${p.nutrition?.antioxidants || 'Fort pouvoir antioxydant'}" />
+                </div>
               </div>
 
             </div>
@@ -2324,18 +2331,27 @@ export class BackofficePage {
                 <span>Enregistrer la Saveur</span>
               </button>
             </div>
-
-          </form>
-        </div>
+        </form>
       </div>
     `;
 
     // Modal Close
+    const overlay = modalContainer.querySelector('.bo-modal-overlay');
     const closeBtn = modalContainer.querySelector('#closeProductModalBtn');
     const cancelBtn = modalContainer.querySelector('#cancelProductModalBtn');
-    const closeModal = () => (modalContainer.innerHTML = '');
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    const closeModal = () => {
+      modalContainer.innerHTML = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
     closeBtn?.addEventListener('click', closeModal);
     cancelBtn?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+    window.addEventListener('keydown', handleKeyDown);
 
     // Live Color Picker Sync
     const colorPicker = modalContainer.querySelector('#pAccentColor') as HTMLInputElement;
@@ -2479,8 +2495,8 @@ export class BackofficePage {
         nutrition: {
           energy: (modalContainer.querySelector('#pNutEnergy') as HTMLInputElement).value.trim() || '40 kcal / 100 ml',
           sugars: (modalContainer.querySelector('#pNutSugars') as HTMLInputElement).value.trim() || 'Sucres naturels des fruits',
-          vitaminC: p.nutrition?.vitaminC || 'Riche en vitamine C naturelle',
-          antioxidants: p.nutrition?.antioxidants || 'Fort pouvoir antioxydant'
+          vitaminC: (modalContainer.querySelector('#pNutVitC') as HTMLInputElement)?.value.trim() || p.nutrition?.vitaminC || 'Riche en vitamine C naturelle',
+          antioxidants: (modalContainer.querySelector('#pNutAntiOx') as HTMLInputElement)?.value.trim() || p.nutrition?.antioxidants || 'Fort pouvoir antioxydant'
         }
       };
 
@@ -2514,7 +2530,7 @@ export class BackofficePage {
 
     modalContainer.innerHTML = `
       <div class="bo-modal-overlay">
-        <div class="bo-modal" style="max-width: 600px;">
+        <form class="bo-modal" id="boStoreEditForm" style="max-width: 600px;">
           <div class="bo-modal-header">
             <div class="bo-modal-title-group">
               <h2>${isNew ? 'Ajouter un Point de Vente' : `Modifier : ${s.name}`}</h2>
@@ -2525,8 +2541,7 @@ export class BackofficePage {
             </button>
           </div>
 
-          <form id="boStoreEditForm">
-            <div class="bo-modal-body">
+          <div class="bo-modal-body">
               <div class="bo-form-group">
                 <label class="bo-label">Nom de l'Enseigne / Point de Vente</label>
                 <input type="text" id="sName" class="bo-input" value="${s.name}" required />
@@ -2608,14 +2623,24 @@ export class BackofficePage {
                 <span>Enregistrer</span>
               </button>
             </div>
-          </form>
-        </div>
+        </form>
       </div>
     `;
 
-    const closeModal = () => (modalContainer.innerHTML = '');
+    const overlay = modalContainer.querySelector('.bo-modal-overlay');
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    const closeModal = () => {
+      modalContainer.innerHTML = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
     modalContainer.querySelector('#closeStoreModalBtn')?.addEventListener('click', closeModal);
     modalContainer.querySelector('#cancelStoreModalBtn')?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+    window.addEventListener('keydown', handleKeyDown);
 
     // Store Photo Uploader binding
     this.setupImageUploader({
@@ -2673,7 +2698,7 @@ export class BackofficePage {
 
     modalContainer.innerHTML = `
       <div class="bo-modal-overlay">
-        <div class="bo-modal" style="max-width: 600px;">
+        <form class="bo-modal" id="boGalleryEditForm" style="max-width: 600px;">
           <div class="bo-modal-header">
             <div class="bo-modal-title-group">
               <h2>${isNew ? 'Ajouter une Photo à la Galerie' : `Modifier : ${g.title}`}</h2>
@@ -2684,8 +2709,7 @@ export class BackofficePage {
             </button>
           </div>
 
-          <form id="boGalleryEditForm">
-            <div class="bo-modal-body">
+          <div class="bo-modal-body">
               <div class="bo-form-group">
                 <label class="bo-label">Titre du Moment / Événement</label>
                 <input type="text" id="gTitle" class="bo-input" value="${g.title}" required />
@@ -2749,14 +2773,24 @@ export class BackofficePage {
                 <span>Enregistrer</span>
               </button>
             </div>
-          </form>
-        </div>
+        </form>
       </div>
     `;
 
-    const closeModal = () => (modalContainer.innerHTML = '');
+    const overlay = modalContainer.querySelector('.bo-modal-overlay');
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    const closeModal = () => {
+      modalContainer.innerHTML = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
     modalContainer.querySelector('#closeGalleryModalBtn')?.addEventListener('click', closeModal);
     modalContainer.querySelector('#cancelGalleryModalBtn')?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+    window.addEventListener('keydown', handleKeyDown);
 
     const imgInput = modalContainer.querySelector('#gImgFileInput') as HTMLInputElement;
     const imgUrlInput = modalContainer.querySelector('#gImgUrl') as HTMLInputElement;
@@ -2882,7 +2916,7 @@ export class BackofficePage {
 
     modalContainer.innerHTML = `
       <div class="bo-modal-overlay">
-        <div class="bo-modal" style="max-width: 550px;">
+        <form class="bo-modal" id="boReelEditForm" style="max-width: 550px;">
           <div class="bo-modal-header">
             <div class="bo-modal-title-group">
               <h2>${isNew ? 'Ajouter une Vidéo Reel' : `Modifier : ${r.title}`}</h2>
@@ -2893,8 +2927,7 @@ export class BackofficePage {
             </button>
           </div>
 
-          <form id="boReelEditForm">
-            <div class="bo-modal-body">
+          <div class="bo-modal-body">
               <div class="bo-form-group">
                 <label class="bo-label">Titre du Reel</label>
                 <input type="text" id="rTitle" class="bo-input" value="${r.title}" required />
@@ -2973,14 +3006,24 @@ export class BackofficePage {
                 <span>Enregistrer</span>
               </button>
             </div>
-          </form>
-        </div>
+        </form>
       </div>
     `;
 
-    const closeModal = () => (modalContainer.innerHTML = '');
+    const overlay = modalContainer.querySelector('.bo-modal-overlay');
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    const closeModal = () => {
+      modalContainer.innerHTML = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
     modalContainer.querySelector('#closeReelModalBtn')?.addEventListener('click', closeModal);
     modalContainer.querySelector('#cancelReelModalBtn')?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+    window.addEventListener('keydown', handleKeyDown);
 
     const videoInput = modalContainer.querySelector('#rVideoFileInput') as HTMLInputElement;
     const videoSrcInput = modalContainer.querySelector('#rSrc') as HTMLInputElement;

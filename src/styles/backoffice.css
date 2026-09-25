@@ -1274,7 +1274,7 @@ body.bo-sidebar-locked {
 .bo-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 61, 34, 0.45);
+  background: rgba(10, 61, 34, 0.5);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
@@ -1283,6 +1283,7 @@ body.bo-sidebar-locked {
   padding: 24px;
   z-index: 1000;
   animation: boFadeIn 0.2s ease;
+  overflow-y: auto;
 }
 
 @keyframes boFadeIn {
@@ -1297,11 +1298,22 @@ body.bo-sidebar-locked {
   box-shadow: var(--bo-shadow-modal);
   width: 100%;
   max-width: 680px;
-  max-height: 90vh;
+  max-height: calc(100vh - 48px);
+  height: auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: boScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.bo-modal form,
+.bo-modal > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 @keyframes boScaleIn {
@@ -1316,6 +1328,9 @@ body.bo-sidebar-locked {
   align-items: center;
   justify-content: space-between;
   background: var(--bo-surface);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .bo-modal-title-group h2 {
@@ -1344,6 +1359,7 @@ body.bo-sidebar-locked {
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .bo-modal-close-btn:hover {
@@ -1352,19 +1368,42 @@ body.bo-sidebar-locked {
 }
 
 .bo-modal-body {
-  padding: 26px 28px;
+  padding: 24px 28px;
   overflow-y: auto;
-  flex: 1;
+  overflow-x: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+/* Custom Sleek Scrollbar for Modal Body */
+.bo-modal-body::-webkit-scrollbar {
+  width: 7px;
+}
+.bo-modal-body::-webkit-scrollbar-track {
+  background: var(--bo-surface-subtle);
+  border-radius: 4px;
+}
+.bo-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(10, 61, 34, 0.25);
+  border-radius: 4px;
+}
+.bo-modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--bo-brand-green);
 }
 
 .bo-modal-footer {
-  padding: 18px 28px;
+  padding: 16px 28px;
   border-top: 1px solid var(--bo-border);
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
   background: var(--bo-surface-subtle);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 /* ==========================================================================
