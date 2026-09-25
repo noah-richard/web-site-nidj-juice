@@ -216,11 +216,6 @@ export class BackofficePage {
             </button>
           </div>
 
-          <!-- Mobile Public Site Link Button -->
-          <a href="/" class="bo-mobile-icon-btn" target="_blank" title="Voir le site public" aria-label="Voir le site public">
-            ${BO_ICONS.external}
-          </a>
-
           <!-- User Chip -->
           <div class="bo-user-chip">
             <div class="bo-user-avatar">SN</div>

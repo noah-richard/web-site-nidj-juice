@@ -1567,19 +1567,102 @@ body.bo-sidebar-locked {
 
   .bo-header {
     height: var(--bo-header-height-mobile);
-    padding: 0 18px;
+    padding: 0 16px;
+    justify-content: space-between;
+  }
+
+  .bo-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  .bo-logo {
+    height: 34px;
+    width: auto;
   }
 
   .bo-menu-toggle-btn {
     display: flex;
+    width: 38px;
+    height: 38px;
+  }
+
+  /* Hide cluttering elements on mobile/tablet to ensure spacious, clean layout */
+  .bo-header-divider {
+    display: none !important;
+  }
+
+  .bo-brand-badge {
+    display: none !important;
+  }
+
+  .bo-brand-sub {
+    display: none !important;
   }
 
   .bo-desktop-actions {
-    display: none;
+    display: none !important;
   }
 
   .bo-mobile-icon-btn {
+    display: none !important;
+  }
+
+  .bo-brand-title {
+    min-width: 0;
+    gap: 0;
+  }
+
+  .bo-brand-name {
+    font-size: 15px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .bo-brand-name span {
+    white-space: nowrap;
+  }
+
+  .bo-header-right {
     display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .bo-user-meta {
+    display: none !important;
+  }
+
+  .bo-user-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    margin-left: 0;
+    background: var(--bo-surface-subtle);
+    border: 1px solid var(--bo-border);
+    border-radius: var(--bo-radius-pill);
+  }
+
+  .bo-user-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .bo-logout-btn {
+    padding: 4px;
+    width: 26px;
+    height: 26px;
   }
 
   /* Transform Sidebar into Off-Canvas Slide Drawer */
@@ -1615,7 +1698,7 @@ body.bo-sidebar-locked {
     margin-left: 0;
     width: 100%;
     max-width: 100%;
-    padding: 22px 18px 48px 18px;
+    padding: 20px 16px 48px 16px;
     box-sizing: border-box;
   }
 
@@ -1631,44 +1714,40 @@ body.bo-sidebar-locked {
 /* --- Mobile Standard (<= 768px) --- */
 @media (max-width: 768px) {
   .bo-header {
-    padding: 0 14px;
+    padding: 0 12px;
+    height: 58px;
   }
 
   .bo-header-left {
-    gap: 12px;
+    gap: 10px;
   }
 
   .bo-logo {
-    height: 32px;
+    height: 30px;
+  }
+
+  .bo-menu-toggle-btn {
+    width: 36px;
+    height: 36px;
   }
 
   .bo-brand-name {
-    font-size: 13.5px;
-    gap: 6px;
-  }
-
-  .bo-brand-badge {
-    font-size: 9.5px;
-    padding: 1px 6px;
-  }
-
-  .bo-brand-sub {
-    display: none;
-  }
-
-  .bo-header-divider {
-    height: 22px;
-  }
-
-  .bo-user-meta {
-    display: none;
+    font-size: 14px;
   }
 
   .bo-user-chip {
     padding: 2px 4px;
-    margin-left: 2px;
-    background: transparent;
-    border: none;
+  }
+
+  .bo-user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 10.5px;
+  }
+
+  .bo-logout-btn {
+    width: 26px;
+    height: 26px;
   }
 
   .bo-page-header {
@@ -1840,8 +1919,12 @@ body.bo-sidebar-locked {
     gap: 8px;
   }
 
-  .bo-brand-title {
-    display: none;
+  .bo-logo {
+    height: 26px;
+  }
+
+  .bo-brand-name {
+    font-size: 13px;
   }
 
   .bo-item-top {
