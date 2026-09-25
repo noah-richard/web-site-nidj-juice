@@ -10,6 +10,7 @@ export interface ShowcaseProduct {
   tagline: string;
   description: string;
   bottleImage: string;
+  splashImage?: string;
   brandWatermark: string;
   accentColor: string;
   glowColor: string;

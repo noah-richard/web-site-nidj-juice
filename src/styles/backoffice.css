@@ -2050,3 +2050,36 @@ body.bo-sidebar-locked {
   object-fit: contain;
 }
 
+.bo-upload-progress-box {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--bo-surface-subtle);
+  border-radius: var(--bo-radius-sm);
+  border: 1px solid var(--bo-border);
+}
+
+.bo-upload-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--bo-forest);
+  margin-bottom: 6px;
+}
+
+.bo-upload-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bo-upload-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bo-brand-green), var(--bo-yellow));
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+

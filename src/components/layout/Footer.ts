@@ -44,7 +44,7 @@ export class Footer {
             <div class="footer-col-brand">
               <a href="/" class="footer-brand-link" aria-label="Nidj Juice">
                 <img 
-                  src="/assets/images/logo-nidj.png" 
+                  src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" 
                   alt="Nidj Juice — Société Nidjeu" 
                   class="footer-logo-img"
                   width="140"

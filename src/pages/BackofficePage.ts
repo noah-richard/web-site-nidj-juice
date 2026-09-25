@@ -95,10 +95,11 @@ export class BackofficePage {
   // 1. SECURITY / AUTHENTICATION GATE (LIGHT AGENCY AESTHETIC)
   // =========================================================================
   private renderAuthGate(): void {
+    const settings = cmsService.getSettings();
     this.element.innerHTML = `
       <div class="bo-auth-container">
         <div class="bo-auth-card">
-          <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="bo-auth-logo" />
+          <img src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" alt="Nidj Juice" class="bo-auth-logo" />
           <h1 class="bo-auth-title">Espace Administration</h1>
           <p class="bo-auth-desc">
             Société Nidjeu • Système de gestion et pilotage officiel de la marque <strong>Nidj Juice</strong> au Cameroun.
@@ -169,6 +170,7 @@ export class BackofficePage {
   // 2. MAIN DASHBOARD RENDERER (STUDIO TOPBAR + SIDEBAR)
   // =========================================================================
   private renderDashboard(): void {
+    const settings = cmsService.getSettings();
     const products = cmsService.getProducts();
     const stores = cmsService.getStores();
     const gallery = cmsService.getGalleryItems();
@@ -182,7 +184,7 @@ export class BackofficePage {
             ${BO_ICONS.menu}
           </button>
           <a href="/" class="bo-logo-wrap" title="Aller à l'accueil du site">
-            <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="bo-logo" />
+            <img src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" alt="Nidj Juice" class="bo-logo" />
           </a>
           <div class="bo-header-divider"></div>
           <div class="bo-brand-title">
@@ -245,7 +247,7 @@ export class BackofficePage {
           <!-- Mobile Drawer Top Bar -->
           <div class="bo-sidebar-mobile-header">
             <div class="bo-sidebar-mobile-title">
-              <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" style="height: 26px; width: auto;" />
+              <img src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" alt="Nidj Juice" style="height: 26px; width: auto;" />
               <span>Panneau de Gestion</span>
             </div>
             <button type="button" class="bo-sidebar-close-btn" id="boSidebarCloseBtn" aria-label="Fermer le menu" title="Fermer">
@@ -721,7 +723,32 @@ export class BackofficePage {
               </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end;">
+            <!-- Hero Background Banner Image -->
+            <div class="bo-form-group" style="margin-top: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label class="bo-label" style="margin: 0;">Image d'Arrière-Plan / Bannière Décorative Héro</label>
+                <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                  ${BO_ICONS.cloud}
+                  <span>CDN Cloudinary</span>
+                </span>
+              </div>
+              <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                <div style="width: 100px; height: 60px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 2px; flex-shrink: 0; overflow: hidden;">
+                  <img id="heroBgBannerPreview" src="${hero.bgBannerImage || '/assets/images/gallery-1.webp'}" alt="Bannière Héro" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                  <input type="text" id="heroBgBannerUrl" class="bo-input" value="${hero.bgBannerImage || ''}" placeholder="URL image Cloudinary ou chemin local (/assets/images/...)" style="margin-bottom: 8px;" />
+                  <label class="bo-upload-action-btn" style="cursor: pointer;">
+                    ${BO_ICONS.camera}
+                    <span>Téléverser vers Cloudinary</span>
+                    <input type="file" id="heroBgBannerFile" accept="image/*" style="display: none;" />
+                  </label>
+                  <div id="heroBgBannerProgress" style="display: none;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
               <button type="submit" class="bo-btn-primary">
                 ${BO_ICONS.check}
                 <span>Enregistrer le Héro</span>
@@ -794,7 +821,97 @@ export class BackofficePage {
               </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end;">
+            <!-- Editorial Photos Company -->
+            <div style="margin: 24px 0 16px 0; border-top: 1px solid var(--bo-border); padding-top: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <h3 style="font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--bo-forest); margin: 0;">
+                  Photos Éditoriales Page Entreprise
+                </h3>
+                <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                  ${BO_ICONS.cloud}
+                  <span>CDN Cloudinary</span>
+                </span>
+              </div>
+              <p style="font-size: 12px; color: var(--bo-text-muted); margin: 0 0 14px 0;">
+                Images officielles du laboratoire, de la cueillette des fruits, de l'équipe et des normes
+              </p>
+            </div>
+
+            <div class="bo-form-grid-2">
+              <!-- Production Photo -->
+              <div class="bo-form-group">
+                <label class="bo-label">Photo 1 : Laboratoire & Embouteillage</label>
+                <div class="bo-modal-image-row" style="display: flex; gap: 12px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 75px; height: 55px; background: #fff; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img id="compProdImgPreview" src="${company.productionImage || '/assets/images/gallery-1.webp'}" alt="Laboratoire" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="compProdImgUrl" class="bo-input" value="${company.productionImage || '/assets/images/gallery-1.webp'}" style="margin-bottom: 6px; font-size: 12px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera} <span>Téléverser vers Cloudinary</span>
+                      <input type="file" id="compProdImgFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="compProdImgProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Savoir-Faire Photo -->
+              <div class="bo-form-group">
+                <label class="bo-label">Photo 2 : Cueillette & Savoir-Faire</label>
+                <div class="bo-modal-image-row" style="display: flex; gap: 12px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 75px; height: 55px; background: #fff; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img id="compSavoirImgPreview" src="${company.savoirFaireImage || '/assets/images/gallery-2.webp'}" alt="Savoir-Faire" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="compSavoirImgUrl" class="bo-input" value="${company.savoirFaireImage || '/assets/images/gallery-2.webp'}" style="margin-bottom: 6px; font-size: 12px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera} <span>Téléverser vers Cloudinary</span>
+                      <input type="file" id="compSavoirImgFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="compSavoirImgProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Governance Photo -->
+              <div class="bo-form-group">
+                <label class="bo-label">Photo 3 : Équipe & Gouvernance</label>
+                <div class="bo-modal-image-row" style="display: flex; gap: 12px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 75px; height: 55px; background: #fff; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img id="compGovImgPreview" src="${company.governanceImage || '/assets/images/gallery-3.webp'}" alt="Équipe" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="compGovImgUrl" class="bo-input" value="${company.governanceImage || '/assets/images/gallery-3.webp'}" style="margin-bottom: 6px; font-size: 12px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera} <span>Téléverser vers Cloudinary</span>
+                      <input type="file" id="compGovImgFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="compGovImgProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quality Photo -->
+              <div class="bo-form-group">
+                <label class="bo-label">Photo 4 : Normes & Traçabilité</label>
+                <div class="bo-modal-image-row" style="display: flex; gap: 12px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 75px; height: 55px; background: #fff; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img id="compQualityImgPreview" src="${company.qualityImage || '/assets/images/gallery-4.webp'}" alt="Qualité" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="compQualityImgUrl" class="bo-input" value="${company.qualityImage || '/assets/images/gallery-4.webp'}" style="margin-bottom: 6px; font-size: 12px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera} <span>Téléverser vers Cloudinary</span>
+                      <input type="file" id="compQualityImgFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="compQualityImgProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
               <button type="submit" class="bo-btn-primary">
                 ${BO_ICONS.check}
                 <span>Enregistrer la Page Entreprise</span>
@@ -838,7 +955,79 @@ export class BackofficePage {
               <textarea id="rseEcoDesc" class="bo-textarea" required>${engagements.ecoDesc}</textarea>
             </div>
 
-            <div style="display: flex; justify-content: flex-end;">
+            <!-- Editorial Photos Engagements -->
+            <div style="margin: 24px 0 16px 0; border-top: 1px solid var(--bo-border); padding-top: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <h3 style="font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--bo-forest); margin: 0;">
+                  Photos Éditoriales Engagements RSE
+                </h3>
+                <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                  ${BO_ICONS.cloud}
+                  <span>CDN Cloudinary</span>
+                </span>
+              </div>
+              <p style="font-size: 12px; color: var(--bo-text-muted); margin: 0 0 14px 0;">
+                Images officielles des coopératives agricoles, de la traçabilité et du recyclage
+              </p>
+            </div>
+
+            <div class="bo-form-grid-3">
+              <!-- Filieres Photo -->
+              <div class="bo-form-group">
+                <label class="bo-label">Photo 1 : Planteurs & Filières</label>
+                <div class="bo-modal-image-row" style="display: flex; gap: 10px; align-items: center; background: var(--bo-surface-subtle); padding: 10px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 60px; height: 50px; background: #fff; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img id="rseFilieresImgPreview" src="${engagements.filieresImage || '/assets/images/gallery-3.webp'}" alt="Filières" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="rseFilieresImgUrl" class="bo-input" value="${engagements.filieresImage || '/assets/images/gallery-3.webp'}" style="margin-bottom: 6px; font-size: 11.5px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera} <span>Cloudinary</span>
+                      <input type="file" id="rseFilieresImgFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="rseFilieresImgProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quality Photo -->
+              <div class="bo-form-group">
+                <label class="bo-label">Photo 2 : Contrôle Qualité</label>
+                <div class="bo-modal-image-row" style="display: flex; gap: 10px; align-items: center; background: var(--bo-surface-subtle); padding: 10px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 60px; height: 50px; background: #fff; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img id="rseQualityImgPreview" src="${engagements.qualityImage || '/assets/images/gallery-1.webp'}" alt="Qualité" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="rseQualityImgUrl" class="bo-input" value="${engagements.qualityImage || '/assets/images/gallery-1.webp'}" style="margin-bottom: 6px; font-size: 11.5px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera} <span>Cloudinary</span>
+                      <input type="file" id="rseQualityImgFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="rseQualityImgProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recycling Photo -->
+              <div class="bo-form-group">
+                <label class="bo-label">Photo 3 : Éco-Recyclage</label>
+                <div class="bo-modal-image-row" style="display: flex; gap: 10px; align-items: center; background: var(--bo-surface-subtle); padding: 10px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 60px; height: 50px; background: #fff; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img id="rseRecyclingImgPreview" src="${engagements.recyclingImage || '/assets/images/gallery-4.webp'}" alt="Recyclage" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="rseRecyclingImgUrl" class="bo-input" value="${engagements.recyclingImage || '/assets/images/gallery-4.webp'}" style="margin-bottom: 6px; font-size: 11.5px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera} <span>Cloudinary</span>
+                      <input type="file" id="rseRecyclingImgFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="rseRecyclingImgProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
               <button type="submit" class="bo-btn-primary">
                 ${BO_ICONS.check}
                 <span>Enregistrer les Engagements RSE</span>
@@ -1186,6 +1375,68 @@ export class BackofficePage {
               <textarea id="cfgMetaDesc" class="bo-textarea" required>${settings.seoMetaDesc}</textarea>
             </div>
 
+            <!-- Visual Brand Identity & Logo -->
+            <div style="margin: 28px 0 16px 0; border-top: 1px solid var(--bo-border); padding-top: 24px;">
+              <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--bo-forest); margin: 0 0 4px 0;">
+                Identité Visuelle & Logos Officiels
+              </h3>
+              <p style="font-size: 12.5px; color: var(--bo-text-muted); margin: 0 0 16px 0;">
+                Logo de marque et favicon affichés dans l'en-tête, le pied de page et l'onglet navigateur
+              </p>
+            </div>
+
+            <div class="bo-form-grid-2">
+              <!-- Brand Logo -->
+              <div class="bo-form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" style="margin: 0;">Logo Officiel Nidj Juice (PNG, SVG, WEBP)</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
+                </div>
+                <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 75px; height: 60px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 4px; flex-shrink: 0;">
+                    <img id="cfgBrandLogoPreview" src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" alt="Logo Aperçu" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="cfgBrandLogoUrl" class="bo-input" value="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" placeholder="URL CDN ou chemin local" style="margin-bottom: 8px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera}
+                      <span>Téléverser vers Cloudinary</span>
+                      <input type="file" id="cfgBrandLogoFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="cfgBrandLogoProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Favicon -->
+              <div class="bo-form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" style="margin: 0;">Favicon du Site (Icône Navigateur)</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
+                </div>
+                <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 60px; height: 60px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 4px; flex-shrink: 0;">
+                    <img id="cfgFaviconPreview" src="${settings.faviconUrl || '/favicon.svg'}" alt="Favicon Aperçu" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="cfgFaviconUrl" class="bo-input" value="${settings.faviconUrl || '/favicon.svg'}" placeholder="URL Favicon" style="margin-bottom: 8px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera}
+                      <span>Téléverser vers Cloudinary</span>
+                      <input type="file" id="cfgFaviconFile" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="cfgFaviconProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Cloudinary Integration Section -->
             <div style="margin: 28px 0 16px 0; border-top: 1px solid var(--bo-border); padding-top: 24px;">
               <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
@@ -1453,14 +1704,17 @@ export class BackofficePage {
     const heroForm = this.element.querySelector('#boHeroForm') as HTMLFormElement;
     heroForm?.addEventListener('submit', (e) => {
       e.preventDefault();
+      const current = cmsService.getHeroContent();
       cmsService.saveHeroContent({
+        ...current,
         titleWord1: (this.element.querySelector('#heroWord1') as HTMLInputElement).value,
         titleWord2: (this.element.querySelector('#heroWord2') as HTMLInputElement).value,
         subtitle: (this.element.querySelector('#heroSubtitle') as HTMLInputElement).value,
         description: (this.element.querySelector('#heroDescription') as HTMLTextAreaElement).value,
         badge1: (this.element.querySelector('#heroBadge1') as HTMLInputElement).value,
         badge2: (this.element.querySelector('#heroBadge2') as HTMLInputElement).value,
-        badge3: (this.element.querySelector('#heroBadge3') as HTMLInputElement).value
+        badge3: (this.element.querySelector('#heroBadge3') as HTMLInputElement).value,
+        bgBannerImage: (this.element.querySelector('#heroBgBannerUrl') as HTMLInputElement)?.value.trim() || current.bgBannerImage || ''
       });
       this.showToast('Section Héro mise à jour avec succès', 'success');
     });
@@ -1481,7 +1735,11 @@ export class BackofficePage {
         stat1Num: (this.element.querySelector('#stat1Num') as HTMLInputElement).value,
         stat1Label: (this.element.querySelector('#stat1Label') as HTMLInputElement).value,
         stat2Num: (this.element.querySelector('#stat2Num') as HTMLInputElement).value,
-        stat2Label: (this.element.querySelector('#stat2Label') as HTMLInputElement).value
+        stat2Label: (this.element.querySelector('#stat2Label') as HTMLInputElement).value,
+        productionImage: (this.element.querySelector('#compProdImgUrl') as HTMLInputElement)?.value.trim() || current.productionImage,
+        savoirFaireImage: (this.element.querySelector('#compSavoirImgUrl') as HTMLInputElement)?.value.trim() || current.savoirFaireImage,
+        governanceImage: (this.element.querySelector('#compGovImgUrl') as HTMLInputElement)?.value.trim() || current.governanceImage,
+        qualityImage: (this.element.querySelector('#compQualityImgUrl') as HTMLInputElement)?.value.trim() || current.qualityImage
       });
       this.showToast('Page Entreprise enregistrée', 'success');
     });
@@ -1496,9 +1754,78 @@ export class BackofficePage {
         heroTitle: (this.element.querySelector('#rseHeroTitle') as HTMLInputElement).value,
         heroSubtitle: (this.element.querySelector('#rseHeroSubtitle') as HTMLInputElement).value,
         filieresDesc: (this.element.querySelector('#rseFilieresDesc') as HTMLTextAreaElement).value,
-        ecoDesc: (this.element.querySelector('#rseEcoDesc') as HTMLTextAreaElement).value
+        ecoDesc: (this.element.querySelector('#rseEcoDesc') as HTMLTextAreaElement).value,
+        filieresImage: (this.element.querySelector('#rseFilieresImgUrl') as HTMLInputElement)?.value.trim() || current.filieresImage,
+        qualityImage: (this.element.querySelector('#rseQualityImgUrl') as HTMLInputElement)?.value.trim() || current.qualityImage,
+        recyclingImage: (this.element.querySelector('#rseRecyclingImgUrl') as HTMLInputElement)?.value.trim() || current.recyclingImage
       });
       this.showToast('Engagements RSE enregistrés', 'success');
+    });
+
+    // Wire up Pages Tab Cloudinary Image Uploaders
+    this.setupImageUploader({
+      fileInputId: '#heroBgBannerFile',
+      urlInputId: '#heroBgBannerUrl',
+      previewId: '#heroBgBannerPreview',
+      progressBoxId: '#heroBgBannerProgress',
+      folder: 'nidj_juice/pages',
+      onSuccessToast: 'Bannière Héro sauvegardée sur Cloudinary !'
+    });
+    this.setupImageUploader({
+      fileInputId: '#compProdImgFile',
+      urlInputId: '#compProdImgUrl',
+      previewId: '#compProdImgPreview',
+      progressBoxId: '#compProdImgProgress',
+      folder: 'nidj_juice/company',
+      onSuccessToast: 'Photo Laboratoire sauvegardée sur Cloudinary !'
+    });
+    this.setupImageUploader({
+      fileInputId: '#compSavoirImgFile',
+      urlInputId: '#compSavoirImgUrl',
+      previewId: '#compSavoirImgPreview',
+      progressBoxId: '#compSavoirImgProgress',
+      folder: 'nidj_juice/company',
+      onSuccessToast: 'Photo Savoir-Faire sauvegardée sur Cloudinary !'
+    });
+    this.setupImageUploader({
+      fileInputId: '#compGovImgFile',
+      urlInputId: '#compGovImgUrl',
+      previewId: '#compGovImgPreview',
+      progressBoxId: '#compGovImgProgress',
+      folder: 'nidj_juice/company',
+      onSuccessToast: 'Photo Équipe & Gouvernance sauvegardée sur Cloudinary !'
+    });
+    this.setupImageUploader({
+      fileInputId: '#compQualityImgFile',
+      urlInputId: '#compQualityImgUrl',
+      previewId: '#compQualityImgPreview',
+      progressBoxId: '#compQualityImgProgress',
+      folder: 'nidj_juice/company',
+      onSuccessToast: 'Photo Normes sauvegardée sur Cloudinary !'
+    });
+    this.setupImageUploader({
+      fileInputId: '#rseFilieresImgFile',
+      urlInputId: '#rseFilieresImgUrl',
+      previewId: '#rseFilieresImgPreview',
+      progressBoxId: '#rseFilieresImgProgress',
+      folder: 'nidj_juice/engagements',
+      onSuccessToast: 'Photo Filières Terroirs sauvegardée sur Cloudinary !'
+    });
+    this.setupImageUploader({
+      fileInputId: '#rseQualityImgFile',
+      urlInputId: '#rseQualityImgUrl',
+      previewId: '#rseQualityImgPreview',
+      progressBoxId: '#rseQualityImgProgress',
+      folder: 'nidj_juice/engagements',
+      onSuccessToast: 'Photo Contrôle Qualité sauvegardée sur Cloudinary !'
+    });
+    this.setupImageUploader({
+      fileInputId: '#rseRecyclingImgFile',
+      urlInputId: '#rseRecyclingImgUrl',
+      previewId: '#rseRecyclingImgPreview',
+      progressBoxId: '#rseRecyclingImgProgress',
+      folder: 'nidj_juice/engagements',
+      onSuccessToast: 'Photo Éco-Recyclage sauvegardée sur Cloudinary !'
     });
 
     // Settings Form Submit
@@ -1521,6 +1848,8 @@ export class BackofficePage {
         linkedinUrl: (this.element.querySelector('#cfgLinkedin') as HTMLInputElement).value,
         seoMetaTitle: (this.element.querySelector('#cfgMetaTitle') as HTMLInputElement).value,
         seoMetaDesc: (this.element.querySelector('#cfgMetaDesc') as HTMLTextAreaElement).value,
+        brandLogoUrl: (this.element.querySelector('#cfgBrandLogoUrl') as HTMLInputElement)?.value.trim() || current.brandLogoUrl,
+        faviconUrl: (this.element.querySelector('#cfgFaviconUrl') as HTMLInputElement)?.value.trim() || current.faviconUrl,
         cloudinaryCloudName: cName,
         cloudinaryUploadPreset: cPreset,
         cloudinaryFolder: cFolder
@@ -1531,6 +1860,24 @@ export class BackofficePage {
 
       this.showToast('Paramètres généraux et Cloudinary enregistrés avec succès !', 'success');
       this.render();
+    });
+
+    // Setup Brand Logo and Favicon Cloudinary Uploaders
+    this.setupImageUploader({
+      fileInputId: '#cfgBrandLogoFile',
+      urlInputId: '#cfgBrandLogoUrl',
+      previewId: '#cfgBrandLogoPreview',
+      progressBoxId: '#cfgBrandLogoProgress',
+      folder: 'nidj_juice/brand',
+      onSuccessToast: 'Logo officiel sauvegardé sur Cloudinary !'
+    });
+    this.setupImageUploader({
+      fileInputId: '#cfgFaviconFile',
+      urlInputId: '#cfgFaviconUrl',
+      previewId: '#cfgFaviconPreview',
+      progressBoxId: '#cfgFaviconProgress',
+      folder: 'nidj_juice/brand',
+      onSuccessToast: 'Favicon du site sauvegardé sur Cloudinary !'
     });
 
     // Cloudinary Test Connection Button
@@ -1878,6 +2225,31 @@ export class BackofficePage {
                 </div>
               </div>
 
+              <!-- Splash Image Uploader -->
+              <div class="bo-form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" style="margin: 0;">Visuel Décoratif / Éclaboussure de Fruits (Splash Image)</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
+                </div>
+                <div class="bo-modal-image-row" style="display: flex; gap: 16px; align-items: center; background: var(--bo-surface-subtle); padding: 14px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 70px; height: 70px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 4px; flex-shrink: 0;">
+                    <img id="pSplashImgPreview" src="${p.splashImage || '/assets/images/splash-bissap.png'}" alt="Prévisualisation Splash" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="pSplashImgUrl" class="bo-input" value="${p.splashImage || ''}" placeholder="URL Cloudinary ou chemin local (/assets/images/...)" style="margin-bottom: 8px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera}
+                      <span>Téléverser vers Cloudinary</span>
+                      <input type="file" id="pSplashImgFileInput" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="pSplashUploadProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Colors & Branding -->
               <div class="bo-form-grid-3">
                 <div class="bo-form-group">
@@ -2063,6 +2435,17 @@ export class BackofficePage {
       }
     });
 
+    // Splash Image Uploader binding
+    this.setupImageUploader({
+      fileInputId: '#pSplashImgFileInput',
+      urlInputId: '#pSplashImgUrl',
+      previewId: '#pSplashImgPreview',
+      progressBoxId: '#pSplashUploadProgress',
+      folder: 'nidj_juice/products',
+      onSuccessToast: 'Éclaboussure de fruits sauvegardée sur Cloudinary !',
+      container: modalContainer as HTMLElement
+    });
+
     // Form Submit
     const form = modalContainer.querySelector('#boProductEditForm') as HTMLFormElement;
     form?.addEventListener('submit', (e) => {
@@ -2074,6 +2457,7 @@ export class BackofficePage {
         subtitle: (modalContainer.querySelector('#pSubtitle') as HTMLInputElement).value.trim(),
         category: (modalContainer.querySelector('#pCategory') as HTMLInputElement).value.trim(),
         bottleImage: imgUrlInput.value.trim() || p.bottleImage,
+        splashImage: (modalContainer.querySelector('#pSplashImgUrl') as HTMLInputElement)?.value.trim() || p.splashImage || '',
         accentColor: colorText.value.trim() || '#58A826',
         glowColor: (modalContainer.querySelector('#pHaloColor') as HTMLInputElement).value.trim() || p.glowColor,
         quote: (modalContainer.querySelector('#pQuote') as HTMLInputElement).value.trim(),
@@ -2190,6 +2574,31 @@ export class BackofficePage {
                 <label class="bo-label">Horaires d'Ouverture</label>
                 <input type="text" id="sHours" class="bo-input" value="${s.openingHours}" required />
               </div>
+
+              <!-- Store Photo Uploader -->
+              <div class="bo-form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" style="margin: 0;">Photo de la Façade / Rayon</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
+                </div>
+                <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 75px; height: 60px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                    <img id="sImgPreview" src="${s.image || '/assets/images/store-supermarket.jpg'}" alt="Point de Vente" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="sImgUrl" class="bo-input" value="${s.image || '/assets/images/store-supermarket.jpg'}" placeholder="URL Cloudinary ou chemin local" style="margin-bottom: 8px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera}
+                      <span>Téléverser vers Cloudinary</span>
+                      <input type="file" id="sImgFileInput" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="sUploadProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="bo-modal-footer">
@@ -2208,6 +2617,17 @@ export class BackofficePage {
     modalContainer.querySelector('#closeStoreModalBtn')?.addEventListener('click', closeModal);
     modalContainer.querySelector('#cancelStoreModalBtn')?.addEventListener('click', closeModal);
 
+    // Store Photo Uploader binding
+    this.setupImageUploader({
+      fileInputId: '#sImgFileInput',
+      urlInputId: '#sImgUrl',
+      previewId: '#sImgPreview',
+      progressBoxId: '#sUploadProgress',
+      folder: 'nidj_juice/stores',
+      onSuccessToast: 'Photo du point de vente sauvegardée sur Cloudinary !',
+      container: modalContainer as HTMLElement
+    });
+
     const form = modalContainer.querySelector('#boStoreEditForm') as HTMLFormElement;
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -2219,7 +2639,8 @@ export class BackofficePage {
         address: (modalContainer.querySelector('#sAddress') as HTMLInputElement).value.trim(),
         phone: (modalContainer.querySelector('#sPhone') as HTMLInputElement).value.trim(),
         type: (modalContainer.querySelector('#sType') as HTMLSelectElement).value as any,
-        openingHours: (modalContainer.querySelector('#sHours') as HTMLInputElement).value.trim()
+        openingHours: (modalContainer.querySelector('#sHours') as HTMLInputElement).value.trim(),
+        image: (modalContainer.querySelector('#sImgUrl') as HTMLInputElement)?.value.trim() || s.image
       };
 
       cmsService.saveStore(updatedStore);
@@ -2509,6 +2930,31 @@ export class BackofficePage {
                 </div>
               </div>
 
+              <!-- Poster Thumbnail Uploader -->
+              <div class="bo-form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" style="margin: 0;">Image Miniature / Poster (.webp, .jpg, .png)</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
+                </div>
+                <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="width: 60px; height: 75px; background: #000; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                    <img id="rPosterPreview" src="${r.poster || ''}" alt="Poster" style="max-height: 100%; max-width: 100%; object-fit: cover; ${r.poster ? '' : 'display: none;'}" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="rPosterUrl" class="bo-input" value="${r.poster || ''}" placeholder="URL Miniature Cloudinary (optionnel)" style="margin-bottom: 8px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.camera}
+                      <span>Téléverser Miniature vers Cloudinary</span>
+                      <input type="file" id="rPosterFileInput" accept="image/*" style="display: none;" />
+                    </label>
+                    <div id="rPosterUploadProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
               <div class="bo-form-group">
                 <label class="bo-label">Légende / Description Courte</label>
                 <input type="text" id="rCaption" class="bo-input" value="${r.caption}" required />
@@ -2614,6 +3060,17 @@ export class BackofficePage {
       }
     });
 
+    // Poster Thumbnail Uploader binding
+    this.setupImageUploader({
+      fileInputId: '#rPosterFileInput',
+      urlInputId: '#rPosterUrl',
+      previewId: '#rPosterPreview',
+      progressBoxId: '#rPosterUploadProgress',
+      folder: 'nidj_juice/reels',
+      onSuccessToast: 'Miniature du Reel sauvegardée sur Cloudinary !',
+      container: modalContainer as HTMLElement
+    });
+
     const form = modalContainer.querySelector('#boReelEditForm') as HTMLFormElement;
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -2621,6 +3078,7 @@ export class BackofficePage {
         ...r,
         title: (modalContainer.querySelector('#rTitle') as HTMLInputElement).value.trim(),
         src: videoSrcInput.value.trim() || r.src,
+        poster: (modalContainer.querySelector('#rPosterUrl') as HTMLInputElement)?.value.trim() || r.poster || '',
         caption: (modalContainer.querySelector('#rCaption') as HTMLInputElement).value.trim(),
         tag: (modalContainer.querySelector('#rTag') as HTMLInputElement).value.trim()
       };
@@ -2629,6 +3087,112 @@ export class BackofficePage {
       closeModal();
       this.render();
       this.showToast('Vidéo Reel enregistrée !', 'success');
+    });
+  }
+
+  // =========================================================================
+  // 8. REUSABLE CLOUDINARY IMAGE UPLOADER HANDLER
+  // =========================================================================
+  private setupImageUploader(options: {
+    fileInputId: string;
+    urlInputId: string;
+    previewId: string;
+    progressBoxId: string;
+    folder: string;
+    onSuccessToast?: string;
+    container?: HTMLElement;
+  }): void {
+    const root = options.container || this.element;
+    const fileInput = root.querySelector(options.fileInputId) as HTMLInputElement;
+    const urlInput = root.querySelector(options.urlInputId) as HTMLInputElement;
+    const preview = root.querySelector(options.previewId) as HTMLImageElement;
+    const progressBox = root.querySelector(options.progressBoxId) as HTMLElement;
+
+    if (!fileInput || !urlInput) return;
+
+    urlInput.addEventListener('input', () => {
+      const val = urlInput.value.trim();
+      if (preview && val) {
+        preview.src = val;
+        preview.style.display = 'block';
+      }
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      if (cloudinaryService.isConfigured()) {
+        try {
+          if (progressBox) {
+            progressBox.style.display = 'block';
+            progressBox.innerHTML = `
+              <div class="bo-upload-progress-box">
+                <div class="bo-upload-progress-header">
+                  <span>Envoi Cloudinary en cours...</span>
+                  <span class="upload-percent">0%</span>
+                </div>
+                <div class="bo-upload-progress-track">
+                  <div class="bo-upload-progress-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+            `;
+          }
+
+          if (preview) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+          }
+
+          const result = await cloudinaryService.upload(file, {
+            resourceType: 'image',
+            folder: options.folder,
+            onProgress: (percent) => {
+              const pLabel = progressBox?.querySelector('.upload-percent');
+              const pFill = progressBox?.querySelector('.bo-upload-progress-fill') as HTMLElement;
+              if (pLabel) pLabel.textContent = `${percent}%`;
+              if (pFill) pFill.style.width = `${percent}%`;
+            }
+          });
+
+          urlInput.value = result.secureUrl;
+          if (preview) {
+            preview.src = result.secureUrl;
+            preview.style.display = 'block';
+          }
+          this.showToast(options.onSuccessToast || 'Image sauvegardée sur Cloudinary !', 'success');
+        } catch (err: any) {
+          console.error('Cloudinary upload error', err);
+          this.showToast(`Échec Cloudinary : ${err.message}`, 'error');
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const dataUrl = evt.target?.result as string;
+            if (preview) {
+              preview.src = dataUrl;
+              preview.style.display = 'block';
+            }
+            urlInput.value = dataUrl;
+          };
+          reader.readAsDataURL(file);
+        } finally {
+          if (progressBox) progressBox.style.display = 'none';
+        }
+      } else {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const dataUrl = evt.target?.result as string;
+          if (preview) {
+            preview.src = dataUrl;
+            preview.style.display = 'block';
+          }
+          urlInput.value = dataUrl;
+        };
+        reader.readAsDataURL(file);
+        this.showToast(
+          'Image chargée localement. Pour héberger sur Cloudinary, renseignez vos identifiants dans les Paramètres.',
+          'error'
+        );
+      }
     });
   }
 

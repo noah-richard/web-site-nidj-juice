@@ -22,6 +22,11 @@ export class PromoOrderBanner {
   }
 
   private render(): void {
+    const products = cmsService.getProducts();
+    const activeProd = products[0];
+    const splashImg = activeProd?.splashImage || '/assets/images/splash-bissap.png';
+    const bottleImg = activeProd?.bottleImage || '/assets/images/bottle-bissap.png';
+
     this.element.innerHTML = `
       <div class="container">
         
@@ -46,13 +51,13 @@ export class PromoOrderBanner {
             <!-- Center Visual Bottle with Splash -->
             <div class="promo-visual">
               <img 
-                src="/assets/images/splash-bissap.png" 
+                src="${splashImg}" 
                 alt="Splash" 
                 class="promo-splash-img" 
                 aria-hidden="true"
               />
               <img 
-                src="/assets/images/bottle-bissap.png" 
+                src="${bottleImg}" 
                 alt="Bouteille Nidj Juice" 
                 class="promo-bottle-img"
               />

@@ -23,6 +23,7 @@ export class FlavorsPage {
 
   private render(): void {
     const products = cmsService.getProducts();
+    const gallery = cmsService.getGalleryItems();
 
     this.element.innerHTML = `
       <!-- Page Hero Header -->
@@ -141,7 +142,7 @@ export class FlavorsPage {
             </div>
             <div class="editorial-media-box">
               <img 
-                src="/assets/images/gallery-2.webp" 
+                src="${gallery[1]?.image || gallery[0]?.image || '/assets/images/gallery-2.webp'}" 
                 alt="Pack Découverte Nidj Juice" 
                 class="editorial-img"
                 loading="lazy"

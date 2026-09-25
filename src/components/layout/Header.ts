@@ -39,6 +39,8 @@ export class Header {
   private render(): void {
     const settings = cmsService.getSettings();
     const products = cmsService.getProducts();
+    const company = cmsService.getCompanyContent();
+    const engagements = cmsService.getEngagementsContent();
     this.element.innerHTML = `
       <div class="header-main-bar">
         <div class="header-container container">
@@ -48,7 +50,7 @@ export class Header {
             <a href="/" class="brand-logo-link" aria-label="Nidj Juice — Société Nidjeu">
               <span class="brand-company-prefix">THE</span>
               <img 
-                src="/assets/images/logo-nidj.png" 
+                src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" 
                 alt="Nidj Juice — Société Nidjeu" 
                 class="brand-logo-img"
                 width="120"
@@ -194,7 +196,7 @@ export class Header {
             <div class="mega-card-feature">
               <div class="mega-card-img-box">
                 <img 
-                  src="/assets/images/gallery-1.webp" 
+                  src="${company.productionImage || '/assets/images/gallery-1.webp'}" 
                   alt="Société Nidjeu Siège & Laboratoire" 
                   class="mega-card-img"
                   loading="lazy"
@@ -254,7 +256,7 @@ export class Header {
             <div class="mega-card-feature">
               <div class="mega-card-img-box">
                 <img 
-                  src="/assets/images/gallery-2.webp" 
+                  src="${company.savoirFaireImage || '/assets/images/gallery-2.webp'}" 
                   alt="Cocktail de Bissap et Ananas Gingembre" 
                   class="mega-card-img"
                   loading="lazy"
@@ -307,7 +309,7 @@ export class Header {
             <div class="mega-card-feature">
               <div class="mega-card-img-box">
                 <img 
-                  src="/assets/images/gallery-3.webp" 
+                  src="${engagements.filieresImage || '/assets/images/gallery-3.webp'}" 
                   alt="Coopératives et terroirs du Cameroun" 
                   class="mega-card-img"
                   loading="lazy"
@@ -398,7 +400,7 @@ export class Header {
           <!-- Drawer Header -->
           <div class="mobile-drawer-header">
             <div class="mobile-drawer-brand">
-              <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="mobile-drawer-logo" width="105" />
+              <img src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" alt="Nidj Juice" class="mobile-drawer-logo" width="105" />
               <span class="mobile-drawer-origin-badge">🇨🇲 Douala, Cameroun</span>
             </div>
             <button type="button" class="close-drawer-btn" id="closeDrawerBtn" aria-label="Fermer le menu">

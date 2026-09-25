@@ -106,7 +106,7 @@ export class CompanyPage {
           </div>
           <div class="editorial-media-box">
             <img 
-              src="/assets/images/gallery-1.webp" 
+              src="${company.productionImage || '/assets/images/gallery-1.webp'}" 
               alt="Laboratoire et embouteillage Société Nidjeu" 
               class="editorial-img"
               loading="lazy"
@@ -180,7 +180,7 @@ export class CompanyPage {
           </div>
           <div class="editorial-media-box">
             <img 
-              src="/assets/images/gallery-2.webp" 
+              src="${company.savoirFaireImage || '/assets/images/gallery-2.webp'}" 
               alt="Sélection des fruits frais et embouteillage" 
               class="editorial-img"
               loading="lazy"
@@ -204,7 +204,7 @@ export class CompanyPage {
           <div class="editorial-split-grid">
             <div class="editorial-media-box">
               <img 
-                src="/assets/images/gallery-3.webp" 
+                src="${company.governanceImage || '/assets/images/gallery-3.webp'}" 
                 alt="Équipe Société Nidjeu" 
                 class="editorial-img"
                 loading="lazy"
@@ -241,7 +241,7 @@ export class CompanyPage {
           </div>
           <div class="editorial-media-box">
             <img 
-              src="/assets/images/gallery-4.webp" 
+              src="${company.qualityImage || '/assets/images/gallery-4.webp'}" 
               alt="Normes et traçabilité Nidj Juice" 
               class="editorial-img"
               loading="lazy"

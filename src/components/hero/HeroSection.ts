@@ -43,7 +43,8 @@ export class HeroSection {
     const activeFlavor = isBissap ? bissapProd : ananasProd;
 
     this.element.innerHTML = `
-      <div class="hero-container container">
+      ${heroContent.bgBannerImage ? `<div class="hero-bg-custom-banner" style="position: absolute; inset: 0; background-image: url('${heroContent.bgBannerImage}'); background-size: cover; background-position: center; opacity: 0.12; pointer-events: none; z-index: 0;"></div>` : ''}
+      <div class="hero-container container" style="position: relative; z-index: 1;">
         
         <!-- Left Column: Editorial Brand Headline & CTA -->
         <div class="hero-content">
@@ -129,7 +130,7 @@ export class HeroSection {
 
           <!-- Dynamic Splash Image with Fruit Slices -->
           <img 
-            src="${isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png'}" 
+            src="${activeFlavor?.splashImage || (isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png')}" 
             alt="Fruit Splash" 
             class="hero-splash-bg-img"
             id="heroSplashImg"
@@ -391,7 +392,7 @@ export class HeroSection {
       splash.style.transition = 'opacity 0.25s ease';
       splash.style.opacity = '0';
       setTimeout(() => {
-        splash.src = isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png';
+        splash.src = flavor?.splashImage || (isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png');
         splash.style.opacity = '1';
       }, 200);
     }

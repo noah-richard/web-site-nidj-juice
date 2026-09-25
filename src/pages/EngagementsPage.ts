@@ -100,7 +100,7 @@ export class EngagementsPage {
           </div>
           <div class="editorial-media-box">
             <img 
-              src="/assets/images/gallery-3.webp" 
+              src="${engagements.filieresImage || '/assets/images/gallery-3.webp'}" 
               alt="Planteurs partenaires Société Nidjeu" 
               class="editorial-img"
               loading="lazy"
@@ -128,7 +128,7 @@ export class EngagementsPage {
           </div>
           <div class="editorial-media-box">
             <img 
-              src="/assets/images/gallery-1.webp" 
+              src="${engagements.qualityImage || '/assets/images/gallery-1.webp'}" 
               alt="Contrôle qualité sans produit chimique" 
               class="editorial-img"
               loading="lazy"
@@ -156,7 +156,7 @@ export class EngagementsPage {
           </div>
           <div class="editorial-media-box">
             <img 
-              src="/assets/images/gallery-4.webp" 
+              src="${engagements.recyclingImage || '/assets/images/gallery-4.webp'}" 
               alt="Programme de recyclage des emballages" 
               class="editorial-img"
               loading="lazy"

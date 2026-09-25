@@ -19,6 +19,7 @@ export interface HeroContent {
   badge1: string;
   badge2: string;
   badge3: string;
+  bgBannerImage?: string;
 }
 
 export interface CompanyContent {
@@ -41,6 +42,10 @@ export interface CompanyContent {
   stat4Num: string;
   stat4Label: string;
   stat4Desc: string;
+  productionImage?: string;
+  savoirFaireImage?: string;
+  governanceImage?: string;
+  qualityImage?: string;
 }
 
 export interface EngagementsContent {
@@ -52,6 +57,9 @@ export interface EngagementsContent {
   ecoDesc: string;
   localImpactNum: string;
   localImpactLabel: string;
+  filieresImage?: string;
+  qualityImage?: string;
+  recyclingImage?: string;
 }
 
 export interface FaqItem {
@@ -73,6 +81,8 @@ export interface SiteSettings {
   linkedinUrl: string;
   seoMetaTitle: string;
   seoMetaDesc: string;
+  brandLogoUrl?: string;
+  faviconUrl?: string;
   cloudinaryCloudName?: string;
   cloudinaryUploadPreset?: string;
   cloudinaryFolder?: string;
@@ -210,7 +220,8 @@ export class CmsService {
           'Une fraîcheur naturelle incomparable, pressée avec passion à Douala à partir de calices d’hibiscus du Grand Nord et d’ananas gorgés de soleil.',
         badge1: '100% Naturel & Brut',
         badge2: 'Fierté Camerounaise',
-        badge3: 'Zéro Conservateur'
+        badge3: 'Zéro Conservateur',
+        bgBannerImage: ''
       },
       company: {
         tagline: 'Histoire, Savoir-Faire & Vision',
@@ -234,7 +245,11 @@ export class CmsService {
         stat3Desc: 'Présents dans les hypermarchés et boutiques sélectes de Douala, Yaoundé, Bafoussam et Kribi.',
         stat4Num: '1000+',
         stat4Label: 'Familles Agricoles',
-        stat4Desc: 'Partenariat direct avec les coopératives d’hibiscus du Nord et de fruits du Littoral.'
+        stat4Desc: 'Partenariat direct avec les coopératives d’hibiscus du Nord et de fruits du Littoral.',
+        productionImage: '/assets/images/gallery-1.webp',
+        savoirFaireImage: '/assets/images/gallery-2.webp',
+        governanceImage: '/assets/images/gallery-3.webp',
+        qualityImage: '/assets/images/gallery-4.webp'
       },
       engagements: {
         heroTitle: 'Nos Engagements RSE & Durabilité',
@@ -246,7 +261,10 @@ export class CmsService {
         ecoDesc:
           'Tous nos contenants sont recyclables et nous privilégions la logistique de proximité afin de réduire l’empreinte carbone liée au transport.',
         localImpactNum: '100%',
-        localImpactLabel: 'Approvisionnement Terroirs Cameroun'
+        localImpactLabel: 'Approvisionnement Terroirs Cameroun',
+        filieresImage: '/assets/images/gallery-3.webp',
+        qualityImage: '/assets/images/gallery-1.webp',
+        recyclingImage: '/assets/images/gallery-4.webp'
       },
       faqs: [
         {
@@ -282,6 +300,8 @@ export class CmsService {
         seoMetaTitle: 'Nidj Juice — 100% Jus Naturels Fabriqués au Cameroun | Société Nidjeu',
         seoMetaDesc:
           'Découvrez Nidj Juice, la marque référence de jus 100% naturels pressés et embouteillés au Cameroun par la Société Nidjeu.',
+        brandLogoUrl: '/assets/images/logo-nidj.png',
+        faviconUrl: '/favicon.svg',
         cloudinaryCloudName: (import.meta as any).env?.VITE_CLOUDINARY_CLOUD_NAME || '',
         cloudinaryUploadPreset: (import.meta as any).env?.VITE_CLOUDINARY_UPLOAD_PRESET || '',
         cloudinaryFolder: 'nidj_juice'
