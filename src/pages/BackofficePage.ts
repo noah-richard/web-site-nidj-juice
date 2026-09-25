@@ -5,6 +5,7 @@
    ========================================================================== */
 
 import { cmsService, type FaqItem } from '../services/cms.service';
+import { cloudinaryService } from '../services/cloudinary.service';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
 import type { StoreLocation, VideoReel } from '../types/product.types';
 import type { GalleryItem } from '../data/gallery.data';
@@ -36,7 +37,9 @@ const BO_ICONS = {
   eye: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`,
   camera: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`,
   layers: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
-  menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`
+  menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`,
+  cloud: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>`,
+  loader: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bo-spin"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>`
 };
 
 export class BackofficePage {
@@ -1183,13 +1186,106 @@ export class BackofficePage {
               <textarea id="cfgMetaDesc" class="bo-textarea" required>${settings.seoMetaDesc}</textarea>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+            <!-- Cloudinary Integration Section -->
+            <div style="margin: 28px 0 16px 0; border-top: 1px solid var(--bo-border); padding-top: 24px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="bo-card-icon" style="width: 32px; height: 32px; font-size: 15px;">${BO_ICONS.cloud}</div>
+                  <div>
+                    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--bo-forest); margin: 0;">
+                      Hébergement Médias Cloudinary (Images & Vidéos)
+                    </h3>
+                    <p style="font-size: 12px; color: var(--bo-text-muted); margin: 2px 0 0 0;">
+                      Les images de bouteilles, photos de galerie et vidéos de reels sont automatiquement sauvegardées sur votre compte Cloudinary
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  ${cloudinaryService.isConfigured()
+                    ? `<span class="bo-cloudinary-badge-pill is-active">${BO_ICONS.check} Cloudinary Connecté</span>`
+                    : `<span class="bo-cloudinary-badge-pill is-inactive">Non configuré</span>`}
+                </div>
+              </div>
+
+              <div class="bo-form-grid-3" style="margin-top: 16px;">
+                <div class="bo-form-group">
+                  <label class="bo-label">
+                    <span>Cloud Name Cloudinary</span>
+                    <span class="bo-label-hint">Identifiant de votre cloud</span>
+                  </label>
+                  <input type="text" id="cfgCloudinaryCloudName" class="bo-input" value="${settings.cloudinaryCloudName || ''}" placeholder="Ex: nidj-juice ou dxxxxxxx" />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">
+                    <span>Upload Preset (Mode Unsigned)</span>
+                    <span class="bo-label-hint">Preset non-signé</span>
+                  </label>
+                  <input type="text" id="cfgCloudinaryUploadPreset" class="bo-input" value="${settings.cloudinaryUploadPreset || ''}" placeholder="Ex: nidj_preset ou ml_default" />
+                </div>
+                <div class="bo-form-group">
+                  <label class="bo-label">
+                    <span>Dossier Racine (Optionnel)</span>
+                    <span class="bo-label-hint">Organisation</span>
+                  </label>
+                  <input type="text" id="cfgCloudinaryFolder" class="bo-input" value="${settings.cloudinaryFolder || 'nidj_juice'}" placeholder="nidj_juice" />
+                </div>
+              </div>
+
+              <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 14px 16px; margin-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                <div style="font-size: 12px; color: var(--bo-text-secondary); line-height: 1.5; max-width: 680px;">
+                  💡 <strong>Comment créer un Upload Preset en 1 minute ?</strong><br/>
+                  1. Connectez-vous sur votre compte gratuit <a href="https://cloudinary.com" target="_blank" rel="noopener" style="color: var(--bo-brand-green); font-weight: 700; text-decoration: underline;">Cloudinary.com</a><br/>
+                  2. Allez dans <strong>Settings (⚙️) &rarr; Upload &rarr; Upload presets</strong><br/>
+                  3. Cliquez sur <strong>Add upload preset</strong>, réglez <strong>Signing Mode</strong> sur <strong>Unsigned</strong>, puis enregistrez et collez son nom ci-dessus.
+                </div>
+                <button type="button" class="bo-btn-secondary" id="boTestCloudinaryBtn" style="font-size: 12px; padding: 7px 14px; white-space: nowrap;">
+                  ${BO_ICONS.refresh}
+                  <span>Tester la connexion</span>
+                </button>
+              </div>
+              <div id="boCloudinaryTestResult" style="margin-top: 8px;"></div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
               <button type="submit" class="bo-btn-primary">
                 ${BO_ICONS.check}
                 <span>Enregistrer les Paramètres</span>
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- Standalone Media Uploader Card -->
+      <div class="bo-card" style="margin-top: 24px;">
+        <div class="bo-card-header">
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon">${BO_ICONS.upload}</div>
+            <div>
+              <h2 class="bo-card-title">Centre de Téléversement Direct Cloudinary</h2>
+              <p class="bo-card-subtitle">Téléversez n'importe quelle image ou vidéo pour obtenir son URL CDN Cloudinary instantanément</p>
+            </div>
+          </div>
+        </div>
+        <div class="bo-card-body">
+          <div style="border: 2px dashed var(--bo-border); border-radius: var(--bo-radius-md); padding: 24px 20px; text-align: center; background: var(--bo-surface-subtle);">
+            <div style="margin-bottom: 10px; color: var(--bo-forest);">
+              ${BO_ICONS.cloud}
+            </div>
+            <p style="font-weight: 700; color: var(--bo-forest); margin: 0 0 6px 0; font-size: 14px;">
+              Sélectionnez une image ou une vidéo à sauvegarder sur Cloudinary
+            </p>
+            <p style="font-size: 12px; color: var(--bo-text-muted); margin: 0 0 16px 0;">
+              Formats supportés : JPG, PNG, WEBP, SVG, MP4, MOV, WEBM. Téléversement haute vitesse vers votre CDN.
+            </p>
+            <label class="bo-btn-primary" style="display: inline-flex; cursor: pointer;">
+              ${BO_ICONS.upload}
+              <span>Sélectionner un fichier média</span>
+              <input type="file" id="boDirectMediaUploadInput" accept="image/*,video/*" style="display: none;" />
+            </label>
+            <div id="boDirectUploadProgress" style="display: none; max-width: 480px; margin: 16px auto 0 auto;"></div>
+            <div id="boDirectUploadResult" style="margin-top: 16px;"></div>
+          </div>
         </div>
       </div>
     `;
@@ -1410,6 +1506,10 @@ export class BackofficePage {
     settingsForm?.addEventListener('submit', (e) => {
       e.preventDefault();
       const current = cmsService.getSettings();
+      const cName = (this.element.querySelector('#cfgCloudinaryCloudName') as HTMLInputElement)?.value.trim() || '';
+      const cPreset = (this.element.querySelector('#cfgCloudinaryUploadPreset') as HTMLInputElement)?.value.trim() || '';
+      const cFolder = (this.element.querySelector('#cfgCloudinaryFolder') as HTMLInputElement)?.value.trim() || 'nidj_juice';
+
       cmsService.saveSettings({
         ...current,
         whatsappNumber: (this.element.querySelector('#cfgWhatsapp') as HTMLInputElement).value.replace(/\D/g, ''),
@@ -1420,9 +1520,142 @@ export class BackofficePage {
         instagramUrl: (this.element.querySelector('#cfgInstagram') as HTMLInputElement).value,
         linkedinUrl: (this.element.querySelector('#cfgLinkedin') as HTMLInputElement).value,
         seoMetaTitle: (this.element.querySelector('#cfgMetaTitle') as HTMLInputElement).value,
-        seoMetaDesc: (this.element.querySelector('#cfgMetaDesc') as HTMLTextAreaElement).value
+        seoMetaDesc: (this.element.querySelector('#cfgMetaDesc') as HTMLTextAreaElement).value,
+        cloudinaryCloudName: cName,
+        cloudinaryUploadPreset: cPreset,
+        cloudinaryFolder: cFolder
       });
-      this.showToast('Paramètres généraux enregistrés', 'success');
+
+      // Synchronize Cloudinary config storage
+      cloudinaryService.saveConfig({ cloudName: cName, uploadPreset: cPreset, folder: cFolder });
+
+      this.showToast('Paramètres généraux et Cloudinary enregistrés avec succès !', 'success');
+      this.render();
+    });
+
+    // Cloudinary Test Connection Button
+    const testCloudinaryBtn = this.element.querySelector('#boTestCloudinaryBtn') as HTMLButtonElement;
+    const testResultBox = this.element.querySelector('#boCloudinaryTestResult') as HTMLElement;
+    testCloudinaryBtn?.addEventListener('click', async () => {
+      const cName = (this.element.querySelector('#cfgCloudinaryCloudName') as HTMLInputElement)?.value.trim();
+      const cPreset = (this.element.querySelector('#cfgCloudinaryUploadPreset') as HTMLInputElement)?.value.trim();
+      const cFolder = (this.element.querySelector('#cfgCloudinaryFolder') as HTMLInputElement)?.value.trim() || 'nidj_juice';
+
+      if (!cName || !cPreset) {
+        if (testResultBox) {
+          testResultBox.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 10px 14px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+              ⚠️ Veuillez d'abord renseigner le Cloud Name et l'Upload Preset ci-dessus.
+            </div>
+          `;
+        }
+        return;
+      }
+
+      cloudinaryService.saveConfig({ cloudName: cName, uploadPreset: cPreset, folder: cFolder });
+
+      testCloudinaryBtn.disabled = true;
+      testCloudinaryBtn.innerHTML = `${BO_ICONS.loader} <span>Test de connexion en cours...</span>`;
+      if (testResultBox) {
+        testResultBox.innerHTML = `<div style="font-size: 12px; color: var(--bo-text-muted);">Vérification de l'endpoint Cloudinary...</div>`;
+      }
+
+      const res = await cloudinaryService.testConnection();
+      testCloudinaryBtn.disabled = false;
+      testCloudinaryBtn.innerHTML = `${BO_ICONS.refresh} <span>Tester la connexion</span>`;
+
+      if (res.success) {
+        if (testResultBox) {
+          testResultBox.innerHTML = `
+            <div style="background: rgba(88, 168, 38, 0.12); border: 1px solid rgba(88, 168, 38, 0.3); color: var(--bo-forest); padding: 10px 14px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 700;">
+              ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Connexion Cloudinary réussie !', 'success');
+      } else {
+        if (testResultBox) {
+          testResultBox.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 10px 14px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+              ❌ Erreur de configuration : ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Échec du test Cloudinary', 'error');
+      }
+    });
+
+    // Standalone Direct Media Upload Dropzone
+    const directUploadInput = this.element.querySelector('#boDirectMediaUploadInput') as HTMLInputElement;
+    const directUploadProgress = this.element.querySelector('#boDirectUploadProgress') as HTMLElement;
+    const directUploadResult = this.element.querySelector('#boDirectUploadResult') as HTMLElement;
+
+    directUploadInput?.addEventListener('change', async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      if (!cloudinaryService.isConfigured()) {
+        this.showToast('Veuillez renseigner et enregistrer votre Cloud Name et Upload Preset d\'abord.', 'error');
+        return;
+      }
+
+      try {
+        if (directUploadProgress) {
+          directUploadProgress.style.display = 'block';
+          directUploadProgress.innerHTML = `
+            <div class="bo-upload-progress-box">
+              <div class="bo-upload-progress-header">
+                <span>Téléversement vers Cloudinary...</span>
+                <span id="directUploadPercent">0%</span>
+              </div>
+              <div class="bo-upload-progress-track">
+                <div class="bo-upload-progress-fill" id="directUploadFill" style="width: 0%;"></div>
+              </div>
+            </div>
+          `;
+        }
+        if (directUploadResult) directUploadResult.innerHTML = '';
+
+        const isVideo = file.type.startsWith('video/');
+        const res = await cloudinaryService.upload(file, {
+          resourceType: isVideo ? 'video' : 'image',
+          folder: 'nidj_juice/media',
+          onProgress: (percent) => {
+            const pLabel = this.element.querySelector('#directUploadPercent');
+            const pFill = this.element.querySelector('#directUploadFill') as HTMLElement;
+            if (pLabel) pLabel.textContent = `${percent}%`;
+            if (pFill) pFill.style.width = `${percent}%`;
+          }
+        });
+
+        if (directUploadProgress) directUploadProgress.style.display = 'none';
+        if (directUploadResult) {
+          directUploadResult.innerHTML = `
+            <div style="background: #FFFFFF; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 16px; text-align: left; display: flex; gap: 14px; align-items: center; max-width: 620px; margin: 0 auto; box-shadow: var(--bo-shadow-sm);">
+              ${isVideo 
+                ? `<video src="${res.secureUrl}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px; background: #000;" controls></video>`
+                : `<img src="${res.secureUrl}" alt="Aperçu" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid var(--bo-border);" />`}
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--bo-forest); margin-bottom: 4px;">✓ Fichier hébergé sur Cloudinary CDN</div>
+                <input type="text" class="bo-input" value="${res.secureUrl}" readonly style="font-size: 11px; padding: 6px 10px;" id="directUploadedUrlInput" />
+              </div>
+              <button type="button" class="bo-btn-secondary" id="boCopyUploadedUrlBtn" style="font-size: 12px; padding: 6px 12px; white-space: nowrap;">
+                Copier l'URL
+              </button>
+            </div>
+          `;
+
+          const copyBtn = directUploadResult.querySelector('#boCopyUploadedUrlBtn') as HTMLButtonElement;
+          copyBtn?.addEventListener('click', () => {
+            navigator.clipboard.writeText(res.secureUrl);
+            this.showToast('URL Cloudinary copiée dans le presse-papiers !', 'success');
+          });
+        }
+        this.showToast('Média sauvegardé avec succès sur Cloudinary !', 'success');
+      } catch (err: any) {
+        if (directUploadProgress) directUploadProgress.style.display = 'none';
+        this.showToast(`Échec du téléversement : ${err.message}`, 'error');
+      }
     });
 
     // FAQ Add and Save
@@ -1622,18 +1855,25 @@ export class BackofficePage {
 
               <!-- Image Uploader -->
               <div class="bo-form-group">
-                <label class="bo-label">Visuel Officiel de la Bouteille</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" style="margin: 0;">Visuel Officiel de la Bouteille</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
+                </div>
                 <div class="bo-modal-image-row" style="display: flex; gap: 16px; align-items: center; background: var(--bo-surface-subtle); padding: 14px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
                   <div style="width: 70px; height: 90px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 4px; flex-shrink: 0;">
                     <img id="pImgPreview" src="${p.bottleImage}" alt="Prévisualisation" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
                   </div>
                   <div style="flex: 1; min-width: 0;">
-                    <input type="text" id="pImgUrl" class="bo-input" value="${p.bottleImage}" placeholder="URL ou chemin de l'image (/assets/...)" style="margin-bottom: 8px;" />
-                    <label class="bo-btn-secondary" style="font-size: 12px; padding: 6px 12px; cursor: pointer; display: inline-flex;">
+                    <input type="text" id="pImgUrl" class="bo-input" value="${p.bottleImage}" placeholder="URL Cloudinary ou chemin local" style="margin-bottom: 8px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
                       ${BO_ICONS.camera}
-                      <span>Choisir un fichier image</span>
+                      <span>Téléverser vers Cloudinary</span>
                       <input type="file" id="pImgFileInput" accept="image/*" style="display: none;" />
                     </label>
+                    <div id="pUploadProgress" style="display: none;"></div>
                   </div>
                 </div>
               </div>
@@ -1746,9 +1986,69 @@ export class BackofficePage {
       imgPreview.src = imgUrlInput.value;
     });
 
-    imgInput?.addEventListener('change', (e) => {
+    imgInput?.addEventListener('change', async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
+      if (!file) return;
+
+      const progressBox = modalContainer.querySelector('#pUploadProgress') as HTMLElement;
+      const saveBtn = modalContainer.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+      if (cloudinaryService.isConfigured()) {
+        try {
+          if (progressBox) {
+            progressBox.style.display = 'block';
+            progressBox.innerHTML = `
+              <div class="bo-upload-progress-box">
+                <div class="bo-upload-progress-header">
+                  <span>Envoi Cloudinary en cours...</span>
+                  <span id="pUploadPercent">0%</span>
+                </div>
+                <div class="bo-upload-progress-track">
+                  <div class="bo-upload-progress-fill" id="pUploadFill" style="width: 0%;"></div>
+                </div>
+              </div>
+            `;
+          }
+          if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `${BO_ICONS.loader} <span>Upload en cours...</span>`;
+          }
+
+          // Local instant preview
+          imgPreview.src = URL.createObjectURL(file);
+
+          const result = await cloudinaryService.upload(file, {
+            resourceType: 'image',
+            folder: 'nidj_juice/products',
+            onProgress: (percent) => {
+              const pLabel = modalContainer.querySelector('#pUploadPercent');
+              const pFill = modalContainer.querySelector('#pUploadFill') as HTMLElement;
+              if (pLabel) pLabel.textContent = `${percent}%`;
+              if (pFill) pFill.style.width = `${percent}%`;
+            }
+          });
+
+          imgUrlInput.value = result.secureUrl;
+          imgPreview.src = result.secureUrl;
+          this.showToast('Visuel produit sauvegardé sur Cloudinary !', 'success');
+        } catch (err: any) {
+          console.error('Cloudinary product upload error', err);
+          this.showToast(`Échec Cloudinary : ${err.message}`, 'error');
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const dataUrl = evt.target?.result as string;
+            imgPreview.src = dataUrl;
+            imgUrlInput.value = dataUrl;
+          };
+          reader.readAsDataURL(file);
+        } finally {
+          if (progressBox) progressBox.style.display = 'none';
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `${BO_ICONS.check} <span>Enregistrer</span>`;
+          }
+        }
+      } else {
         const reader = new FileReader();
         reader.onload = (evt) => {
           const dataUrl = evt.target?.result as string;
@@ -1756,6 +2056,10 @@ export class BackofficePage {
           imgUrlInput.value = dataUrl;
         };
         reader.readAsDataURL(file);
+        this.showToast(
+          'Image chargée localement. Pour héberger sur Cloudinary, renseignez vos identifiants dans les Paramètres.',
+          'error'
+        );
       }
     });
 
@@ -1968,18 +2272,25 @@ export class BackofficePage {
 
               <!-- Image Uploader -->
               <div class="bo-form-group">
-                <label class="bo-label">Photo de l'Événement</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" style="margin: 0;">Photo de l'Événement</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
+                </div>
                 <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
                   <div style="width: 80px; height: 60px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); overflow: hidden; flex-shrink: 0;">
                     <img id="gImgPreview" src="${g.image}" alt="Aperçu" style="width: 100%; height: 100%; object-fit: cover;" />
                   </div>
                   <div style="flex: 1; min-width: 0;">
-                    <input type="text" id="gImgUrl" class="bo-input" value="${g.image}" placeholder="URL ou chemin de la photo" style="margin-bottom: 6px;" />
-                    <label class="bo-btn-secondary" style="font-size: 11.5px; padding: 5px 10px; cursor: pointer; display: inline-flex;">
+                    <input type="text" id="gImgUrl" class="bo-input" value="${g.image}" placeholder="URL Cloudinary ou chemin local" style="margin-bottom: 6px;" />
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
                       ${BO_ICONS.camera}
-                      <span>Choisir un fichier</span>
+                      <span>Téléverser vers Cloudinary</span>
                       <input type="file" id="gImgFileInput" accept="image/*" style="display: none;" />
                     </label>
+                    <div id="gUploadProgress" style="display: none;"></div>
                   </div>
                 </div>
               </div>
@@ -2031,9 +2342,69 @@ export class BackofficePage {
     const imgPreview = modalContainer.querySelector('#gImgPreview') as HTMLImageElement;
 
     imgUrlInput?.addEventListener('input', () => (imgPreview.src = imgUrlInput.value));
-    imgInput?.addEventListener('change', (e) => {
+    imgInput?.addEventListener('change', async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
+      if (!file) return;
+
+      const progressBox = modalContainer.querySelector('#gUploadProgress') as HTMLElement;
+      const saveBtn = modalContainer.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+      if (cloudinaryService.isConfigured()) {
+        try {
+          if (progressBox) {
+            progressBox.style.display = 'block';
+            progressBox.innerHTML = `
+              <div class="bo-upload-progress-box">
+                <div class="bo-upload-progress-header">
+                  <span>Envoi photo vers Cloudinary...</span>
+                  <span id="gUploadPercent">0%</span>
+                </div>
+                <div class="bo-upload-progress-track">
+                  <div class="bo-upload-progress-fill" id="gUploadFill" style="width: 0%;"></div>
+                </div>
+              </div>
+            `;
+          }
+          if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `${BO_ICONS.loader} <span>Upload en cours...</span>`;
+          }
+
+          // Local instant preview
+          imgPreview.src = URL.createObjectURL(file);
+
+          const result = await cloudinaryService.upload(file, {
+            resourceType: 'image',
+            folder: 'nidj_juice/gallery',
+            onProgress: (percent) => {
+              const pLabel = modalContainer.querySelector('#gUploadPercent');
+              const pFill = modalContainer.querySelector('#gUploadFill') as HTMLElement;
+              if (pLabel) pLabel.textContent = `${percent}%`;
+              if (pFill) pFill.style.width = `${percent}%`;
+            }
+          });
+
+          imgUrlInput.value = result.secureUrl;
+          imgPreview.src = result.secureUrl;
+          this.showToast('Photo de galerie sauvegardée sur Cloudinary !', 'success');
+        } catch (err: any) {
+          console.error('Cloudinary gallery upload error', err);
+          this.showToast(`Échec Cloudinary : ${err.message}`, 'error');
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const dataUrl = evt.target?.result as string;
+            imgPreview.src = dataUrl;
+            imgUrlInput.value = dataUrl;
+          };
+          reader.readAsDataURL(file);
+        } finally {
+          if (progressBox) progressBox.style.display = 'none';
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `${BO_ICONS.check} <span>Enregistrer</span>`;
+          }
+        }
+      } else {
         const reader = new FileReader();
         reader.onload = (evt) => {
           const dataUrl = evt.target?.result as string;
@@ -2041,6 +2412,10 @@ export class BackofficePage {
           imgUrlInput.value = dataUrl;
         };
         reader.readAsDataURL(file);
+        this.showToast(
+          'Photo chargée localement. Pour héberger sur Cloudinary, configurez vos identifiants dans les Paramètres.',
+          'error'
+        );
       }
     });
 
@@ -2105,8 +2480,33 @@ export class BackofficePage {
               </div>
 
               <div class="bo-form-group">
-                <label class="bo-label">Source de la Vidéo (Fichier .mp4 ou URL)</label>
-                <input type="text" id="rSrc" class="bo-input" value="${r.src}" required />
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" style="margin: 0;">Fichier Vidéo du Reel (.mp4, .webm, .mov)</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
+                </div>
+                <div style="background: var(--bo-surface-subtle); padding: 14px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                  <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
+                    <label class="bo-upload-action-btn" style="cursor: pointer;">
+                      ${BO_ICONS.film}
+                      <span>Choisir une vidéo (.mp4, .mov, .webm)</span>
+                      <input type="file" id="rVideoFileInput" accept="video/*" style="display: none;" />
+                    </label>
+                    <span style="font-size: 11.5px; color: var(--bo-text-muted);">
+                      Téléversement direct sur Cloudinary
+                    </span>
+                  </div>
+
+                  <input type="text" id="rSrc" class="bo-input" value="${r.src}" placeholder="URL Cloudinary (https://res.cloudinary.com/...)" required />
+
+                  <div id="rUploadProgress" style="display: none;"></div>
+
+                  <div class="bo-video-preview-box" id="rVideoPreviewWrapper" style="${r.src ? '' : 'display: none;'}">
+                    <video id="rVideoPreview" src="${r.src}" controls playsinline style="max-width: 100%; max-height: 200px; border-radius: var(--bo-radius-sm);"></video>
+                  </div>
+                </div>
               </div>
 
               <div class="bo-form-group">
@@ -2136,13 +2536,91 @@ export class BackofficePage {
     modalContainer.querySelector('#closeReelModalBtn')?.addEventListener('click', closeModal);
     modalContainer.querySelector('#cancelReelModalBtn')?.addEventListener('click', closeModal);
 
+    const videoInput = modalContainer.querySelector('#rVideoFileInput') as HTMLInputElement;
+    const videoSrcInput = modalContainer.querySelector('#rSrc') as HTMLInputElement;
+    const videoPreview = modalContainer.querySelector('#rVideoPreview') as HTMLVideoElement;
+    const videoPreviewWrapper = modalContainer.querySelector('#rVideoPreviewWrapper') as HTMLElement;
+    const progressBox = modalContainer.querySelector('#rUploadProgress') as HTMLElement;
+    const saveBtn = modalContainer.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    videoSrcInput?.addEventListener('input', () => {
+      const val = videoSrcInput.value.trim();
+      if (val) {
+        videoPreview.src = val;
+        videoPreviewWrapper.style.display = 'flex';
+      } else {
+        videoPreviewWrapper.style.display = 'none';
+      }
+    });
+
+    videoInput?.addEventListener('change', async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      if (cloudinaryService.isConfigured()) {
+        try {
+          if (progressBox) {
+            progressBox.style.display = 'block';
+            progressBox.innerHTML = `
+              <div class="bo-upload-progress-box">
+                <div class="bo-upload-progress-header">
+                  <span>Téléversement vidéo vers Cloudinary...</span>
+                  <span id="rUploadPercent">0%</span>
+                </div>
+                <div class="bo-upload-progress-track">
+                  <div class="bo-upload-progress-fill" id="rUploadFill" style="width: 0%;"></div>
+                </div>
+              </div>
+            `;
+          }
+          if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `${BO_ICONS.loader} <span>Upload Vidéo en cours...</span>`;
+          }
+
+          // Local preview
+          videoPreview.src = URL.createObjectURL(file);
+          videoPreviewWrapper.style.display = 'flex';
+
+          const result = await cloudinaryService.upload(file, {
+            resourceType: 'video',
+            folder: 'nidj_juice/reels',
+            onProgress: (percent) => {
+              const pLabel = modalContainer.querySelector('#rUploadPercent');
+              const pFill = modalContainer.querySelector('#rUploadFill') as HTMLElement;
+              if (pLabel) pLabel.textContent = `${percent}%`;
+              if (pFill) pFill.style.width = `${percent}%`;
+            }
+          });
+
+          videoSrcInput.value = result.secureUrl;
+          videoPreview.src = result.secureUrl;
+          this.showToast('Vidéo Reel sauvegardée sur Cloudinary avec succès !', 'success');
+        } catch (err: any) {
+          console.error('Cloudinary video upload error', err);
+          this.showToast(`Échec du téléversement vidéo : ${err.message}`, 'error');
+        } finally {
+          if (progressBox) progressBox.style.display = 'none';
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `${BO_ICONS.check} <span>Enregistrer</span>`;
+          }
+        }
+      } else {
+        this.showToast(
+          'Pour téléverser vos vidéos sur Cloudinary, renseignez vos identifiants dans l\'onglet Paramètres.',
+          'error'
+        );
+      }
+    });
+
     const form = modalContainer.querySelector('#boReelEditForm') as HTMLFormElement;
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
       const updatedReel: VideoReel = {
         ...r,
         title: (modalContainer.querySelector('#rTitle') as HTMLInputElement).value.trim(),
-        src: (modalContainer.querySelector('#rSrc') as HTMLInputElement).value.trim(),
+        src: videoSrcInput.value.trim() || r.src,
         caption: (modalContainer.querySelector('#rCaption') as HTMLInputElement).value.trim(),
         tag: (modalContainer.querySelector('#rTag') as HTMLInputElement).value.trim()
       };

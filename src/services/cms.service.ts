@@ -73,6 +73,9 @@ export interface SiteSettings {
   linkedinUrl: string;
   seoMetaTitle: string;
   seoMetaDesc: string;
+  cloudinaryCloudName?: string;
+  cloudinaryUploadPreset?: string;
+  cloudinaryFolder?: string;
 }
 
 export interface CmsDatabase {
@@ -278,7 +281,10 @@ export class CmsService {
         linkedinUrl: 'https://linkedin.com/company/societe-nidjeu',
         seoMetaTitle: 'Nidj Juice — 100% Jus Naturels Fabriqués au Cameroun | Société Nidjeu',
         seoMetaDesc:
-          'Découvrez Nidj Juice, la marque référence de jus 100% naturels pressés et embouteillés au Cameroun par la Société Nidjeu.'
+          'Découvrez Nidj Juice, la marque référence de jus 100% naturels pressés et embouteillés au Cameroun par la Société Nidjeu.',
+        cloudinaryCloudName: (import.meta as any).env?.VITE_CLOUDINARY_CLOUD_NAME || '',
+        cloudinaryUploadPreset: (import.meta as any).env?.VITE_CLOUDINARY_UPLOAD_PRESET || '',
+        cloudinaryFolder: 'nidj_juice'
       }
     };
   }

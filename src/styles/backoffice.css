@@ -1945,3 +1945,108 @@ body.bo-sidebar-locked {
     max-width: 100% !important;
   }
 }
+
+/* ==========================================================================
+   CLOUDINARY UPLOAD WIDGET & MEDIA CONTROLS
+   ========================================================================== */
+
+.bo-upload-progress-box {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--bo-brand-green-tint);
+  border: 1px solid rgba(88, 168, 38, 0.25);
+  border-radius: var(--bo-radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: boFadeIn 0.2s ease;
+}
+
+.bo-upload-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bo-forest);
+}
+
+.bo-upload-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(10, 61, 34, 0.1);
+  border-radius: var(--bo-radius-pill);
+  overflow: hidden;
+  position: relative;
+}
+
+.bo-upload-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bo-brand-green), #76C836);
+  border-radius: var(--bo-radius-pill);
+  transition: width 0.2s ease;
+  width: 0%;
+}
+
+.bo-cloudinary-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--bo-radius-pill);
+}
+
+.bo-cloudinary-badge-pill.is-active {
+  background: rgba(88, 168, 38, 0.15);
+  color: var(--bo-forest);
+  border: 1px solid rgba(88, 168, 38, 0.3);
+}
+
+.bo-cloudinary-badge-pill.is-inactive {
+  background: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+  border: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+.bo-upload-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: var(--bo-radius-sm);
+  background: var(--bo-brand-green-tint);
+  border: 1px solid rgba(88, 168, 38, 0.3);
+  color: var(--bo-forest);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.bo-upload-action-btn:hover {
+  background: rgba(88, 168, 38, 0.22);
+  border-color: var(--bo-brand-green);
+  transform: translateY(-1px);
+}
+
+.bo-video-preview-box {
+  width: 100%;
+  max-height: 220px;
+  background: #000000;
+  border-radius: var(--bo-radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  border: 1px solid var(--bo-border);
+}
+
+.bo-video-preview-box video {
+  max-width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+}
+
