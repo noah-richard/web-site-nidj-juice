@@ -35,7 +35,8 @@ const BO_ICONS = {
   close: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
   eye: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`,
   camera: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`,
-  layers: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`
+  layers: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
+  menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`
 };
 
 export class BackofficePage {
@@ -53,7 +54,33 @@ export class BackofficePage {
     return this.element;
   }
 
+  public closeMobileSidebar(): void {
+    const sidebar = this.element.querySelector('#boSidebar');
+    const backdrop = this.element.querySelector('#boSidebarBackdrop');
+    sidebar?.classList.remove('is-mobile-open');
+    backdrop?.classList.remove('is-active');
+    document.body.classList.remove('bo-sidebar-locked');
+  }
+
+  public toggleMobileSidebar(): void {
+    const sidebar = this.element.querySelector('#boSidebar');
+    const backdrop = this.element.querySelector('#boSidebarBackdrop');
+    const isOpen = sidebar?.classList.contains('is-mobile-open');
+    if (isOpen) {
+      this.closeMobileSidebar();
+    } else {
+      sidebar?.classList.add('is-mobile-open');
+      backdrop?.classList.add('is-active');
+      document.body.classList.add('bo-sidebar-locked');
+    }
+  }
+
+  public destroy(): void {
+    document.body.classList.remove('bo-sidebar-locked');
+  }
+
   public render(): void {
+    document.body.classList.remove('bo-sidebar-locked');
     if (!cmsService.isAuthenticated()) {
       this.renderAuthGate();
     } else {
@@ -148,6 +175,9 @@ export class BackofficePage {
       <!-- Top Corporate App Bar -->
       <header class="bo-header">
         <div class="bo-header-left">
+          <button type="button" class="bo-menu-toggle-btn" id="boMenuToggleBtn" aria-label="Menu de navigation" title="Menu de navigation">
+            ${BO_ICONS.menu}
+          </button>
           <a href="/" class="bo-logo-wrap" title="Aller à l'accueil du site">
             <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" class="bo-logo" />
           </a>
@@ -162,26 +192,34 @@ export class BackofficePage {
         </div>
 
         <div class="bo-header-right">
-          <a href="/" class="bo-btn-public-site" target="_blank" title="Ouvrir le site public dans un nouvel onglet">
-            <span>Voir le site</span>
+          <!-- Desktop Action Buttons -->
+          <div class="bo-desktop-actions">
+            <a href="/" class="bo-btn-public-site" target="_blank" title="Ouvrir le site public dans un nouvel onglet">
+              <span>Voir le site</span>
+              ${BO_ICONS.external}
+            </a>
+
+            <button type="button" class="bo-action-pill" id="boExportBtn" title="Télécharger une sauvegarde complète en JSON">
+              ${BO_ICONS.download}
+              <span>Exporter Backup</span>
+            </button>
+
+            <label class="bo-action-pill" title="Restaurer une sauvegarde JSON" style="margin: 0; cursor: pointer;">
+              ${BO_ICONS.upload}
+              <span>Importer Backup</span>
+              <input type="file" id="boImportFileInput" accept=".json" style="display: none;" />
+            </label>
+
+            <button type="button" class="bo-action-pill danger" id="boResetBtn" title="Rétablir les contenus par défaut">
+              ${BO_ICONS.refresh}
+              <span>Réinitialiser</span>
+            </button>
+          </div>
+
+          <!-- Mobile Public Site Link Button -->
+          <a href="/" class="bo-mobile-icon-btn" target="_blank" title="Voir le site public" aria-label="Voir le site public">
             ${BO_ICONS.external}
           </a>
-
-          <button type="button" class="bo-action-pill" id="boExportBtn" title="Télécharger une sauvegarde complète en JSON">
-            ${BO_ICONS.download}
-            <span>Exporter Backup</span>
-          </button>
-
-          <label class="bo-action-pill" title="Restaurer une sauvegarde JSON" style="margin: 0; cursor: pointer;">
-            ${BO_ICONS.upload}
-            <span>Importer Backup</span>
-            <input type="file" id="boImportFileInput" accept=".json" style="display: none;" />
-          </label>
-
-          <button type="button" class="bo-action-pill danger" id="boResetBtn" title="Rétablir les contenus par défaut">
-            ${BO_ICONS.refresh}
-            <span>Réinitialiser</span>
-          </button>
 
           <!-- User Chip -->
           <div class="bo-user-chip">
@@ -197,11 +235,37 @@ export class BackofficePage {
         </div>
       </header>
 
-      <!-- Layout Body: Sidebar + Workspace -->
+      <!-- Layout Body: Sidebar Drawer + Workspace -->
       <div class="bo-body-layout">
         
-        <!-- Sidebar Navigation -->
-        <aside class="bo-sidebar">
+        <!-- Mobile Drawer Backdrop Overlay -->
+        <div class="bo-sidebar-backdrop" id="boSidebarBackdrop"></div>
+
+        <!-- Sidebar Navigation (Desktop Anchor / Mobile Off-Canvas Drawer) -->
+        <aside class="bo-sidebar" id="boSidebar">
+          
+          <!-- Mobile Drawer Top Bar -->
+          <div class="bo-sidebar-mobile-header">
+            <div class="bo-sidebar-mobile-title">
+              <img src="/assets/images/logo-nidj.png" alt="Nidj Juice" style="height: 26px; width: auto;" />
+              <span>Panneau de Gestion</span>
+            </div>
+            <button type="button" class="bo-sidebar-close-btn" id="boSidebarCloseBtn" aria-label="Fermer le menu" title="Fermer">
+              ${BO_ICONS.close}
+            </button>
+          </div>
+
+          <!-- Mobile Drawer User Summary -->
+          <div class="bo-sidebar-mobile-user">
+            <div class="bo-user-avatar">SN</div>
+            <div class="bo-sidebar-user-details">
+              <div class="bo-sidebar-user-name">Administrateur</div>
+              <div class="bo-sidebar-user-role">Direction Société Nidjeu</div>
+            </div>
+            <button type="button" class="bo-logout-btn" id="boMobileLogoutBtn" title="Déconnexion" style="background: var(--bo-surface); border: 1px solid var(--bo-border);">
+              ${BO_ICONS.logout}
+            </button>
+          </div>
           
           <div class="bo-nav-section">
             <div class="bo-nav-heading">Gestion & Contenus</div>
@@ -264,6 +328,28 @@ export class BackofficePage {
             </button>
           </div>
 
+          <!-- Mobile Actions in Drawer (Backups, Reset) -->
+          <div class="bo-sidebar-mobile-actions">
+            <div class="bo-nav-heading">Outils & Sauvegardes</div>
+            <a href="/" target="_blank" class="bo-mobile-action-link">
+              ${BO_ICONS.external}
+              <span>Ouvrir le Site Public</span>
+            </a>
+            <button type="button" class="bo-mobile-action-link" id="boMobileExportBtn">
+              ${BO_ICONS.download}
+              <span>Exporter Backup JSON</span>
+            </button>
+            <label class="bo-mobile-action-link" style="margin: 0; cursor: pointer;">
+              ${BO_ICONS.upload}
+              <span>Importer Backup JSON</span>
+              <input type="file" id="boMobileImportFileInput" accept=".json" style="display: none;" />
+            </label>
+            <button type="button" class="bo-mobile-action-link danger" id="boMobileResetBtn">
+              ${BO_ICONS.refresh}
+              <span>Rétablir Valeurs Usine</span>
+            </button>
+          </div>
+
           <!-- Live Indicator Box -->
           <div class="bo-sidebar-footer">
             <div class="bo-status-dot"></div>
@@ -277,6 +363,42 @@ export class BackofficePage {
 
         <!-- Main Dynamic Workspace -->
         <main class="bo-workspace" id="boWorkspace">
+          <!-- Mobile Horizontal Quick Tab Bar -->
+          <nav class="bo-mobile-tab-strip" role="tablist" aria-label="Navigation rapide">
+            <button type="button" class="bo-mobile-tab-btn ${this.currentTab === 'overview' ? 'is-active' : ''}" data-tab="overview">
+              ${BO_ICONS.grid}
+              <span>Aperçu</span>
+            </button>
+            <button type="button" class="bo-mobile-tab-btn ${this.currentTab === 'products' ? 'is-active' : ''}" data-tab="products">
+              ${BO_ICONS.bottle}
+              <span>Saveurs</span>
+              <span class="bo-mobile-tab-badge">${products.length}</span>
+            </button>
+            <button type="button" class="bo-mobile-tab-btn ${this.currentTab === 'pages' ? 'is-active' : ''}" data-tab="pages">
+              ${BO_ICONS.fileText}
+              <span>Pages</span>
+            </button>
+            <button type="button" class="bo-mobile-tab-btn ${this.currentTab === 'gallery' ? 'is-active' : ''}" data-tab="gallery">
+              ${BO_ICONS.image}
+              <span>Galerie</span>
+              <span class="bo-mobile-tab-badge">${gallery.length}</span>
+            </button>
+            <button type="button" class="bo-mobile-tab-btn ${this.currentTab === 'reels' ? 'is-active' : ''}" data-tab="reels">
+              ${BO_ICONS.film}
+              <span>Reels</span>
+              <span class="bo-mobile-tab-badge">${reels.length}</span>
+            </button>
+            <button type="button" class="bo-mobile-tab-btn ${this.currentTab === 'stores' ? 'is-active' : ''}" data-tab="stores">
+              ${BO_ICONS.mapPin}
+              <span>Stores</span>
+              <span class="bo-mobile-tab-badge">${stores.length}</span>
+            </button>
+            <button type="button" class="bo-mobile-tab-btn ${this.currentTab === 'settings' ? 'is-active' : ''}" data-tab="settings">
+              ${BO_ICONS.settings}
+              <span>Paramètres</span>
+            </button>
+          </nav>
+
           ${this.renderActiveTabContent()}
         </main>
 
@@ -913,8 +1035,12 @@ export class BackofficePage {
       </div>
 
       <div class="bo-card">
-        <div style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+        <div class="bo-table-scroll-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8L22 12L18 16"/><path d="M6 8L2 12L6 16"/><path d="M2 12H22"/></svg>
+          <span>Faites défiler le tableau horizontalement</span>
+        </div>
+        <div class="bo-table-responsive">
+          <table class="bo-table">
             <thead>
               <tr style="border-bottom: 1px solid var(--bo-border); color: var(--bo-text-muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; background: var(--bo-surface-subtle);">
                 <th style="padding: 14px 20px;">Enseigne / Nom</th>
@@ -944,7 +1070,7 @@ export class BackofficePage {
                   </td>
                   <td style="padding: 14px 16px; color: var(--bo-text-secondary); font-weight: 600;">${s.phone}</td>
                   <td style="padding: 14px 16px; color: var(--bo-text-muted); font-size: 12.5px;">${s.openingHours}</td>
-                  <td style="padding: 14px 20px; text-align: right;">
+                  <td style="padding: 14px 20px; text-align: right; white-space: nowrap;">
                     <button type="button" class="bo-btn-edit" data-edit-store="${s.id}" style="margin-right: 6px;">
                       ${BO_ICONS.edit}
                       <span>Modifier</span>
@@ -1082,13 +1208,42 @@ export class BackofficePage {
   }
 
   private bindDashboardEvents(): void {
-    // Tab Switching
+    // Mobile Drawer Hamburger Toggle & Close
+    this.element.querySelector('#boMenuToggleBtn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleMobileSidebar();
+    });
+
+    this.element.querySelector('#boSidebarCloseBtn')?.addEventListener('click', () => {
+      this.closeMobileSidebar();
+    });
+
+    this.element.querySelector('#boSidebarBackdrop')?.addEventListener('click', () => {
+      this.closeMobileSidebar();
+    });
+
+    // Mobile Horizontal Quick Tab Bar Switching
+    this.element.querySelectorAll('.bo-mobile-tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab') as BackofficeTab;
+        if (tab && tab !== this.currentTab) {
+          this.currentTab = tab;
+          this.closeMobileSidebar();
+          this.render();
+        }
+      });
+    });
+
+    // Desktop/Drawer Tab Switching
     this.element.querySelectorAll('.bo-nav-item').forEach((btn) => {
       btn.addEventListener('click', () => {
         const tab = btn.getAttribute('data-tab') as BackofficeTab;
         if (tab && tab !== this.currentTab) {
           this.currentTab = tab;
+          this.closeMobileSidebar();
           this.render();
+        } else {
+          this.closeMobileSidebar();
         }
       });
     });
@@ -1323,8 +1478,8 @@ export class BackofficePage {
       this.showToast('FAQ enregistrée', 'success');
     });
 
-    // Export Backup
-    this.element.querySelector('#boExportBtn')?.addEventListener('click', () => {
+    // Export Backup (Desktop + Mobile)
+    const handleExport = () => {
       const json = cmsService.exportBackupJson();
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -1333,44 +1488,57 @@ export class BackofficePage {
       a.download = `nidj-juice-cms-backup-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
+      this.closeMobileSidebar();
       this.showToast('Sauvegarde JSON téléchargée avec succès', 'success');
-    });
+    };
+    this.element.querySelector('#boExportBtn')?.addEventListener('click', handleExport);
+    this.element.querySelector('#boMobileExportBtn')?.addEventListener('click', handleExport);
 
-    // Import Backup File
-    const fileInput = this.element.querySelector('#boImportFileInput') as HTMLInputElement;
-    fileInput?.addEventListener('change', (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const content = evt.target?.result as string;
-          const ok = cmsService.importBackupJson(content);
-          if (ok) {
-            this.showToast('Sauvegarde restaurée avec succès !', 'success');
-            this.render();
-          } else {
-            this.showToast('Fichier de sauvegarde invalide', 'error');
-          }
-        };
-        reader.readAsText(file);
-      }
-    });
+    // Import Backup File (Desktop + Mobile)
+    const handleImportFile = (inputEl: HTMLInputElement | null) => {
+      inputEl?.addEventListener('change', (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const content = evt.target?.result as string;
+            const ok = cmsService.importBackupJson(content);
+            if (ok) {
+              this.closeMobileSidebar();
+              this.showToast('Sauvegarde restaurée avec succès !', 'success');
+              this.render();
+            } else {
+              this.showToast('Fichier de sauvegarde invalide', 'error');
+            }
+          };
+          reader.readAsText(file);
+        }
+      });
+    };
+    handleImportFile(this.element.querySelector('#boImportFileInput') as HTMLInputElement);
+    handleImportFile(this.element.querySelector('#boMobileImportFileInput') as HTMLInputElement);
 
-    // Reset Defaults
-    this.element.querySelector('#boResetBtn')?.addEventListener('click', () => {
+    // Reset Defaults (Desktop + Mobile)
+    const handleReset = () => {
       if (confirm('Attention : Voulez-vous vraiment réinitialiser toutes les données aux valeurs par défaut d\'origine ?')) {
         cmsService.resetToDefaults();
+        this.closeMobileSidebar();
         this.render();
         this.showToast('Données réinitialisées aux valeurs usine', 'success');
       }
-    });
+    };
+    this.element.querySelector('#boResetBtn')?.addEventListener('click', handleReset);
+    this.element.querySelector('#boMobileResetBtn')?.addEventListener('click', handleReset);
 
-    // Logout
-    this.element.querySelector('#boLogoutBtn')?.addEventListener('click', () => {
+    // Logout (Desktop + Mobile)
+    const handleLogout = () => {
+      this.closeMobileSidebar();
       cmsService.setAuthenticated(false);
       this.render();
       this.showToast('Déconnecté du panneau d\'administration', 'success');
-    });
+    };
+    this.element.querySelector('#boLogoutBtn')?.addEventListener('click', handleLogout);
+    this.element.querySelector('#boMobileLogoutBtn')?.addEventListener('click', handleLogout);
   }
 
   // =========================================================================
@@ -1460,11 +1628,11 @@ export class BackofficePage {
               <!-- Image Uploader -->
               <div class="bo-form-group">
                 <label class="bo-label">Visuel Officiel de la Bouteille</label>
-                <div style="display: flex; gap: 16px; align-items: center; background: var(--bo-surface-subtle); padding: 14px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                <div class="bo-modal-image-row" style="display: flex; gap: 16px; align-items: center; background: var(--bo-surface-subtle); padding: 14px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
                   <div style="width: 70px; height: 90px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 4px; flex-shrink: 0;">
                     <img id="pImgPreview" src="${p.bottleImage}" alt="Prévisualisation" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
                   </div>
-                  <div style="flex: 1;">
+                  <div style="flex: 1; min-width: 0;">
                     <input type="text" id="pImgUrl" class="bo-input" value="${p.bottleImage}" placeholder="URL ou chemin de l'image (/assets/...)" style="margin-bottom: 8px;" />
                     <label class="bo-btn-secondary" style="font-size: 12px; padding: 6px 12px; cursor: pointer; display: inline-flex;">
                       ${BO_ICONS.camera}
@@ -1806,11 +1974,11 @@ export class BackofficePage {
               <!-- Image Uploader -->
               <div class="bo-form-group">
                 <label class="bo-label">Photo de l'Événement</label>
-                <div style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
+                <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
                   <div style="width: 80px; height: 60px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); overflow: hidden; flex-shrink: 0;">
                     <img id="gImgPreview" src="${g.image}" alt="Aperçu" style="width: 100%; height: 100%; object-fit: cover;" />
                   </div>
-                  <div style="flex: 1;">
+                  <div style="flex: 1; min-width: 0;">
                     <input type="text" id="gImgUrl" class="bo-input" value="${g.image}" placeholder="URL ou chemin de la photo" style="margin-bottom: 6px;" />
                     <label class="bo-btn-secondary" style="font-size: 11.5px; padding: 5px 10px; cursor: pointer; display: inline-flex;">
                       ${BO_ICONS.camera}
