@@ -117,13 +117,25 @@ export class Header {
                 </a>
               </li>
 
-              ${cmsService.getPublishedCustomPages().filter(p => p.showInNav).map((p) => `
+              ${cmsService
+                .getPublishedCustomPages()
+                .filter((p) => p.showInNav)
+                .map((p) => {
+                  let label = p.title.trim();
+                  if (label.length > 16) {
+                    const parts = label.split(/[\s&:-]+/);
+                    label = parts.slice(0, 2).join(' ');
+                    if (label.length > 18) label = label.slice(0, 16);
+                  }
+                  return `
                 <li class="nav-item">
-                  <a href="/page/${p.id}" class="nav-link" data-link="custom-${p.id}">
-                    ${p.title.length > 22 ? p.title.slice(0, 20) + '…' : p.title}
+                  <a href="/page/${p.id}" class="nav-link" data-link="custom-${p.id}" title="${p.title}">
+                    ${label}
                   </a>
                 </li>
-              `).join('')}
+              `;
+                })
+                .join('')}
 
             </ul>
 
