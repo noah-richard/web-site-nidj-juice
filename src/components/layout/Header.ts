@@ -48,7 +48,6 @@ export class Header {
           <!-- Left: Brand Logo + Region/Country Selector (Coca-Cola Style) -->
           <div class="header-brand-group">
             <a href="/" class="brand-logo-link" aria-label="Nidj Juice — Société Nidjeu">
-              <span class="brand-company-prefix">THE</span>
               <img 
                 src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" 
                 alt="Nidj Juice — Société Nidjeu" 
@@ -56,7 +55,6 @@ export class Header {
                 width="120"
                 height="42"
               />
-              <span class="brand-company-suffix">COMPANY</span>
             </a>
 
             <!-- Country / Region Selector Pill -->
@@ -120,12 +118,13 @@ export class Header {
               ${cmsService
                 .getPublishedCustomPages()
                 .filter((p) => p.showInNav)
+                .slice(0, 1)
                 .map((p) => {
                   let label = p.title.trim();
-                  if (label.length > 16) {
-                    const parts = label.split(/[\s&:-]+/);
-                    label = parts.slice(0, 2).join(' ');
-                    if (label.length > 18) label = label.slice(0, 16);
+                  if (label.toLowerCase().includes('cocktail')) {
+                    label = 'Cocktails';
+                  } else if (label.length > 14) {
+                    label = label.split(/[\s&:-]+/)[0].slice(0, 12);
                   }
                   return `
                 <li class="nav-item">

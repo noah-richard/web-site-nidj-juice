@@ -44,11 +44,11 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  gap: clamp(12px, 1.8vw, 28px);
+  gap: 16px;
 }
 
 /* ==========================================================================
-   LEFT: BRAND IDENTITY (THE NIDJ JUICE COMPANY) + REGION PILL
+   LEFT: BRAND IDENTITY (NIDJ JUICE) + REGION PILL
    ========================================================================== */
 .header-brand-group {
   display: flex;
@@ -67,32 +67,12 @@
   display: inline-flex;
   align-items: center;
   text-decoration: none;
-  gap: 6px;
   flex-shrink: 0;
   white-space: nowrap;
-}
-
-.brand-company-prefix,
-.brand-company-suffix {
-  font-family: var(--font-body);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1.6px;
-  color: #111111;
-  text-transform: uppercase;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-@media (max-width: 1360px) {
-  .brand-company-prefix,
-  .brand-company-suffix {
-    display: none;
-  }
 }
 
 .brand-logo-img {
-  height: 42px;
+  height: 40px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
@@ -101,7 +81,7 @@
 
 @media (max-width: 640px) {
   .brand-logo-img {
-    height: 35px;
+    height: 34px;
   }
 }
 
@@ -156,23 +136,20 @@
   display: none;
   position: relative;
   height: 74px;
-  flex: 1 1 auto;
-  justify-content: center;
-  min-width: 0;
+  align-items: center;
+  flex: 0 1 auto;
 }
 
-@media (min-width: 1140px) {
+@media (min-width: 1200px) {
   .desktop-nav {
     display: flex;
-    align-items: center;
-    height: 74px;
   }
 }
 
 .nav-list {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 1.4vw, 24px);
+  gap: clamp(12px, 1.4vw, 24px);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -365,7 +342,7 @@
   }
 }
 
-@media (min-width: 1140px) {
+@media (min-width: 1200px) {
   .mobile-menu-btn {
     display: none;
   }
