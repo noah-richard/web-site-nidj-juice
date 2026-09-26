@@ -10,9 +10,9 @@ import { GALLERY_ITEMS, type GalleryItem } from '../data/gallery.data';
 import { VIDEO_REELS } from '../data/flavors.data';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
 import type { StoreLocation, VideoReel, JuiceCollection, CmsCustomPage } from '../types/product.types';
-import { supabaseService } from './supabase.service';
+import { supabaseService, type AdminUser } from './supabase.service';
 
-export type { JuiceCollection, CmsCustomPage };
+export type { JuiceCollection, CmsCustomPage, AdminUser };
 
 export interface HeroContent {
   titleWord1: string;
@@ -159,12 +159,61 @@ export class CmsService {
     return CmsService.instance;
   }
 
-  // --- Authentication State ---
+  // --- Authentication & Administrator State ---
+  private currentAdmin: AdminUser | null = null;
+
   public isAuthenticated(): boolean {
     try {
-      return sessionStorage.getItem(AUTH_KEY) === 'true' || localStorage.getItem(AUTH_KEY) === 'true';
+      return (
+        sessionStorage.getItem(AUTH_KEY) === 'true' ||
+        localStorage.getItem(AUTH_KEY) === 'true' ||
+        Boolean(sessionStorage.getItem('nidj_current_admin')) ||
+        Boolean(localStorage.getItem('nidj_current_admin'))
+      );
     } catch {
       return false;
+    }
+  }
+
+  public getCurrentAdmin(): AdminUser {
+    if (!this.currentAdmin) {
+      try {
+        const raw = sessionStorage.getItem('nidj_current_admin') || localStorage.getItem('nidj_current_admin');
+        if (raw) {
+          this.currentAdmin = JSON.parse(raw);
+        }
+      } catch (e) {
+        console.warn('Could not parse cached admin user', e);
+      }
+    }
+
+    return (
+      this.currentAdmin || {
+        email: 'direction@nidj-juice.cm',
+        fullName: 'Direction Société Nidjeu',
+        role: 'Direction Générale'
+      }
+    );
+  }
+
+  public setCurrentAdmin(admin: AdminUser | null, remember: boolean = false): void {
+    this.currentAdmin = admin;
+    try {
+      if (admin) {
+        sessionStorage.setItem('nidj_current_admin', JSON.stringify(admin));
+        sessionStorage.setItem(AUTH_KEY, 'true');
+        if (remember) {
+          localStorage.setItem('nidj_current_admin', JSON.stringify(admin));
+          localStorage.setItem(AUTH_KEY, 'true');
+        }
+      } else {
+        sessionStorage.removeItem('nidj_current_admin');
+        sessionStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem('nidj_current_admin');
+        localStorage.removeItem(AUTH_KEY);
+      }
+    } catch (e) {
+      console.warn('Error saving admin session', e);
     }
   }
 
@@ -176,8 +225,11 @@ export class CmsService {
           localStorage.setItem(AUTH_KEY, 'true');
         }
       } else {
+        this.currentAdmin = null;
         sessionStorage.removeItem(AUTH_KEY);
+        sessionStorage.removeItem('nidj_current_admin');
         localStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem('nidj_current_admin');
       }
     } catch (e) {
       console.error('Error saving auth state', e);

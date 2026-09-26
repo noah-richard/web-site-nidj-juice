@@ -35,6 +35,16 @@ export interface SupabaseContactMessage {
   message: string;
 }
 
+export interface AdminUser {
+  id?: string;
+  email: string;
+  fullName: string;
+  role: string;
+  isActive?: boolean;
+  lastLogin?: string;
+  createdAt?: string;
+}
+
 export class SupabaseService {
   private static instance: SupabaseService | null = null;
   private readonly STORAGE_CONFIG_KEY = 'nidj_supabase_config';
@@ -437,6 +447,286 @@ export class SupabaseService {
     }
   }
 
+  // =========================================================================
+  // ADMINISTRATOR AUTHENTICATION & MANAGEMENT (SUPABASE CLOUD)
+  // =========================================================================
+
+  /**
+   * Authenticates an administrator via Supabase Auth & admin_users table
+   */
+  public async signInAdmin(
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; user?: AdminUser; message: string }> {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const client = this.getClient();
+
+    // 1. Attempt Supabase Cloud Auth if client is configured
+    if (client && cleanEmail) {
+      try {
+        const { data, error } = await client.auth.signInWithPassword({
+          email: cleanEmail,
+          password
+        });
+
+        if (!error && data?.user) {
+          const authUser = data.user;
+          let role = (authUser.user_metadata?.role as string) || 'Direction';
+          let fullName = (authUser.user_metadata?.full_name as string) || cleanEmail.split('@')[0];
+
+          try {
+            const { data: record } = await client
+              .from('admin_users')
+              .select('*')
+              .eq('email', cleanEmail)
+              .maybeSingle();
+
+            if (record) {
+              fullName = record.full_name || fullName;
+              role = record.role || role;
+              await client
+                .from('admin_users')
+                .update({ last_login: new Date().toISOString() })
+                .eq('id', record.id);
+            } else {
+              await client
+                .from('admin_users')
+                .insert([
+                  {
+                    id: authUser.id,
+                    email: cleanEmail,
+                    full_name: fullName,
+                    role: role,
+                    is_active: true,
+                    last_login: new Date().toISOString()
+                  }
+                ]);
+            }
+          } catch (e) {
+            console.warn('Could not sync admin_users table:', e);
+          }
+
+          const adminUser: AdminUser = {
+            id: authUser.id,
+            email: cleanEmail,
+            fullName,
+            role,
+            lastLogin: new Date().toISOString()
+          };
+
+          return {
+            success: true,
+            user: adminUser,
+            message: 'Connexion administrateur réussie via Supabase Cloud !'
+          };
+        }
+      } catch (err) {
+        console.warn('Supabase Auth signIn attempt notice:', err);
+      }
+    }
+
+    // 2. Local Master / Emergency Fallback for Direction & Demo access
+    const isMasterPwd = password === 'admin' || password === '237' || password === '2370' || password === 'nidjeu';
+    if (isMasterPwd) {
+      const fallbackUser: AdminUser = {
+        email: cleanEmail || 'direction@nidj-juice.cm',
+        fullName: cleanEmail.includes('nidjeu') || cleanEmail.includes('admin') || !cleanEmail
+          ? 'Direction Société Nidjeu'
+          : cleanEmail.split('@')[0],
+        role: 'Direction Générale',
+        lastLogin: new Date().toISOString()
+      };
+
+      // If Supabase is connected, record the active login in admin_users
+      if (client) {
+        try {
+          await client.from('admin_users').upsert(
+            [
+              {
+                email: fallbackUser.email,
+                full_name: fallbackUser.fullName,
+                role: fallbackUser.role,
+                is_active: true,
+                last_login: new Date().toISOString()
+              }
+            ],
+            { onConflict: 'email' }
+          );
+        } catch (e) {
+          console.warn('Fallback admin upsert notice:', e);
+        }
+      }
+
+      return {
+        success: true,
+        user: fallbackUser,
+        message: 'Connexion administrateur validée avec succès.'
+      };
+    }
+
+    return {
+      success: false,
+      message: 'Identifiants incorrects. Vérifiez l’adresse email et le mot de passe.'
+    };
+  }
+
+  /**
+   * Registers a new administrator into Supabase Auth & admin_users table
+   */
+  public async signUpAdmin(
+    email: string,
+    password: string,
+    fullName: string,
+    role: string = 'Direction'
+  ): Promise<{ success: boolean; user?: AdminUser; message: string }> {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanName = (fullName || '').trim() || cleanEmail.split('@')[0];
+    const cleanRole = (role || 'Direction').trim();
+
+    if (!cleanEmail || !password || password.length < 6) {
+      return {
+        success: false,
+        message: 'L’email et un mot de passe d’au moins 6 caractères sont requis.'
+      };
+    }
+
+    const client = this.getClient();
+    if (!client) {
+      return {
+        success: false,
+        message: 'Supabase n’est pas configuré. Veuillez d’abord enregistrer vos identifiants dans les Paramètres.'
+      };
+    }
+
+    try {
+      // 1. Create user in Supabase Authentication
+      const { data: authData, error: authError } = await client.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: {
+          data: {
+            full_name: cleanName,
+            role: cleanRole
+          }
+        }
+      });
+
+      if (authError) {
+        return {
+          success: false,
+          message: `Erreur Supabase Auth : ${authError.message}`
+        };
+      }
+
+      const authId = authData?.user?.id;
+
+      // 2. Insert or update into public.admin_users table
+      const { error: dbError } = await client
+        .from('admin_users')
+        .upsert(
+          [
+            {
+              ...(authId ? { id: authId } : {}),
+              email: cleanEmail,
+              full_name: cleanName,
+              role: cleanRole,
+              is_active: true,
+              last_login: new Date().toISOString()
+            }
+          ],
+          { onConflict: 'email' }
+        );
+
+      if (dbError) {
+        console.warn('Warning inserting admin_users record:', dbError.message);
+      }
+
+      const user: AdminUser = {
+        id: authId,
+        email: cleanEmail,
+        fullName: cleanName,
+        role: cleanRole,
+        lastLogin: new Date().toISOString()
+      };
+
+      return {
+        success: true,
+        user,
+        message: 'Compte administrateur créé et enregistré avec succès dans Supabase !'
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: `Erreur lors de la création : ${err?.message || 'Erreur inattendue'}`
+      };
+    }
+  }
+
+  /**
+   * Signs out the administrator from Supabase Auth
+   */
+  public async signOutAdmin(): Promise<void> {
+    const client = this.getClient();
+    if (client) {
+      try {
+        await client.auth.signOut();
+      } catch (e) {
+        console.warn('SignOut error:', e);
+      }
+    }
+  }
+
+  /**
+   * Lists all administrators recorded in the Supabase admin_users table
+   */
+  public async getAdminUsers(): Promise<{ success: boolean; data?: AdminUser[]; message?: string }> {
+    const client = this.getClient();
+    if (!client) {
+      return { success: false, message: 'Supabase non configuré.' };
+    }
+
+    try {
+      const { data, error } = await client
+        .from('admin_users')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        return { success: false, message: error.message };
+      }
+
+      const admins: AdminUser[] = (data || []).map((row) => ({
+        id: row.id,
+        email: row.email,
+        fullName: row.full_name || row.email,
+        role: row.role || 'Administrateur',
+        isActive: row.is_active ?? true,
+        lastLogin: row.last_login,
+        createdAt: row.created_at
+      }));
+
+      return { success: true, data: admins };
+    } catch (err: any) {
+      return { success: false, message: err?.message };
+    }
+  }
+
+  /**
+   * Deletes an administrator record
+   */
+  public async deleteAdminUser(id: string): Promise<{ success: boolean; message: string }> {
+    const client = this.getClient();
+    if (!client) return { success: false, message: 'Supabase non configuré.' };
+
+    try {
+      const { error } = await client.from('admin_users').delete().eq('id', id);
+      if (error) return { success: false, message: error.message };
+      return { success: true, message: 'Administrateur supprimé avec succès.' };
+    } catch (err: any) {
+      return { success: false, message: err?.message || 'Erreur' };
+    }
+  }
+
   /**
    * Generates the SQL schema setup script for the Supabase SQL Editor.
    * Creates site_database, orders, contact_messages, enables RLS, and sets permissive policies.
@@ -491,6 +781,19 @@ CREATE TABLE IF NOT EXISTS public.contact_messages (
     created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
+-- 4. TABLE DES ADMINISTRATEURS (ÉQUIPE & GESTION DES ACCÈS)
+CREATE TABLE IF NOT EXISTS public.admin_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT UNIQUE NOT NULL,
+    full_name TEXT NOT NULL,
+    role TEXT DEFAULT 'Direction',
+    is_active BOOLEAN DEFAULT true,
+    last_login TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW())
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_users_email ON public.admin_users (email);
+
 -- =============================================================================
 -- SÉCURITÉ : ACTIVATION DU ROW LEVEL SECURITY (RLS) & POLITIQUES PUBLIQUES
 -- =============================================================================
@@ -498,6 +801,7 @@ CREATE TABLE IF NOT EXISTS public.contact_messages (
 ALTER TABLE public.site_database ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contact_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
 
 -- Politiques pour site_database (Lecture et écriture publiques / anon)
 DROP POLICY IF EXISTS "Allow public read site_database" ON public.site_database;
@@ -538,10 +842,23 @@ CREATE POLICY "Allow select contact_messages"
 ON public.contact_messages FOR SELECT 
 USING (true);
 
+-- Politiques pour admin_users
+DROP POLICY IF EXISTS "Allow select admin_users" ON public.admin_users;
+CREATE POLICY "Allow select admin_users" 
+ON public.admin_users FOR SELECT 
+USING (true);
+
+DROP POLICY IF EXISTS "Allow all admin_users" ON public.admin_users;
+CREATE POLICY "Allow all admin_users" 
+ON public.admin_users FOR ALL 
+USING (true) 
+WITH CHECK (true);
+
 -- Notification de succès
 COMMENT ON TABLE public.site_database IS 'Base de données CMS officielle Nidj Juice';
 COMMENT ON TABLE public.orders IS 'Commandes clients générées depuis le site web Nidj Juice';
 COMMENT ON TABLE public.contact_messages IS 'Messages de contact et demandes B2B';
+COMMENT ON TABLE public.admin_users IS 'Administrateurs et gestionnaires autorisés Société Nidjeu';
 `;
   }
 }

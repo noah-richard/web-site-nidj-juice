@@ -6,7 +6,7 @@
 
 import { cmsService, type FaqItem } from '../services/cms.service';
 import { cloudinaryService } from '../services/cloudinary.service';
-import { supabaseService } from '../services/supabase.service';
+import { supabaseService, type AdminUser } from '../services/supabase.service';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
 import type { StoreLocation, VideoReel, JuiceCollection, CmsCustomPage } from '../types/product.types';
 import type { GalleryItem } from '../data/gallery.data';
@@ -48,6 +48,7 @@ const BO_ICONS = {
 export class BackofficePage {
   private element: HTMLElement;
   private currentTab: BackofficeTab = 'overview';
+  private authMode: 'login' | 'register' = 'login';
 
   constructor() {
     this.element = document.createElement('div');
@@ -95,42 +96,142 @@ export class BackofficePage {
   }
 
   // =========================================================================
-  // 1. SECURITY / AUTHENTICATION GATE (LIGHT AGENCY AESTHETIC)
+  // 1. SECURITY & ADMINISTRATOR AUTHENTICATION GATE (SUPABASE CLOUD AUTH)
   // =========================================================================
   private renderAuthGate(): void {
     const settings = cmsService.getSettings();
+    const isCloudConfigured = supabaseService.isConfigured();
+
     this.element.innerHTML = `
       <div class="bo-auth-container">
         <div class="bo-auth-card">
           <img src="${settings.brandLogoUrl || '/assets/images/logo-nidj.png'}" alt="Nidj Juice" class="bo-auth-logo" />
           <h1 class="bo-auth-title">Espace Administration</h1>
           <p class="bo-auth-desc">
-            Société Nidjeu • Système de gestion et pilotage officiel de la marque <strong>Nidj Juice</strong> au Cameroun.
+            Société Nidjeu • Plateforme sécurisée de pilotage officiel de la marque <strong>Nidj Juice</strong> au Cameroun.
           </p>
 
-          <form id="boLoginForm" class="bo-form">
-            <div class="bo-form-group">
-              <label class="bo-label" for="boAuthPassword">Code d'accès administrateur</label>
-              <input 
-                type="password" 
-                id="boAuthPassword" 
-                class="bo-input" 
-                placeholder="Entrez votre mot de passe" 
-                autocomplete="current-password"
-                required
-                style="text-align: center; font-size: 15px; letter-spacing: 0.1em;"
-              />
-            </div>
+          <!-- Supabase Cloud Connection Status Badge -->
+          <div style="margin-bottom: 16px;">
+            ${isCloudConfigured 
+              ? `<span class="bo-auth-badge-status is-cloud">${BO_ICONS.check} Authentification Supabase Cloud Active</span>`
+              : `<span class="bo-auth-badge-status is-local">⚠️ Mode Local (Supabase à configurer)</span>`}
+          </div>
 
-            <button type="submit" class="bo-btn-primary" style="width: 100%; justify-content: center; margin-top: 6px;">
-              ${BO_ICONS.lock}
-              <span>Déverrouiller l'accès</span>
+          <!-- Auth Mode Tabs (Connexion / Nouvel Administrateur) -->
+          <div class="bo-auth-tabs">
+            <button type="button" class="bo-auth-tab-btn ${this.authMode === 'login' ? 'is-active' : ''}" id="boTabLoginBtn">
+              Connexion
             </button>
-          </form>
+            <button type="button" class="bo-auth-tab-btn ${this.authMode === 'register' ? 'is-active' : ''}" id="boTabRegisterBtn">
+              Créer un Administrateur
+            </button>
+          </div>
 
+          <!-- Dynamic Form Container -->
+          ${this.authMode === 'login' ? `
+            <form id="boLoginForm" class="bo-form">
+              <div class="bo-form-group">
+                <label class="bo-label" for="boAuthEmail">Adresse Email Administrateur</label>
+                <input 
+                  type="email" 
+                  id="boAuthEmail" 
+                  class="bo-input" 
+                  placeholder="ex: nidjeuinsarl@gmail.com ou admin" 
+                  value="nidjeuinsarl@gmail.com"
+                  autocomplete="username"
+                  required
+                />
+              </div>
+
+              <div class="bo-form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label class="bo-label" for="boAuthPassword" style="margin: 0;">Mot de passe</label>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700;">Supabase Auth</span>
+                </div>
+                <input 
+                  type="password" 
+                  id="boAuthPassword" 
+                  class="bo-input" 
+                  placeholder="Entrez votre mot de passe" 
+                  autocomplete="current-password"
+                  required
+                />
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0 14px 0;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--bo-text-muted); cursor: pointer;">
+                  <input type="checkbox" id="boRememberMe" checked style="accent-color: var(--bo-brand-green); width: 15px; height: 15px;" />
+                  <span>Rester connecté</span>
+                </label>
+              </div>
+
+              <div id="boAuthFeedback" style="margin-bottom: 12px;"></div>
+
+              <button type="submit" class="bo-btn-primary" id="boLoginSubmitBtn" style="width: 100%; justify-content: center; margin-top: 4px;">
+                ${BO_ICONS.lock}
+                <span>Se Connecter au Backoffice</span>
+              </button>
+            </form>
+          ` : `
+            <form id="boRegisterForm" class="bo-form">
+              <div class="bo-form-group">
+                <label class="bo-label" for="boRegName">Nom et Prénom de l'Administrateur</label>
+                <input 
+                  type="text" 
+                  id="boRegName" 
+                  class="bo-input" 
+                  placeholder="ex: Noah Richard - Direction" 
+                  required
+                />
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label" for="boRegEmail">Adresse Email Professionnelle</label>
+                <input 
+                  type="email" 
+                  id="boRegEmail" 
+                  class="bo-input" 
+                  placeholder="ex: nidjeuinsarl@gmail.com" 
+                  required
+                />
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label" for="boRegRole">Rôle Administratif</label>
+                <select id="boRegRole" class="bo-select" required>
+                  <option value="Direction Générale">Direction Générale</option>
+                  <option value="Responsable Ventes & Distribution">Responsable Ventes & Distribution</option>
+                  <option value="Gestionnaire Catalogue & Contenus">Gestionnaire Catalogue & Contenus</option>
+                  <option value="Superviseur Production">Superviseur Production</option>
+                </select>
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label" for="boRegPassword">Mot de passe Supabase (Min. 6 caractères)</label>
+                <input 
+                  type="password" 
+                  id="boRegPassword" 
+                  class="bo-input" 
+                  placeholder="••••••••" 
+                  required
+                  minlength="6"
+                />
+              </div>
+
+              <div id="boAuthFeedback" style="margin-bottom: 12px;"></div>
+
+              <button type="submit" class="bo-btn-primary" id="boRegisterSubmitBtn" style="width: 100%; justify-content: center; background: #2ea069; border-color: #2ea069; margin-top: 4px;">
+                ${BO_ICONS.plus}
+                <span>Créer l'Administrateur sur Supabase</span>
+              </button>
+            </form>
+          `}
+
+          <!-- Quick Unlock for Demo -->
           <div class="bo-quick-unlock-card">
             <p style="font-size: 12px; color: var(--bo-forest); font-weight: 600; margin: 0 0 10px 0;">
-              Accès rapide pour la démonstration client :
+              Accès rapide de démonstration client :
             </p>
             <button type="button" class="bo-quick-unlock-btn" id="boQuickUnlockBtn">
               ${BO_ICONS.sparkles}
@@ -147,23 +248,100 @@ export class BackofficePage {
       </div>
     `;
 
-    const form = this.element.querySelector('#boLoginForm') as HTMLFormElement;
-    form?.addEventListener('submit', (e) => {
+    // Tab buttons switching
+    this.element.querySelector('#boTabLoginBtn')?.addEventListener('click', () => {
+      this.authMode = 'login';
+      this.renderAuthGate();
+    });
+    this.element.querySelector('#boTabRegisterBtn')?.addEventListener('click', () => {
+      this.authMode = 'register';
+      this.renderAuthGate();
+    });
+
+    // Login Form Submit (Supabase Auth + Fallback)
+    const loginForm = this.element.querySelector('#boLoginForm') as HTMLFormElement;
+    loginForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const pwdInput = this.element.querySelector('#boAuthPassword') as HTMLInputElement;
-      const pwd = pwdInput?.value.trim().toLowerCase();
-      if (pwd === 'admin' || pwd === '237' || pwd === '2370' || pwd === 'nidjeu' || pwd.length >= 3) {
-        cmsService.setAuthenticated(true, true);
+      const email = (this.element.querySelector('#boAuthEmail') as HTMLInputElement)?.value.trim();
+      const password = (this.element.querySelector('#boAuthPassword') as HTMLInputElement)?.value;
+      const remember = (this.element.querySelector('#boRememberMe') as HTMLInputElement)?.checked ?? true;
+      const submitBtn = this.element.querySelector('#boLoginSubmitBtn') as HTMLButtonElement;
+      const feedback = this.element.querySelector('#boAuthFeedback') as HTMLElement;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `${BO_ICONS.loader} <span>Connexion en cours...</span>`;
+      if (feedback) feedback.innerHTML = '';
+
+      const res = await supabaseService.signInAdmin(email, password);
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `${BO_ICONS.lock} <span>Se Connecter au Backoffice</span>`;
+
+      if (res.success && res.user) {
+        cmsService.setCurrentAdmin(res.user, remember);
         this.render();
-        this.showToast('Bienvenue sur le panneau de gestion Société Nidjeu', 'success');
+        this.showToast(`Bienvenue ${res.user.fullName} (${res.user.role}) !`, 'success');
       } else {
-        this.showToast('Code d\'accès incorrect', 'error');
+        if (feedback) {
+          feedback.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
+              ❌ ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Identifiants incorrects', 'error');
       }
     });
 
+    // Registration Form Submit (Supabase Auth Sign Up)
+    const regForm = this.element.querySelector('#boRegisterForm') as HTMLFormElement;
+    regForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (this.element.querySelector('#boRegName') as HTMLInputElement)?.value.trim();
+      const email = (this.element.querySelector('#boRegEmail') as HTMLInputElement)?.value.trim();
+      const role = (this.element.querySelector('#boRegRole') as HTMLSelectElement)?.value;
+      const password = (this.element.querySelector('#boRegPassword') as HTMLInputElement)?.value;
+      const submitBtn = this.element.querySelector('#boRegisterSubmitBtn') as HTMLButtonElement;
+      const feedback = this.element.querySelector('#boAuthFeedback') as HTMLElement;
+
+      if (!name || !email || !password) {
+        this.showToast('Veuillez renseigner tous les champs.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `${BO_ICONS.loader} <span>Création sur Supabase...</span>`;
+      if (feedback) feedback.innerHTML = '';
+
+      const res = await supabaseService.signUpAdmin(email, password, name, role);
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `${BO_ICONS.plus} <span>Créer l'Administrateur sur Supabase</span>`;
+
+      if (res.success && res.user) {
+        cmsService.setCurrentAdmin(res.user, true);
+        this.render();
+        this.showToast('Compte administrateur créé et enregistré avec succès dans Supabase !', 'success');
+      } else {
+        if (feedback) {
+          feedback.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
+              ❌ ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Erreur création administrateur', 'error');
+      }
+    });
+
+    // 1-Click demo unlock
     const quickBtn = this.element.querySelector('#boQuickUnlockBtn');
     quickBtn?.addEventListener('click', () => {
-      cmsService.setAuthenticated(true, true);
+      const demoUser: AdminUser = {
+        email: 'direction@nidj-juice.cm',
+        fullName: 'Direction Société Nidjeu',
+        role: 'Direction Générale',
+        lastLogin: new Date().toISOString()
+      };
+      cmsService.setCurrentAdmin(demoUser, true);
       this.render();
       this.showToast('Accès Administrateur Déverrouillé avec succès', 'success');
     });
@@ -174,6 +352,14 @@ export class BackofficePage {
   // =========================================================================
   private renderDashboard(): void {
     const settings = cmsService.getSettings();
+    const currentAdmin = cmsService.getCurrentAdmin();
+    const adminInitials = currentAdmin.fullName
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join('') || 'SN';
+
     const products = cmsService.getProducts();
     const collections = cmsService.getCollections();
     const customPages = cmsService.getCustomPages();
@@ -231,12 +417,12 @@ export class BackofficePage {
             </button>
           </div>
 
-          <!-- User Chip -->
-          <div class="bo-user-chip">
-            <div class="bo-user-avatar">SN</div>
+          <!-- User Chip with Supabase Admin Identity -->
+          <div class="bo-user-chip" title="Connecté : ${currentAdmin.email}">
+            <div class="bo-user-avatar">${adminInitials}</div>
             <div class="bo-user-meta">
-              <span class="bo-user-name">Administrateur</span>
-              <span class="bo-user-role">Direction</span>
+              <span class="bo-user-name">${currentAdmin.fullName}</span>
+              <span class="bo-user-role">${currentAdmin.role}</span>
             </div>
             <button type="button" class="bo-logout-btn" id="boLogoutBtn" title="Fermer la session administrateur">
               ${BO_ICONS.logout}
@@ -267,10 +453,10 @@ export class BackofficePage {
 
           <!-- Mobile Drawer User Summary -->
           <div class="bo-sidebar-mobile-user">
-            <div class="bo-user-avatar">SN</div>
+            <div class="bo-user-avatar">${adminInitials}</div>
             <div class="bo-sidebar-user-details">
-              <div class="bo-sidebar-user-name">Administrateur</div>
-              <div class="bo-sidebar-user-role">Direction Société Nidjeu</div>
+              <div class="bo-sidebar-user-name">${currentAdmin.fullName}</div>
+              <div class="bo-sidebar-user-role">${currentAdmin.role}</div>
             </div>
             <button type="button" class="bo-logout-btn" id="boMobileLogoutBtn" title="Déconnexion" style="background: var(--bo-surface); border: 1px solid var(--bo-border);">
               ${BO_ICONS.logout}
@@ -1883,6 +2069,35 @@ export class BackofficePage {
 
         </div>
       </div>
+
+      <!-- Administrator Management & Team Card -->
+      <div class="bo-card" style="margin-top: 24px;">
+        <div class="bo-card-header">
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon" style="background: rgba(10, 61, 34, 0.12); color: var(--bo-forest);">
+              ${BO_ICONS.lock}
+            </div>
+            <div>
+              <h2 class="bo-card-title">Équipe Administrative & Comptes Autorisés (Supabase)</h2>
+              <p class="bo-card-subtitle">
+                Gérez les accès à ce Backoffice, les rôles de l'équipe et visualisez les dernières connexions
+              </p>
+            </div>
+          </div>
+          <button type="button" class="bo-btn-primary" id="boOpenAddAdminModalBtn">
+            ${BO_ICONS.plus}
+            <span>Ajouter un Administrateur</span>
+          </button>
+        </div>
+
+        <div class="bo-card-body">
+          <div id="boAdminUsersContainer">
+            <div style="text-align: center; padding: 24px 16px; color: var(--bo-text-muted); font-size: 13px;">
+              ${BO_ICONS.loader} <span>Chargement des administrateurs depuis Supabase...</span>
+            </div>
+          </div>
+        </div>
+      </div>
     `;
   }
 
@@ -2701,15 +2916,262 @@ export class BackofficePage {
     this.element.querySelector('#boResetBtn')?.addEventListener('click', handleReset);
     this.element.querySelector('#boMobileResetBtn')?.addEventListener('click', handleReset);
 
+    // Load admin users list if on settings tab
+    if (this.currentTab === 'settings') {
+      this.loadAndRenderAdminUsers();
+      this.element.querySelector('#boOpenAddAdminModalBtn')?.addEventListener('click', () => {
+        this.openAddAdminModal();
+      });
+    }
+
     // Logout (Desktop + Mobile)
-    const handleLogout = () => {
+    const handleLogout = async () => {
       this.closeMobileSidebar();
-      cmsService.setAuthenticated(false);
+      await supabaseService.signOutAdmin();
+      cmsService.setCurrentAdmin(null);
       this.render();
       this.showToast('Déconnecté du panneau d\'administration', 'success');
     };
     this.element.querySelector('#boLogoutBtn')?.addEventListener('click', handleLogout);
     this.element.querySelector('#boMobileLogoutBtn')?.addEventListener('click', handleLogout);
+  }
+
+  // =========================================================================
+  // ADMINISTRATOR TEAM MANAGEMENT HELPERS
+  // =========================================================================
+  private async loadAndRenderAdminUsers(): Promise<void> {
+    const container = this.element.querySelector('#boAdminUsersContainer');
+    if (!container) return;
+
+    if (!supabaseService.isConfigured()) {
+      const current = cmsService.getCurrentAdmin();
+      container.innerHTML = `
+        <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="bo-user-avatar" style="width: 42px; height: 42px; font-size: 15px;">SN</div>
+            <div>
+              <div style="font-weight: 700; color: var(--bo-forest); font-size: 14px;">${current.fullName} (${current.email})</div>
+              <div style="font-size: 12px; color: var(--bo-text-muted);">${current.role} • Session locale active</div>
+            </div>
+          </div>
+          <span class="bo-cloudinary-badge-pill is-active">🟢 Administrateur Actif</span>
+        </div>
+        <p style="font-size: 12px; color: var(--bo-text-muted); margin: 12px 0 0 4px;">
+          💡 <em>Configurez vos clés Supabase ci-dessus pour inviter et synchroniser d'autres administrateurs sur votre base cloud.</em>
+        </p>
+      `;
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="text-align: center; padding: 24px; color: var(--bo-text-muted); font-size: 13px;">
+        ${BO_ICONS.loader} <span>Récupération des administrateurs depuis Supabase...</span>
+      </div>
+    `;
+
+    const res = await supabaseService.getAdminUsers();
+    if (!res.success || !res.data || res.data.length === 0) {
+      const current = cmsService.getCurrentAdmin();
+      container.innerHTML = `
+        <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="bo-user-avatar" style="width: 42px; height: 42px; font-size: 15px;">
+              ${current.fullName.slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--bo-forest); font-size: 14px;">${current.fullName} (${current.email})</div>
+              <div style="font-size: 12px; color: var(--bo-text-muted);">${current.role} • Session active</div>
+            </div>
+          </div>
+          <span class="bo-cloudinary-badge-pill is-active">🟢 Session Active</span>
+        </div>
+        <div style="margin-top: 14px; text-align: center;">
+          <p style="font-size: 12.5px; color: var(--bo-text-muted); margin: 0 0 10px 0;">
+            Aucun autre compte enregistré dans la table <code>admin_users</code>. Utilisez le bouton ci-dessus pour en ajouter.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    const currentAdmin = cmsService.getCurrentAdmin();
+
+    container.innerHTML = `
+      <div class="bo-table-wrapper" style="border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); overflow-x: auto;">
+        <table class="bo-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+          <thead style="background: var(--bo-surface-subtle); border-bottom: 1px solid var(--bo-border);">
+            <tr>
+              <th style="padding: 12px 16px; font-weight: 700; color: var(--bo-forest);">Administrateur</th>
+              <th style="padding: 12px 16px; font-weight: 700; color: var(--bo-forest);">Rôle</th>
+              <th style="padding: 12px 16px; font-weight: 700; color: var(--bo-forest);">Dernière Connexion</th>
+              <th style="padding: 12px 16px; font-weight: 700; color: var(--bo-forest);">Statut</th>
+              <th style="padding: 12px 16px; font-weight: 700; color: var(--bo-forest); text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${res.data.map((admin) => {
+              const initials = admin.fullName.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || 'AD';
+              const isCurrent = admin.email.toLowerCase() === currentAdmin.email.toLowerCase();
+              const dateStr = admin.lastLogin ? new Date(admin.lastLogin).toLocaleString('fr-FR') : 'Jamais connecté';
+              return `
+                <tr style="border-bottom: 1px solid var(--bo-border);">
+                  <td style="padding: 14px 16px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <div class="bo-user-avatar" style="width: 34px; height: 34px; font-size: 12px;">${initials}</div>
+                      <div>
+                        <div style="font-weight: 700; color: var(--bo-forest);">${admin.fullName} ${isCurrent ? '<span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700;">(Vous)</span>' : ''}</div>
+                        <div style="font-size: 11.5px; color: var(--bo-text-muted);">${admin.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="padding: 14px 16px;">
+                    <span style="display: inline-block; background: var(--bo-brand-green-tint); border: 1px solid rgba(88,168,38,0.25); color: var(--bo-forest); font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: var(--bo-radius-pill);">
+                      ${admin.role}
+                    </span>
+                  </td>
+                  <td style="padding: 14px 16px; color: var(--bo-text-muted); font-size: 12px;">
+                    ${dateStr}
+                  </td>
+                  <td style="padding: 14px 16px;">
+                    <span style="color: #2ea069; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">
+                      <span style="width: 7px; height: 7px; border-radius: 50%; background: #2ea069;"></span> Actif
+                    </span>
+                  </td>
+                  <td style="padding: 14px 16px; text-align: right;">
+                    ${isCurrent ? `
+                      <span style="font-size: 11px; color: var(--bo-text-muted); font-style: italic;">Compte actif</span>
+                    ` : `
+                      <button type="button" class="bo-action-pill danger bo-delete-admin-btn" data-id="${admin.id || ''}" data-email="${admin.email}" title="Supprimer cet administrateur" style="padding: 4px 8px; font-size: 11px;">
+                        ${BO_ICONS.trash} Supprimer
+                      </button>
+                    `}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    // Bind delete buttons
+    container.querySelectorAll('.bo-delete-admin-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        const email = btn.getAttribute('data-email');
+        if (!id) return;
+        if (confirm(`Êtes-vous sûr de vouloir supprimer l'administrateur ${email} ?`)) {
+          const delRes = await supabaseService.deleteAdminUser(id);
+          if (delRes.success) {
+            this.showToast('Administrateur supprimé avec succès', 'success');
+            this.loadAndRenderAdminUsers();
+          } else {
+            this.showToast(delRes.message, 'error');
+          }
+        }
+      });
+    });
+  }
+
+  private openAddAdminModal(): void {
+    const modalContainer = this.element.querySelector('#boModalContainer');
+    if (!modalContainer) return;
+
+    modalContainer.innerHTML = `
+      <div class="bo-modal-backdrop" id="boAddAdminModalBackdrop">
+        <div class="bo-modal-card" style="max-width: 480px;">
+          <div class="bo-modal-header">
+            <div class="bo-modal-title-group">
+              <div class="bo-card-icon" style="background: rgba(10, 61, 34, 0.12); color: var(--bo-forest);">${BO_ICONS.plus}</div>
+              <div>
+                <h3 class="bo-modal-title">Créer un Nouvel Administrateur</h3>
+                <p class="bo-modal-subtitle">Le compte sera enregistré directement dans Supabase Auth & admin_users</p>
+              </div>
+            </div>
+            <button type="button" class="bo-modal-close-btn" id="boCloseAdminModalBtn">${BO_ICONS.close}</button>
+          </div>
+
+          <form id="boModalAddAdminForm" style="padding: 20px 24px;">
+            <div class="bo-form-group">
+              <label class="bo-label">Nom et Prénom</label>
+              <input type="text" id="modalAdminName" class="bo-input" placeholder="ex: Richard N. - Direction" required />
+            </div>
+
+            <div class="bo-form-group">
+              <label class="bo-label">Adresse Email Professionnelle</label>
+              <input type="email" id="modalAdminEmail" class="bo-input" placeholder="ex: commercial@nidj-juice.cm" required />
+            </div>
+
+            <div class="bo-form-group">
+              <label class="bo-label">Rôle Administratif</label>
+              <select id="modalAdminRole" class="bo-select" required>
+                <option value="Direction Générale">Direction Générale</option>
+                <option value="Responsable Ventes & Distribution">Responsable Ventes & Distribution</option>
+                <option value="Gestionnaire Catalogue & Contenus">Gestionnaire Catalogue & Contenus</option>
+                <option value="Superviseur Production">Superviseur Production</option>
+              </select>
+            </div>
+
+            <div class="bo-form-group">
+              <label class="bo-label">Mot de passe provisoire (Min. 6 caractères)</label>
+              <input type="password" id="modalAdminPassword" class="bo-input" placeholder="••••••••" minlength="6" required />
+            </div>
+
+            <div id="modalAdminFeedback" style="margin-top: 10px;"></div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+              <button type="button" class="bo-btn-secondary" id="modalCancelAdminBtn">Annuler</button>
+              <button type="submit" class="bo-btn-primary" id="modalSubmitAdminBtn">
+                ${BO_ICONS.check}
+                <span>Enregistrer dans Supabase</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    const close = () => {
+      modalContainer.innerHTML = '';
+    };
+
+    modalContainer.querySelector('#boCloseAdminModalBtn')?.addEventListener('click', close);
+    modalContainer.querySelector('#modalCancelAdminBtn')?.addEventListener('click', close);
+    modalContainer.querySelector('#boAddAdminModalBackdrop')?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) close();
+    });
+
+    const form = modalContainer.querySelector('#boModalAddAdminForm') as HTMLFormElement;
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (modalContainer.querySelector('#modalAdminName') as HTMLInputElement)?.value.trim();
+      const email = (modalContainer.querySelector('#modalAdminEmail') as HTMLInputElement)?.value.trim();
+      const role = (modalContainer.querySelector('#modalAdminRole') as HTMLSelectElement)?.value;
+      const pwd = (modalContainer.querySelector('#modalAdminPassword') as HTMLInputElement)?.value;
+      const submitBtn = modalContainer.querySelector('#modalSubmitAdminBtn') as HTMLButtonElement;
+      const feedback = modalContainer.querySelector('#modalAdminFeedback') as HTMLElement;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `${BO_ICONS.loader} <span>Création sur Supabase...</span>`;
+
+      const res = await supabaseService.signUpAdmin(email, pwd, name, role);
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `${BO_ICONS.check} <span>Enregistrer dans Supabase</span>`;
+
+      if (res.success) {
+        this.showToast('Nouvel administrateur enregistré sur Supabase !', 'success');
+        close();
+        this.loadAndRenderAdminUsers();
+      } else {
+        if (feedback) {
+          feedback.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 10px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+              ❌ ${res.message}
+            </div>
+          `;
+        }
+      }
+    });
   }
 
   // =========================================================================

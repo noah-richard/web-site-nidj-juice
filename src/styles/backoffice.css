@@ -1453,8 +1453,59 @@ body.bo-sidebar-locked {
 .bo-auth-desc {
   font-size: 13.5px;
   color: var(--bo-text-muted);
-  margin: 0 0 26px 0;
+  margin: 0 0 20px 0;
   line-height: 1.5;
+}
+
+.bo-auth-tabs {
+  display: flex;
+  background: var(--bo-surface-subtle);
+  padding: 4px;
+  border-radius: var(--bo-radius-pill);
+  border: 1px solid var(--bo-border);
+  margin-bottom: 18px;
+  gap: 4px;
+}
+
+.bo-auth-tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: var(--bo-radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--bo-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bo-auth-tab-btn.is-active {
+  background: var(--bo-surface);
+  color: var(--bo-forest);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.bo-auth-badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--bo-radius-pill);
+}
+
+.bo-auth-badge-status.is-cloud {
+  background: rgba(46, 160, 105, 0.12);
+  color: #1f7a4d;
+  border: 1px solid rgba(46, 160, 105, 0.25);
+}
+
+.bo-auth-badge-status.is-local {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .bo-quick-unlock-card {
