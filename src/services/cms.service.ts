@@ -10,6 +10,7 @@ import { GALLERY_ITEMS, type GalleryItem } from '../data/gallery.data';
 import { VIDEO_REELS } from '../data/flavors.data';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
 import type { StoreLocation, VideoReel, JuiceCollection, CmsCustomPage } from '../types/product.types';
+import { supabaseService } from './supabase.service';
 
 export type { JuiceCollection, CmsCustomPage };
 
@@ -88,6 +89,9 @@ export interface SiteSettings {
   cloudinaryCloudName?: string;
   cloudinaryUploadPreset?: string;
   cloudinaryFolder?: string;
+  supabaseUrl?: string;
+  supabaseAnonKey?: string;
+  supabaseAutoSync?: boolean;
 }
 
 export interface CmsDatabase {
@@ -128,6 +132,9 @@ export class CmsService {
           }
         }
       });
+
+      // Background cloud sync check on startup
+      this.initCloudSync();
     }
   }
 
@@ -208,8 +215,42 @@ export class CmsService {
           detail: { ...this.db }
         })
       );
+
+      // Asynchronous auto-sync to Supabase Cloud if configured
+      if (supabaseService.isConfigured() && this.db.settings?.supabaseAutoSync !== false) {
+        supabaseService.saveSiteData(this.db).then((res) => {
+          if (res.success) {
+            console.log('⚡ [Supabase Cloud] Sauvegarde automatique effectuée avec succès.');
+          }
+        }).catch((err) => {
+          console.warn('⚠️ [Supabase Cloud] Auto-synchronisation ignorée:', err);
+        });
+      }
     } catch (err) {
       console.error('Error saving CMS data to localStorage:', err);
+    }
+  }
+
+  private async initCloudSync(): Promise<void> {
+    try {
+      if (typeof window === 'undefined') return;
+      setTimeout(async () => {
+        if (supabaseService.isConfigured()) {
+          const res = await supabaseService.loadSiteData();
+          if (res.success && res.data) {
+            const cloudTime = new Date(res.data.lastUpdated || 0).getTime();
+            const localTime = new Date(this.db.lastUpdated || 0).getTime();
+            if (cloudTime > localTime) {
+              console.log('⚡ [Supabase Cloud] Version cloud plus récente détectée. Mise à jour des données locales.');
+              this.db = res.data;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+              window.dispatchEvent(new CustomEvent('nidj:cms-data-changed', { detail: this.db }));
+            }
+          }
+        }
+      }, 600);
+    } catch (err) {
+      console.warn('Cloud sync init error:', err);
     }
   }
 
@@ -316,7 +357,10 @@ export class CmsService {
         faviconUrl: '/favicon.svg',
         cloudinaryCloudName: (import.meta as any).env?.VITE_CLOUDINARY_CLOUD_NAME || '',
         cloudinaryUploadPreset: (import.meta as any).env?.VITE_CLOUDINARY_UPLOAD_PRESET || '',
-        cloudinaryFolder: 'nidj_juice'
+        cloudinaryFolder: 'nidj_juice',
+        supabaseUrl: (import.meta as any).env?.VITE_SUPABASE_URL || '',
+        supabaseAnonKey: (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || '',
+        supabaseAutoSync: true
       }
     };
   }
@@ -666,6 +710,44 @@ export class CmsService {
   public resetToDefaults(): void {
     this.db = this.getDefaultDatabase();
     this.persist();
+  }
+
+  // --- Cloud Sync Helpers ---
+  public async syncToSupabase(): Promise<{ success: boolean; message: string }> {
+    if (!supabaseService.isConfigured()) {
+      return {
+        success: false,
+        message: 'Supabase n’est pas configuré. Veuillez renseigner l’URL et la clé API dans les Paramètres.'
+      };
+    }
+    return await supabaseService.saveSiteData(this.db);
+  }
+
+  public async syncFromSupabase(): Promise<{ success: boolean; message: string }> {
+    if (!supabaseService.isConfigured()) {
+      return {
+        success: false,
+        message: 'Supabase n’est pas configuré.'
+      };
+    }
+    const res = await supabaseService.loadSiteData();
+    if (res.success && res.data) {
+      this.db = res.data;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+      window.dispatchEvent(
+        new CustomEvent('nidj:cms-data-changed', {
+          detail: { ...this.db }
+        })
+      );
+      return {
+        success: true,
+        message: res.message || 'Données synchronisées avec succès depuis Supabase !'
+      };
+    }
+    return {
+      success: false,
+      message: res.message || 'Échec de la récupération des données Supabase.'
+    };
   }
 }
 

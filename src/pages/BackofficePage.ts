@@ -6,6 +6,7 @@
 
 import { cmsService, type FaqItem } from '../services/cms.service';
 import { cloudinaryService } from '../services/cloudinary.service';
+import { supabaseService } from '../services/supabase.service';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
 import type { StoreLocation, VideoReel, JuiceCollection, CmsCustomPage } from '../types/product.types';
 import type { GalleryItem } from '../data/gallery.data';
@@ -40,6 +41,7 @@ const BO_ICONS = {
   camera: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`,
   menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`,
   cloud: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>`,
+  database: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`,
   loader: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bo-spin"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>`
 };
 
@@ -207,6 +209,11 @@ export class BackofficePage {
               ${BO_ICONS.external}
             </a>
 
+            <button type="button" class="bo-action-pill" id="boTopSyncSupabaseBtn" title="Sauvegarder immédiatement toutes les données vers Supabase (Push Cloud)">
+              ${BO_ICONS.database}
+              <span>Sync Cloud</span>
+            </button>
+
             <button type="button" class="bo-action-pill" id="boExportBtn" title="Télécharger une sauvegarde complète en JSON">
               ${BO_ICONS.download}
               <span>Exporter Backup</span>
@@ -347,6 +354,10 @@ export class BackofficePage {
               ${BO_ICONS.external}
               <span>Ouvrir le Site Public</span>
             </a>
+            <button type="button" class="bo-mobile-action-link" id="boMobileSyncSupabaseBtn">
+              ${BO_ICONS.database}
+              <span>Sauvegarder sur Supabase</span>
+            </button>
             <button type="button" class="bo-mobile-action-link" id="boMobileExportBtn">
               ${BO_ICONS.download}
               <span>Exporter Backup JSON</span>
@@ -1487,6 +1498,8 @@ export class BackofficePage {
   // -------------------------------------------------------------------------
   private renderSettingsTab(): string {
     const settings = cmsService.getSettings();
+    const supabaseConfig = supabaseService.getConfig();
+    const sqlScript = supabaseService.getSqlSetupScript();
 
     return `
       <div class="bo-page-header">
@@ -1742,6 +1755,132 @@ export class BackofficePage {
             <div id="boDirectUploadProgress" style="display: none; max-width: 480px; margin: 16px auto 0 auto;"></div>
             <div id="boDirectUploadResult" style="margin-top: 16px;"></div>
           </div>
+        </div>
+      </div>
+
+      <!-- Supabase Cloud Database Persistence & Sync Card -->
+      <div class="bo-card" style="margin-top: 24px;">
+        <div class="bo-card-header">
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon" style="background: rgba(46, 160, 105, 0.15); color: #2ea069;">
+              ${BO_ICONS.database}
+            </div>
+            <div>
+              <h2 class="bo-card-title">Base de Données Cloud Supabase (Sauvegarde Complète & Synchronisation)</h2>
+              <p class="bo-card-subtitle">
+                Stockage cloud persistant de toutes les données du site (Saveurs, Collections, Pages, Points de vente, Commandes & Paramètres)
+              </p>
+            </div>
+          </div>
+          <div>
+            ${supabaseService.isConfigured()
+              ? `<span class="bo-cloudinary-badge-pill is-active">${BO_ICONS.check} Supabase Connecté</span>`
+              : `<span class="bo-cloudinary-badge-pill is-inactive">Non configuré</span>`}
+          </div>
+        </div>
+
+        <div class="bo-card-body">
+          <form id="boSupabaseConfigForm">
+            <div class="bo-form-grid-2">
+              <div class="bo-form-group">
+                <label class="bo-label">
+                  <span>URL du Projet Supabase</span>
+                  <span class="bo-label-hint">https://xxxx.supabase.co</span>
+                </label>
+                <input 
+                  type="url" 
+                  id="cfgSupabaseUrl" 
+                  class="bo-input" 
+                  value="${supabaseConfig.url || ''}" 
+                  placeholder="https://xyzabcdefg.supabase.co" 
+                  required 
+                />
+                <span style="font-size: 11px; color: var(--bo-text-muted); margin-top: 4px; display: block;">
+                  Trouvez-la dans Supabase : <strong>Project Settings &rarr; API &rarr; Project URL</strong>
+                </span>
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label">
+                  <span>Clé API Publique Supabase (Anon Key)</span>
+                  <span class="bo-label-hint">anon / public</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="cfgSupabaseAnonKey" 
+                  class="bo-input" 
+                  value="${supabaseConfig.anonKey || ''}" 
+                  placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." 
+                  required 
+                />
+                <span style="font-size: 11px; color: var(--bo-text-muted); margin-top: 4px; display: block;">
+                  Trouvez-la dans Supabase : <strong>Project Settings &rarr; API &rarr; Project API keys &rarr; anon public</strong>
+                </span>
+              </div>
+            </div>
+
+            <div style="margin-top: 14px; background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 14px 16px;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--bo-forest);">
+                <input type="checkbox" id="cfgSupabaseAutoSync" ${supabaseConfig.autoSync !== false ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--bo-brand-green); cursor: pointer;" />
+                <span>Synchronisation automatique en direct (Auto-Push à chaque sauvegarde de produit, collection ou page)</span>
+              </label>
+              <p style="font-size: 12px; color: var(--bo-text-muted); margin: 6px 0 0 28px;">
+                Lorsque cette option est cochée, toute modification effectuée dans ce Backoffice est immédiatement répercutée dans votre base de données Supabase.
+              </p>
+            </div>
+
+            <!-- Action Buttons Row -->
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 20px;">
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <button type="submit" class="bo-btn-primary" id="boSaveSupabaseConfigBtn">
+                  ${BO_ICONS.check}
+                  <span>Enregistrer la Configuration</span>
+                </button>
+
+                <button type="button" class="bo-btn-secondary" id="boTestSupabaseBtn">
+                  ${BO_ICONS.refresh}
+                  <span>Tester la Connexion</span>
+                </button>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="bo-btn-primary" id="boPushSupabaseBtn" style="background: #2ea069; border-color: #2ea069;" title="Envoyer toutes les données locales vers Supabase">
+                  ${BO_ICONS.upload}
+                  <span>Sauvegarder tout sur Supabase (Push)</span>
+                </button>
+
+                <button type="button" class="bo-btn-secondary" id="boPullSupabaseBtn" title="Récupérer la version stockée sur Supabase">
+                  ${BO_ICONS.download}
+                  <span>Restaurer depuis Supabase (Pull)</span>
+                </button>
+              </div>
+            </div>
+            <div id="boSupabaseResultBox" style="margin-top: 14px;"></div>
+          </form>
+
+          <!-- Expandable SQL Schema Setup Box -->
+          <details style="margin-top: 24px; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); background: var(--bo-surface); overflow: hidden;">
+            <summary style="padding: 14px 18px; font-weight: 700; color: var(--bo-forest); cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; background: var(--bo-surface-subtle);">
+              <span style="display: flex; align-items: center; gap: 8px;">
+                ${BO_ICONS.database}
+                <span>Script SQL d'initialisation Supabase (Cliquez pour afficher / copier)</span>
+              </span>
+              <span style="font-size: 12px; color: var(--bo-brand-green); font-weight: 700;">Afficher le script &darr;</span>
+            </summary>
+            <div style="padding: 16px 18px; border-top: 1px solid var(--bo-border);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                <p style="font-size: 12.5px; color: var(--bo-text-muted); margin: 0;">
+                  Exécutez ce script une seule fois dans votre espace <a href="https://supabase.com/dashboard" target="_blank" rel="noopener" style="color: var(--bo-brand-green); font-weight: 700;">Supabase &rarr; SQL Editor</a> pour créer automatiquement les tables et les permissions :
+                </p>
+                <button type="button" class="bo-btn-secondary" id="boCopySqlScriptBtn" style="font-size: 12px; padding: 6px 12px;">
+                  ${BO_ICONS.sparkles}
+                  <span id="boCopySqlLabel">Copier le Script SQL (1-Clic)</span>
+                </button>
+              </div>
+              <pre style="background: #0f172a; color: #f8fafc; padding: 16px; border-radius: var(--bo-radius-sm); font-size: 12px; line-height: 1.5; overflow-x: auto; max-height: 320px; font-family: monospace; border: 1px solid #334155;"><code>${sqlScript}</code></pre>
+            </div>
+          </details>
+
         </div>
       </div>
     `;
@@ -2308,6 +2447,206 @@ export class BackofficePage {
 
       cmsService.saveFaqs(updatedFaqs);
       this.showToast('FAQ enregistrée', 'success');
+    });
+
+    // --- Supabase Cloud Sync Quick Topbar Actions (Desktop + Mobile) ---
+    const handleTopSyncSupabase = async (btn: HTMLElement | null) => {
+      if (!supabaseService.isConfigured()) {
+        this.showToast('Veuillez d\'abord configurer Supabase dans l\'onglet Paramètres.', 'error');
+        this.currentTab = 'settings';
+        this.render();
+        return;
+      }
+
+      if (btn) {
+        btn.style.pointerEvents = 'none';
+        btn.innerHTML = `${BO_ICONS.loader} <span>Synchronisation...</span>`;
+      }
+
+      const res = await cmsService.syncToSupabase();
+      if (btn) {
+        btn.style.pointerEvents = 'auto';
+        btn.innerHTML = `${BO_ICONS.database} <span>Sync Cloud</span>`;
+      }
+
+      if (res.success) {
+        this.showToast(res.message, 'success');
+      } else {
+        this.showToast(res.message, 'error');
+      }
+    };
+
+    this.element.querySelector('#boTopSyncSupabaseBtn')?.addEventListener('click', (e) => {
+      handleTopSyncSupabase(e.currentTarget as HTMLElement);
+    });
+    this.element.querySelector('#boMobileSyncSupabaseBtn')?.addEventListener('click', (e) => {
+      this.closeMobileSidebar();
+      handleTopSyncSupabase(e.currentTarget as HTMLElement);
+    });
+
+    // --- Supabase Configuration Form Submit ---
+    const supabaseConfigForm = this.element.querySelector('#boSupabaseConfigForm') as HTMLFormElement;
+    supabaseConfigForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const urlInput = (this.element.querySelector('#cfgSupabaseUrl') as HTMLInputElement)?.value.trim() || '';
+      const keyInput = (this.element.querySelector('#cfgSupabaseAnonKey') as HTMLInputElement)?.value.trim() || '';
+      const autoSync = (this.element.querySelector('#cfgSupabaseAutoSync') as HTMLInputElement)?.checked ?? true;
+
+      if (!urlInput || !keyInput) {
+        this.showToast('Veuillez renseigner l\'URL et la clé Anon de Supabase.', 'error');
+        return;
+      }
+
+      supabaseService.saveConfig({ url: urlInput, anonKey: keyInput, autoSync });
+
+      const current = cmsService.getSettings();
+      cmsService.saveSettings({
+        ...current,
+        supabaseUrl: urlInput,
+        supabaseAnonKey: keyInput,
+        supabaseAutoSync: autoSync
+      });
+
+      this.showToast('Configuration Supabase enregistrée avec succès !', 'success');
+      this.render();
+    });
+
+    // --- Supabase Test Connection Button ---
+    const testSupabaseBtn = this.element.querySelector('#boTestSupabaseBtn') as HTMLButtonElement;
+    const supabaseResultBox = this.element.querySelector('#boSupabaseResultBox') as HTMLElement;
+    testSupabaseBtn?.addEventListener('click', async () => {
+      const urlInput = (this.element.querySelector('#cfgSupabaseUrl') as HTMLInputElement)?.value.trim() || '';
+      const keyInput = (this.element.querySelector('#cfgSupabaseAnonKey') as HTMLInputElement)?.value.trim() || '';
+      const autoSync = (this.element.querySelector('#cfgSupabaseAutoSync') as HTMLInputElement)?.checked ?? true;
+
+      if (!urlInput || !keyInput) {
+        if (supabaseResultBox) {
+          supabaseResultBox.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 10px 14px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+              ⚠️ Veuillez renseigner l'URL et la clé Anon Key ci-dessus avant de tester.
+            </div>
+          `;
+        }
+        return;
+      }
+
+      supabaseService.saveConfig({ url: urlInput, anonKey: keyInput, autoSync });
+
+      testSupabaseBtn.disabled = true;
+      testSupabaseBtn.innerHTML = `${BO_ICONS.loader} <span>Vérification...</span>`;
+      if (supabaseResultBox) {
+        supabaseResultBox.innerHTML = `<div style="font-size: 12px; color: var(--bo-text-muted);">Connexion au serveur Supabase en cours...</div>`;
+      }
+
+      const res = await supabaseService.testConnection();
+      testSupabaseBtn.disabled = false;
+      testSupabaseBtn.innerHTML = `${BO_ICONS.refresh} <span>Tester la Connexion</span>`;
+
+      if (res.success) {
+        if (supabaseResultBox) {
+          supabaseResultBox.innerHTML = `
+            <div style="background: rgba(88, 168, 38, 0.12); border: 1px solid rgba(88, 168, 38, 0.3); color: var(--bo-forest); padding: 12px 14px; border-radius: var(--bo-radius-sm); font-size: 12.5px; font-weight: 700;">
+              ✓ ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Connexion Supabase réussie !', 'success');
+      } else {
+        if (supabaseResultBox) {
+          supabaseResultBox.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 12px 14px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; line-height: 1.5;">
+              ❌ <strong>Échec de connexion :</strong> ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Erreur de connexion Supabase', 'error');
+      }
+    });
+
+    // --- Supabase Push (Save All to Cloud) Button ---
+    const pushSupabaseBtn = this.element.querySelector('#boPushSupabaseBtn') as HTMLButtonElement;
+    pushSupabaseBtn?.addEventListener('click', async () => {
+      if (!supabaseService.isConfigured()) {
+        this.showToast('Veuillez d\'abord renseigner et enregistrer vos identifiants Supabase.', 'error');
+        return;
+      }
+
+      pushSupabaseBtn.disabled = true;
+      pushSupabaseBtn.innerHTML = `${BO_ICONS.loader} <span>Sauvegarde vers Supabase...</span>`;
+      if (supabaseResultBox) {
+        supabaseResultBox.innerHTML = `<div style="font-size: 12px; color: var(--bo-text-muted);">Envoi des données vers la table site_database...</div>`;
+      }
+
+      const res = await cmsService.syncToSupabase();
+      pushSupabaseBtn.disabled = false;
+      pushSupabaseBtn.innerHTML = `${BO_ICONS.upload} <span>Sauvegarder tout sur Supabase (Push)</span>`;
+
+      if (res.success) {
+        if (supabaseResultBox) {
+          supabaseResultBox.innerHTML = `
+            <div style="background: rgba(88, 168, 38, 0.12); border: 1px solid rgba(88, 168, 38, 0.3); color: var(--bo-forest); padding: 12px 14px; border-radius: var(--bo-radius-sm); font-size: 12.5px; font-weight: 700;">
+              ✓ ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Sauvegarde Supabase réussie avec succès !', 'success');
+      } else {
+        if (supabaseResultBox) {
+          supabaseResultBox.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 12px 14px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+              ❌ ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Erreur lors de la sauvegarde Supabase', 'error');
+      }
+    });
+
+    // --- Supabase Pull (Restore from Cloud) Button ---
+    const pullSupabaseBtn = this.element.querySelector('#boPullSupabaseBtn') as HTMLButtonElement;
+    pullSupabaseBtn?.addEventListener('click', async () => {
+      if (!supabaseService.isConfigured()) {
+        this.showToast('Veuillez d\'abord configurer Supabase.', 'error');
+        return;
+      }
+
+      if (!confirm('Attention : Cette action va synchroniser et remplacer les données locales par la version actuellement stockée sur votre Supabase. Voulez-vous continuer ?')) {
+        return;
+      }
+
+      pullSupabaseBtn.disabled = true;
+      pullSupabaseBtn.innerHTML = `${BO_ICONS.loader} <span>Récupération...</span>`;
+
+      const res = await cmsService.syncFromSupabase();
+      pullSupabaseBtn.disabled = false;
+      pullSupabaseBtn.innerHTML = `${BO_ICONS.download} <span>Restaurer depuis Supabase (Pull)</span>`;
+
+      if (res.success) {
+        this.showToast(res.message, 'success');
+        this.render();
+      } else {
+        if (supabaseResultBox) {
+          supabaseResultBox.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 12px 14px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+              ❌ ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Échec de synchronisation depuis Supabase', 'error');
+      }
+    });
+
+    // --- Supabase Copy SQL Script Button ---
+    const copySqlBtn = this.element.querySelector('#boCopySqlScriptBtn') as HTMLButtonElement;
+    copySqlBtn?.addEventListener('click', () => {
+      const sql = supabaseService.getSqlSetupScript();
+      navigator.clipboard.writeText(sql);
+      const label = this.element.querySelector('#boCopySqlLabel');
+      if (label) label.textContent = '✓ Script SQL Copié !';
+      this.showToast('Script SQL copié dans le presse-papiers ! Collez-le dans Supabase SQL Editor.', 'success');
+      setTimeout(() => {
+        if (label) label.textContent = 'Copier le Script SQL (1-Clic)';
+      }, 2500);
     });
 
     // Export Backup (Desktop + Mobile)

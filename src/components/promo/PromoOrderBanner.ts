@@ -5,6 +5,7 @@
 
 import { audioController } from '../../features/audio-controller';
 import { cmsService } from '../../services/cms.service';
+import { supabaseService } from '../../services/supabase.service';
 
 export class PromoOrderBanner {
   private element: HTMLElement;
@@ -133,6 +134,17 @@ export class PromoOrderBanner {
       }
 
       audioController.playPop();
+
+      // Asynchronously record order in Supabase Cloud Database
+      supabaseService.saveOrder({
+        flavor: 'Commande Rapide (Bannière)',
+        format: 'Sélection Client',
+        quantity: 1,
+        customer_name: name,
+        customer_phone: phone,
+        city: city,
+        source: 'promo_banner'
+      }).catch((err) => console.warn('Supabase saveOrder:', err));
 
       const message = `*NOUVELLE COMMANDE RAPIDE — NIDJ JUICE*\n\n` +
         `• Client : ${name}\n` +

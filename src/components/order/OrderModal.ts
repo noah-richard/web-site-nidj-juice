@@ -7,6 +7,7 @@ import { OFFICIAL_CONTACT } from '../../data/stores.data';
 import { themeController } from '../../features/theme-controller';
 import { audioController } from '../../features/audio-controller';
 import { cmsService } from '../../services/cms.service';
+import { supabaseService } from '../../services/supabase.service';
 
 export class OrderModal {
   private element: HTMLElement;
@@ -221,6 +222,19 @@ export class OrderModal {
       }
 
       audioController.playPop();
+
+      // Asynchronously record order in Supabase Cloud Database
+      supabaseService.saveOrder({
+        flavor,
+        format,
+        quantity: parseInt(qty, 10) || 1,
+        customer_name: name,
+        customer_phone: phone,
+        city,
+        neighborhood,
+        store_hint: storeHint || '',
+        source: 'order_modal'
+      }).catch((err) => console.warn('Supabase saveOrder:', err));
 
       // Construct professional WhatsApp message
       let message = `*COMMANDE NIDJ JUICE — SITE OFFICIEL*\n\n`;
