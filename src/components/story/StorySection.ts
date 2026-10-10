@@ -1,22 +1,40 @@
 /* ==========================================================================
    NIDJ JUICE — ABOUT / O HAC SECTION (MOCKUP COMPLIANT)
    Soft rounded container: Brand narrative + 2x2 Feature Cards Grid
+   Dynamically connected in real-time to CMS Service
    ========================================================================== */
 
 import { cmsService } from '../../services/cms.service';
 
 export class StorySection {
   private element: HTMLElement;
+  private unsubscribeCms: (() => void) | null = null;
 
   constructor() {
     this.element = document.createElement('section');
     this.element.id = 'story';
     this.element.className = 'section about-section';
     this.render();
+    this.bindEvents();
   }
 
   public getElement(): HTMLElement {
     return this.element;
+  }
+
+  private bindEvents(): void {
+    if (!this.unsubscribeCms) {
+      this.unsubscribeCms = cmsService.onDataChanged(() => {
+        this.render();
+      });
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 
   private render(): void {
@@ -58,7 +76,7 @@ export class StorySection {
             <!-- Right: 2x2 White Feature Cards Grid matching Mockup -->
             <div class="about-features-grid">
               
-              <!-- Card 1: Vitamines & Minéraux -->
+              <!-- Card 1: Stat 1 -->
               <div class="feature-card">
                 <div class="feature-card-icon icon-orange">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -68,12 +86,12 @@ export class StorySection {
                   </svg>
                 </div>
                 <div class="feature-card-text">
-                  <h3 class="feature-title">Vitamines & minéraux</h3>
-                  <p class="feature-subtitle">Plein de vitalité dans chaque bouteille</p>
+                  <h3 class="feature-title">${company.stat1Label || 'Vitamines & minéraux'}</h3>
+                  <p class="feature-subtitle">${company.stat1Desc || 'Plein de vitalité dans chaque bouteille'}</p>
                 </div>
               </div>
 
-              <!-- Card 2: Santé & Bien-être -->
+              <!-- Card 2: Stat 2 -->
               <div class="feature-card">
                 <div class="feature-card-icon icon-green">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -81,12 +99,12 @@ export class StorySection {
                   </svg>
                 </div>
                 <div class="feature-card-text">
-                  <h3 class="feature-title">Santé & bien-être</h3>
-                  <p class="feature-subtitle">Soutien d'un mode de vie actif</p>
+                  <h3 class="feature-title">${company.stat2Label || 'Santé & bien-être'}</h3>
+                  <p class="feature-subtitle">${company.stat2Desc || 'Soutien d\'un mode de vie actif'}</p>
                 </div>
               </div>
 
-              <!-- Card 3: Énergie Naturelle -->
+              <!-- Card 3: Stat 3 -->
               <div class="feature-card">
                 <div class="feature-card-icon icon-pink">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -94,12 +112,12 @@ export class StorySection {
                   </svg>
                 </div>
                 <div class="feature-card-text">
-                  <h3 class="feature-title">Énergie & tonus</h3>
-                  <p class="feature-subtitle">Vivacité naturelle pour toute la journée</p>
+                  <h3 class="feature-title">${company.stat3Label || 'Énergie & tonus'}</h3>
+                  <p class="feature-subtitle">${company.stat3Desc || 'Vivacité naturelle pour toute la journée'}</p>
                 </div>
               </div>
 
-              <!-- Card 4: 100% Naturel -->
+              <!-- Card 4: Stat 4 / Pure Jus -->
               <div class="feature-card">
                 <div class="feature-card-icon icon-leaf">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -108,8 +126,8 @@ export class StorySection {
                   </svg>
                 </div>
                 <div class="feature-card-text">
-                  <h3 class="feature-title">100% Pur Jus</h3>
-                  <p class="feature-subtitle">Fruits frais du terroir camerounais</p>
+                  <h3 class="feature-title">${company.stat4Label || '100% Pur Jus'}</h3>
+                  <p class="feature-subtitle">${company.stat4Desc || 'Fruits frais du terroir camerounais'}</p>
                 </div>
               </div>
 
@@ -123,3 +141,4 @@ export class StorySection {
     `;
   }
 }
+

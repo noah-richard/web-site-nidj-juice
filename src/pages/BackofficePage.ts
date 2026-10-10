@@ -42,13 +42,17 @@ const BO_ICONS = {
   menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`,
   cloud: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>`,
   database: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`,
-  loader: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bo-spin"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>`
+  loader: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bo-spin"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>`,
+  key: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="m21 2-9.6 9.6"></path><path d="m15.5 7.5 3 3L22 7l-3-3"></path></svg>`,
+  shield: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+  info: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
+  eyeOff: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`
 };
 
 export class BackofficePage {
   private element: HTMLElement;
   private currentTab: BackofficeTab = 'overview';
-  private authMode: 'login' | 'register' = 'login';
+  private authMode: 'login' | 'register' | 'reset' = 'login';
 
   constructor() {
     this.element = document.createElement('div');
@@ -119,12 +123,16 @@ export class BackofficePage {
           </div>
 
           <!-- Auth Mode Tabs (Connexion / Nouvel Administrateur) -->
+          <!-- Auth Mode Tabs (Connexion / Nouvel Administrateur / Changer Mot de Passe) -->
           <div class="bo-auth-tabs">
             <button type="button" class="bo-auth-tab-btn ${this.authMode === 'login' ? 'is-active' : ''}" id="boTabLoginBtn">
               Connexion
             </button>
             <button type="button" class="bo-auth-tab-btn ${this.authMode === 'register' ? 'is-active' : ''}" id="boTabRegisterBtn">
-              Créer un Administrateur
+              Créer un Compte
+            </button>
+            <button type="button" class="bo-auth-tab-btn ${this.authMode === 'reset' ? 'is-active' : ''}" id="boTabResetBtn">
+              Changer Mot de Passe
             </button>
           </div>
 
@@ -149,21 +157,29 @@ export class BackofficePage {
                   <label class="bo-label" for="boAuthPassword" style="margin: 0;">Mot de passe</label>
                   <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700;">Supabase Auth</span>
                 </div>
-                <input 
-                  type="password" 
-                  id="boAuthPassword" 
-                  class="bo-input" 
-                  placeholder="Entrez votre mot de passe" 
-                  autocomplete="current-password"
-                  required
-                />
+                <div class="bo-input-pwd-wrap">
+                  <input 
+                    type="password" 
+                    id="boAuthPassword" 
+                    class="bo-input" 
+                    placeholder="Entrez votre mot de passe" 
+                    autocomplete="current-password"
+                    required
+                  />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="boAuthPassword" title="Afficher/Masquer le mot de passe">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
               </div>
 
-              <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0 14px 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0 14px 0; flex-wrap: wrap; gap: 8px;">
                 <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--bo-text-muted); cursor: pointer;">
                   <input type="checkbox" id="boRememberMe" checked style="accent-color: var(--bo-brand-green); width: 15px; height: 15px;" />
                   <span>Rester connecté</span>
                 </label>
+                <button type="button" id="boForgotPwdBtn" style="background:none; border:none; color:var(--bo-brand-green); font-size:12px; font-weight:700; cursor:pointer; padding:0; text-decoration:underline;">
+                  Changer de mot de passe ?
+                </button>
               </div>
 
               <div id="boAuthFeedback" style="margin-bottom: 12px;"></div>
@@ -173,7 +189,7 @@ export class BackofficePage {
                 <span>Se Connecter au Backoffice</span>
               </button>
             </form>
-          ` : `
+          ` : this.authMode === 'register' ? `
             <form id="boRegisterForm" class="bo-form">
               <div class="bo-form-group">
                 <label class="bo-label" for="boRegName">Nom et Prénom de l'Administrateur</label>
@@ -209,14 +225,19 @@ export class BackofficePage {
 
               <div class="bo-form-group">
                 <label class="bo-label" for="boRegPassword">Mot de passe Supabase (Min. 6 caractères)</label>
-                <input 
-                  type="password" 
-                  id="boRegPassword" 
-                  class="bo-input" 
-                  placeholder="••••••••" 
-                  required
-                  minlength="6"
-                />
+                <div class="bo-input-pwd-wrap">
+                  <input 
+                    type="password" 
+                    id="boRegPassword" 
+                    class="bo-input" 
+                    placeholder="••••••••" 
+                    required
+                    minlength="6"
+                  />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="boRegPassword" title="Afficher/Masquer le mot de passe">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
               </div>
 
               <div id="boAuthFeedback" style="margin-bottom: 12px;"></div>
@@ -224,6 +245,101 @@ export class BackofficePage {
               <button type="submit" class="bo-btn-primary" id="boRegisterSubmitBtn" style="width: 100%; justify-content: center; background: #2ea069; border-color: #2ea069; margin-top: 4px;">
                 ${BO_ICONS.plus}
                 <span>Créer l'Administrateur sur Supabase</span>
+              </button>
+            </form>
+          ` : `
+            <!-- Password Reset / Change Form -->
+            <form id="boResetPwdForm" class="bo-form">
+              <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: var(--bo-text-secondary); line-height: 1.4;">
+                🔑 Définissez un nouveau mot de passe administrateur pour votre compte. Validé instantanément sur <strong>Supabase Auth Cloud</strong> et en local.
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label" for="boResetEmail">Adresse Email Administrateur</label>
+                <input 
+                  type="email" 
+                  id="boResetEmail" 
+                  class="bo-input" 
+                  placeholder="ex: nidjeuinsarl@gmail.com ou direction@nidj-juice.cm" 
+                  value="nidjeuinsarl@gmail.com"
+                  autocomplete="username"
+                  required
+                />
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label" for="boResetCode">
+                  <span>Ancien Mot de Passe ou Code Sécurité</span>
+                  <span class="bo-label-hint">Code secours : 237</span>
+                </label>
+                <div class="bo-input-pwd-wrap">
+                  <input 
+                    type="password" 
+                    id="boResetCode" 
+                    class="bo-input" 
+                    placeholder="Ancien mot de passe ou code 237" 
+                    required
+                  />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="boResetCode" title="Afficher/Masquer">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label" for="boResetNewPassword">Nouveau Mot de Passe (Min. 6 caractères)</label>
+                <div class="bo-input-pwd-wrap">
+                  <input 
+                    type="password" 
+                    id="boResetNewPassword" 
+                    class="bo-input" 
+                    placeholder="••••••••" 
+                    minlength="6"
+                    autocomplete="new-password"
+                    required
+                  />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="boResetNewPassword" title="Afficher/Masquer">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
+                <div class="bo-pwd-strength-box" id="boResetStrengthBox" style="display: none;">
+                  <div class="bo-pwd-strength-bars">
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                  </div>
+                  <div class="bo-pwd-strength-label">
+                    <span>Robustesse</span>
+                    <span>Recommandé : 8+ caractères</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label" for="boResetConfirmPassword">Confirmer le Nouveau Mot de Passe</label>
+                <div class="bo-input-pwd-wrap">
+                  <input 
+                    type="password" 
+                    id="boResetConfirmPassword" 
+                    class="bo-input" 
+                    placeholder="••••••••" 
+                    minlength="6"
+                    autocomplete="new-password"
+                    required
+                  />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="boResetConfirmPassword" title="Afficher/Masquer">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
+                <div id="boResetMatchNotice" style="font-size: 11px; margin-top: 4px; font-weight: 600;"></div>
+              </div>
+
+              <div id="boAuthFeedback" style="margin-bottom: 12px;"></div>
+
+              <button type="submit" class="bo-btn-primary" id="boResetSubmitBtn" style="width: 100%; justify-content: center; background: var(--bo-forest); border-color: var(--bo-forest); margin-top: 4px;">
+                ${BO_ICONS.key}
+                <span>Enregistrer le Nouveau Mot de Passe</span>
               </button>
             </form>
           `}
@@ -257,6 +373,17 @@ export class BackofficePage {
       this.authMode = 'register';
       this.renderAuthGate();
     });
+    this.element.querySelector('#boTabResetBtn')?.addEventListener('click', () => {
+      this.authMode = 'reset';
+      this.renderAuthGate();
+    });
+    this.element.querySelector('#boForgotPwdBtn')?.addEventListener('click', () => {
+      this.authMode = 'reset';
+      this.renderAuthGate();
+    });
+
+    // Password Eye Toggles
+    this.bindPasswordToggleButtons(this.element);
 
     // Login Form Submit (Supabase Auth + Fallback)
     const loginForm = this.element.querySelector('#boLoginForm') as HTMLFormElement;
@@ -331,6 +458,97 @@ export class BackofficePage {
         this.showToast('Erreur création administrateur', 'error');
       }
     });
+
+    // Reset Password Form Submit (Supabase Auth & Local sync)
+    const resetForm = this.element.querySelector('#boResetPwdForm') as HTMLFormElement;
+    if (resetForm) {
+      const resetNewPwd = this.element.querySelector('#boResetNewPassword') as HTMLInputElement;
+      const resetConfirmPwd = this.element.querySelector('#boResetConfirmPassword') as HTMLInputElement;
+      const resetStrengthBox = this.element.querySelector('#boResetStrengthBox')?.parentElement as HTMLElement;
+      const resetMatchNotice = this.element.querySelector('#boResetMatchNotice') as HTMLElement;
+
+      resetNewPwd?.addEventListener('input', () => {
+        const val = resetNewPwd.value;
+        const strength = this.calculatePasswordStrength(val);
+        this.updateStrengthBars(resetStrengthBox, strength.score, strength.label, strength.color);
+        if (resetConfirmPwd?.value) {
+          if (val === resetConfirmPwd.value) {
+            resetMatchNotice.innerHTML = '✅ Les mots de passe correspondent';
+            resetMatchNotice.style.color = '#10b981';
+          } else {
+            resetMatchNotice.innerHTML = '❌ Les mots de passe ne correspondent pas';
+            resetMatchNotice.style.color = '#ef4444';
+          }
+        }
+      });
+
+      resetConfirmPwd?.addEventListener('input', () => {
+        if (!resetConfirmPwd.value) {
+          resetMatchNotice.innerHTML = '';
+        } else if (resetNewPwd?.value === resetConfirmPwd.value) {
+          resetMatchNotice.innerHTML = '✅ Les mots de passe correspondent';
+          resetMatchNotice.style.color = '#10b981';
+        } else {
+          resetMatchNotice.innerHTML = '❌ Les mots de passe ne correspondent pas';
+          resetMatchNotice.style.color = '#ef4444';
+        }
+      });
+
+      resetForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = (this.element.querySelector('#boResetEmail') as HTMLInputElement)?.value.trim();
+        const code = (this.element.querySelector('#boResetCode') as HTMLInputElement)?.value;
+        const newPassword = resetNewPwd.value;
+        const confirmPassword = resetConfirmPwd.value;
+        const submitBtn = this.element.querySelector('#boResetSubmitBtn') as HTMLButtonElement;
+        const feedback = this.element.querySelector('#boAuthFeedback') as HTMLElement;
+
+        if (newPassword !== confirmPassword) {
+          if (feedback) {
+            feedback.innerHTML = `
+              <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
+                ❌ Les deux mots de passe saisis ne sont pas identiques.
+              </div>
+            `;
+          }
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `${BO_ICONS.loader} <span>Mise à jour en cours...</span>`;
+        if (feedback) feedback.innerHTML = '';
+
+        const res = await supabaseService.resetAdminPassword(email, code, newPassword);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `${BO_ICONS.key} <span>Enregistrer le Nouveau Mot de Passe</span>`;
+
+        if (res.success) {
+          cmsService.setCustomAdminPassword(newPassword);
+          this.showToast('Nouveau mot de passe enregistré avec succès !', 'success');
+          this.authMode = 'login';
+          this.renderAuthGate();
+          const authFeedback = this.element.querySelector('#boAuthFeedback') as HTMLElement;
+          if (authFeedback) {
+            authFeedback.innerHTML = `
+              <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
+                ✅ Mot de passe mis à jour ! Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
+              </div>
+            `;
+          }
+          const emailInput = this.element.querySelector('#boAuthEmail') as HTMLInputElement;
+          if (emailInput) emailInput.value = email;
+        } else {
+          if (feedback) {
+            feedback.innerHTML = `
+              <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
+                ❌ ${res.message}
+              </div>
+            `;
+          }
+          this.showToast('Erreur réinitialisation mot de passe', 'error');
+        }
+      });
+    }
 
     // 1-Click demo unlock
     const quickBtn = this.element.querySelector('#boQuickUnlockBtn');
@@ -424,6 +642,9 @@ export class BackofficePage {
               <span class="bo-user-name">${currentAdmin.fullName}</span>
               <span class="bo-user-role">${currentAdmin.role}</span>
             </div>
+            <button type="button" class="bo-pwd-btn" id="boChangePasswordTopBtn" title="Changer mon mot de passe administrateur" aria-label="Changer le mot de passe">
+              ${BO_ICONS.key}
+            </button>
             <button type="button" class="bo-logout-btn" id="boLogoutBtn" title="Fermer la session administrateur">
               ${BO_ICONS.logout}
             </button>
@@ -458,9 +679,14 @@ export class BackofficePage {
               <div class="bo-sidebar-user-name">${currentAdmin.fullName}</div>
               <div class="bo-sidebar-user-role">${currentAdmin.role}</div>
             </div>
-            <button type="button" class="bo-logout-btn" id="boMobileLogoutBtn" title="Déconnexion" style="background: var(--bo-surface); border: 1px solid var(--bo-border);">
-              ${BO_ICONS.logout}
-            </button>
+            <div style="display: flex; gap: 4px;">
+              <button type="button" class="bo-pwd-btn" id="boMobileChangePasswordBtn" title="Changer mon mot de passe" style="background: var(--bo-surface); border: 1px solid var(--bo-border);">
+                ${BO_ICONS.key}
+              </button>
+              <button type="button" class="bo-logout-btn" id="boMobileLogoutBtn" title="Déconnexion" style="background: var(--bo-surface); border: 1px solid var(--bo-border);">
+                ${BO_ICONS.logout}
+              </button>
+            </div>
           </div>
           
           <div class="bo-nav-section">
@@ -836,7 +1062,11 @@ export class BackofficePage {
                 <img src="${p.bottleImage}" alt="${p.name}" class="bo-item-img" />
               </div>
               <div class="bo-item-info">
-                <div class="bo-item-category" style="color: ${p.accentColor};">${p.category || 'Collection Officielle'}</div>
+                <div class="bo-item-category" style="color: ${p.accentColor}; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                  <span>${p.category || 'Collection Officielle'}</span>
+                  ${(p.id === 'cocktail-bissap' || p.id === 'bissap') ? `<span class="bo-badge-pill" style="background: rgba(196, 0, 62, 0.08); color: #C4003E; border: 1px solid rgba(196, 0, 62, 0.25); font-size: 10px; font-weight: 800; padding: 2px 6px;">★ Héro (Saveur 01)</span>` : ''}
+                  ${(p.id === 'ananas-gingembre' || p.id === 'ananas') ? `<span class="bo-badge-pill" style="background: rgba(230, 163, 0, 0.12); color: #B37D00; border: 1px solid rgba(230, 163, 0, 0.3); font-size: 10px; font-weight: 800; padding: 2px 6px;">★ Héro (Saveur 02)</span>` : ''}
+                </div>
                 <h3 class="bo-item-name">${p.name}</h3>
                 <p class="bo-item-desc">${p.subtitle}</p>
                 <div style="font-size: 11.5px; font-weight: 600; color: var(--bo-text-muted);">
@@ -969,6 +1199,9 @@ export class BackofficePage {
     const company = cmsService.getCompanyContent();
     const engagements = cmsService.getEngagementsContent();
     const faqs = cmsService.getFaqs();
+    const products = cmsService.getProducts();
+    const bissapProd = products.find((p) => p.id === 'cocktail-bissap' || p.id === 'bissap') || products[0];
+    const ananasProd = products.find((p) => p.id === 'ananas-gingembre' || p.id === 'ananas') || products[1] || products[0];
 
     return `
       <div class="bo-page-header">
@@ -1125,27 +1358,134 @@ export class BackofficePage {
               </div>
             </div>
 
-            <!-- Hero Background Banner Image -->
-            <div class="bo-form-group" style="margin-top: 14px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label class="bo-label" style="margin: 0;">Image d'Arrière-Plan / Bannière Décorative Héro</label>
-                <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-                  ${BO_ICONS.cloud}
-                  <span>CDN Cloudinary</span>
-                </span>
+            <!-- Visuels & Images de la Zone Héro -->
+            <div style="margin-top: 24px; padding-top: 20px; border-top: 1.5px solid var(--bo-border);">
+              <div style="margin-bottom: 14px;">
+                <h3 style="font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--bo-forest); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                  ${BO_ICONS.image}
+                  <span>Gestion des Images & Visuels de la Zone Héro</span>
+                </h3>
+                <p style="font-size: 12.5px; color: var(--bo-text-muted); margin: 0; line-height: 1.5;">
+                  La zone d'accueil supérieure est composée de <strong>3 types de visuels</strong> : l'image d'arrière-plan en filigrane (fond), les bouteilles officielles détourées et les éclaboussures de fruits (splashs).
+                </p>
               </div>
-              <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: var(--bo-surface-subtle); padding: 12px; border-radius: var(--bo-radius-md); border: 1px solid var(--bo-border);">
-                <div style="width: 100px; height: 60px; background: #FFFFFF; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 2px; flex-shrink: 0; overflow: hidden;">
-                  <img id="heroBgBannerPreview" src="${hero.bgBannerImage || '/assets/images/gallery-1.webp'}" alt="Bannière Héro" style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+
+              <!-- 1. Image d'Arrière-Plan du Héro (Fond / Visage) -->
+              <div class="bo-form-group" style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                  <div>
+                    <label class="bo-label" style="margin: 0; font-size: 13px; font-weight: 700; color: var(--bo-text-headline);">
+                      1. Image d'Arrière-Plan du Héro (Fond en Filigrane / Bannière)
+                    </label>
+                    <p style="font-size: 11.5px; color: var(--bo-text-muted); margin: 2px 0 0 0;">
+                      Image affichée en fond transparent (opacité 12%) derrière les grands titres du Héro.
+                    </p>
+                  </div>
+                  <span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${BO_ICONS.cloud}
+                    <span>CDN Cloudinary</span>
+                  </span>
                 </div>
-                <div style="flex: 1; min-width: 0;">
-                  <input type="text" id="heroBgBannerUrl" class="bo-input" value="${hero.bgBannerImage || ''}" placeholder="URL image Cloudinary ou chemin local (/assets/images/...)" style="margin-bottom: 8px;" />
-                  <label class="bo-upload-action-btn" style="cursor: pointer;">
-                    ${BO_ICONS.camera}
-                    <span>Téléverser vers Cloudinary</span>
-                    <input type="file" id="heroBgBannerFile" accept="image/*" style="display: none;" />
+
+                <div class="bo-modal-image-row" style="display: flex; gap: 14px; align-items: center; background: #FFFFFF; padding: 12px; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border);">
+                  <div style="width: 110px; height: 75px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border); display: flex; align-items: center; justify-content: center; padding: 2px; flex-shrink: 0; overflow: hidden;">
+                    <img id="heroBgBannerPreview" src="${hero.bgBannerImage || '/assets/images/gallery-1.webp'}" alt="Bannière Héro" style="max-height: 100%; max-width: 100%; object-fit: cover; opacity: ${hero.bgBannerImage ? '1' : '0.35'};" />
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <input type="text" id="heroBgBannerUrl" class="bo-input" value="${hero.bgBannerImage || ''}" placeholder="URL image Cloudinary ou chemin local (ou vide pour aucun fond)" style="margin-bottom: 8px;" />
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                      <label class="bo-upload-action-btn" style="cursor: pointer;">
+                        ${BO_ICONS.camera}
+                        <span>Téléverser vers Cloudinary</span>
+                        <input type="file" id="heroBgBannerFile" accept="image/*" style="display: none;" />
+                      </label>
+                      <button type="button" class="bo-btn-icon" id="heroClearBgBtn" title="Supprimer l'image d'arrière-plan" style="padding: 6px 12px; font-size: 12px; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); color: var(--bo-red); display: inline-flex; align-items: center; gap: 4px; background: #FFF;">
+                        ${BO_ICONS.trash}
+                        <span>Retirer l'image de fond</span>
+                      </button>
+                    </div>
+                    <div id="heroBgBannerProgress" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Visuels des Bouteilles & Splashs affichés dans le Héro (Saveurs 01 & 02) -->
+              <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <label class="bo-label" style="margin: 0; font-size: 13px; font-weight: 700; color: var(--bo-text-headline);">
+                    2. Bouteilles & Éclaboussures (Splashs) affichées dans la Zone Héro
                   </label>
-                  <div id="heroBgBannerProgress" style="display: none;"></div>
+                  <p style="font-size: 11.5px; color: var(--bo-text-muted); margin: 2px 0 0 0;">
+                    Le Héro présente les saveurs en rotation (01 Cocktail de Bissap et 02 Jus d'Ananas Gingembre). Cliquez sur <strong>« Modifier »</strong> pour changer la bouteille détourée ou l'éclaboussure de fruits.
+                  </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                  
+                  <!-- Carte Saveur 01: Cocktail de Bissap -->
+                  <div style="background: #FFFFFF; border: 1.5px solid rgba(196, 0, 62, 0.2); border-radius: var(--bo-radius-sm); padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--flavor-bissap-primary, #C4003E); background: rgba(196, 0, 62, 0.08); padding: 3px 8px; border-radius: var(--bo-radius-pill);">
+                          Saveur 01 • Héro
+                        </span>
+                        <span style="font-weight: 700; font-size: 12px; color: var(--bo-text-primary);">${bissapProd?.name || 'Cocktail de Bissap'}</span>
+                      </div>
+
+                      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                        <div style="text-align: center; flex: 1;">
+                          <div style="height: 80px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border);">
+                            <img src="${bissapProd?.bottleImage || '/assets/images/bottle-bissap.png'}" alt="Bouteille Bissap" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                          </div>
+                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">Bouteille détourée</span>
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                          <div style="height: 80px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border);">
+                            <img src="${bissapProd?.splashImage || '/assets/images/splash-bissap.png'}" alt="Splash Bissap" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                          </div>
+                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">Splash de fruits</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button type="button" class="bo-btn-secondary" data-edit-product="${bissapProd?.id || 'cocktail-bissap'}" style="width: 100%; justify-content: center;">
+                      ${BO_ICONS.edit}
+                      <span>Modifier Bouteille & Splash (01)</span>
+                    </button>
+                  </div>
+
+                  <!-- Carte Saveur 02: Jus d'Ananas Gingembre -->
+                  <div style="background: #FFFFFF; border: 1.5px solid rgba(230, 163, 0, 0.25); border-radius: var(--bo-radius-sm); padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #B37D00; background: rgba(230, 163, 0, 0.12); padding: 3px 8px; border-radius: var(--bo-radius-pill);">
+                          Saveur 02 • Héro
+                        </span>
+                        <span style="font-weight: 700; font-size: 12px; color: var(--bo-text-primary);">${ananasProd?.name || "Jus d'Ananas Gingembre"}</span>
+                      </div>
+
+                      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                        <div style="text-align: center; flex: 1;">
+                          <div style="height: 80px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border);">
+                            <img src="${ananasProd?.bottleImage || '/assets/images/bottle-ananas.png'}" alt="Bouteille Ananas" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                          </div>
+                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">Bouteille détourée</span>
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                          <div style="height: 80px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border);">
+                            <img src="${ananasProd?.splashImage || '/assets/images/splash-ananas.png'}" alt="Splash Ananas" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                          </div>
+                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">Splash de fruits</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button type="button" class="bo-btn-secondary" data-edit-product="${ananasProd?.id || 'ananas-gingembre'}" style="width: 100%; justify-content: center;">
+                      ${BO_ICONS.edit}
+                      <span>Modifier Bouteille & Splash (02)</span>
+                    </button>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -1173,6 +1513,11 @@ export class BackofficePage {
         </div>
         <div class="bo-card-body">
           <form id="boCompanyForm">
+            <div class="bo-form-group">
+              <label class="bo-label">Surnom / Tagline Institutionnelle</label>
+              <input type="text" id="companyTagline" class="bo-input" value="${company.tagline || 'Histoire, Savoir-Faire & Vision'}" required />
+            </div>
+
             <div class="bo-form-group">
               <label class="bo-label">Titre Principal de Présentation</label>
               <input type="text" id="companyLeadTitle" class="bo-input" value="${company.leadTitle}" required />
@@ -1205,21 +1550,42 @@ export class BackofficePage {
               </div>
             </div>
 
-            <!-- Stats -->
+            <!-- Stats 1 to 4 -->
             <div class="bo-form-grid-2" style="margin-top: 10px;">
               <div class="bo-form-group">
-                <label class="bo-label">Métrique 1 (Chiffre & Label)</label>
-                <div style="display: flex; gap: 10px;">
-                  <input type="text" id="stat1Num" class="bo-input" style="max-width: 110px;" value="${company.stat1Num}" />
-                  <input type="text" id="stat1Label" class="bo-input" value="${company.stat1Label}" />
+                <label class="bo-label">Pilier 1 (Chiffre, Label & Description)</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                  <input type="text" id="stat1Num" class="bo-input" style="max-width: 90px;" value="${company.stat1Num || '100%'}" />
+                  <input type="text" id="stat1Label" class="bo-input" value="${company.stat1Label || 'Naturel & Authentique'}" />
                 </div>
+                <input type="text" id="stat1Desc" class="bo-input" placeholder="Description courte..." value="${company.stat1Desc || 'Zéro colorant chimique, aucun conservateur de synthèse ni sucre raffiné.'}" />
               </div>
+
               <div class="bo-form-group">
-                <label class="bo-label">Métrique 2 (Chiffre & Label)</label>
-                <div style="display: flex; gap: 10px;">
-                  <input type="text" id="stat2Num" class="bo-input" style="max-width: 110px;" value="${company.stat2Num}" />
-                  <input type="text" id="stat2Label" class="bo-input" value="${company.stat2Label}" />
+                <label class="bo-label">Pilier 2 (Chiffre, Label & Description)</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                  <input type="text" id="stat2Num" class="bo-input" style="max-width: 90px;" value="${company.stat2Num || '237'}" />
+                  <input type="text" id="stat2Label" class="bo-input" value="${company.stat2Label || 'Fierté Camerounaise'}" />
                 </div>
+                <input type="text" id="stat2Desc" class="bo-input" placeholder="Description courte..." value="${company.stat2Desc || 'Fruits récoltés, pressés et conditionnés localement dans nos ateliers à Douala.'}" />
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label">Pilier 3 (Chiffre, Label & Description)</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                  <input type="text" id="stat3Num" class="bo-input" style="max-width: 90px;" value="${company.stat3Num || '+10'}" />
+                  <input type="text" id="stat3Label" class="bo-input" value="${company.stat3Label || 'Points de Vente Agréés'}" />
+                </div>
+                <input type="text" id="stat3Desc" class="bo-input" placeholder="Description courte..." value="${company.stat3Desc || 'Présence à Douala, Yaoundé, Bafoussam et Kribi avec livraison réfrigérée.'}" />
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label">Pilier 4 (Chiffre, Label & Description)</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                  <input type="text" id="stat4Num" class="bo-input" style="max-width: 90px;" value="${company.stat4Num || '1000+'}" />
+                  <input type="text" id="stat4Label" class="bo-input" value="${company.stat4Label || 'Familles Agricoles'}" />
+                </div>
+                <input type="text" id="stat4Desc" class="bo-input" placeholder="Description courte..." value="${company.stat4Desc || 'Partenariat direct avec les coopératives d’hibiscus du Nord et de fruits du Littoral.'}" />
               </div>
             </div>
 
@@ -1342,14 +1708,33 @@ export class BackofficePage {
                 <input type="text" id="rseHeroTitle" class="bo-input" value="${engagements.heroTitle}" required />
               </div>
               <div class="bo-form-group">
-                <label class="bo-label">Sous-Titre</label>
+                <label class="bo-label">Sous-Titre Héro</label>
                 <input type="text" id="rseHeroSubtitle" class="bo-input" value="${engagements.heroSubtitle}" required />
+              </div>
+            </div>
+
+            <div class="bo-form-grid-2">
+              <div class="bo-form-group">
+                <label class="bo-label">Impact Local (Chiffre & Label)</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="rseLocalImpactNum" class="bo-input" style="max-width: 90px;" value="${engagements.localImpactNum || '100%'}" />
+                  <input type="text" id="rseLocalImpactLabel" class="bo-input" value="${engagements.localImpactLabel || 'Approvisionnement Terroirs Cameroun'}" />
+                </div>
+              </div>
+              <div class="bo-form-group">
+                <label class="bo-label">Titre Filières Agricoles</label>
+                <input type="text" id="rseFilieresTitle" class="bo-input" value="${engagements.filieresTitle || 'Soutien aux Filières Agricoles Locales'}" required />
               </div>
             </div>
 
             <div class="bo-form-group">
               <label class="bo-label">Soutien aux Coopératives Agricoles (Filières)</label>
               <textarea id="rseFilieresDesc" class="bo-textarea" required>${engagements.filieresDesc}</textarea>
+            </div>
+
+            <div class="bo-form-group">
+              <label class="bo-label">Titre Éco-responsabilité & Emballages</label>
+              <input type="text" id="rseEcoTitle" class="bo-input" value="${engagements.ecoTitle || 'Bouteilles Recyclables & Circuits Courts'}" required />
             </div>
 
             <div class="bo-form-group">
@@ -1684,6 +2069,13 @@ export class BackofficePage {
   // -------------------------------------------------------------------------
   private renderSettingsTab(): string {
     const settings = cmsService.getSettings();
+    const currentAdmin = cmsService.getCurrentAdmin();
+    const adminInitials = currentAdmin.fullName
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join('') || 'SN';
     const supabaseConfig = supabaseService.getConfig();
     const sqlScript = supabaseService.getSqlSetupScript();
 
@@ -2070,6 +2462,110 @@ export class BackofficePage {
         </div>
       </div>
 
+      <!-- Security & Password Change Card -->
+      <div class="bo-card" style="margin-top: 24px;">
+        <div class="bo-card-header">
+          <div class="bo-card-title-group">
+            <div class="bo-card-icon" style="background: rgba(88, 168, 38, 0.15); color: var(--bo-brand-green);">
+              ${BO_ICONS.key}
+            </div>
+            <div>
+              <h2 class="bo-card-title">Sécurité de l'Accès & Modification du Mot de Passe Administrateur</h2>
+              <p class="bo-card-subtitle">
+                Modifiez le mot de passe de connexion pour sécuriser l'accès au Backoffice Société Nidjeu
+              </p>
+            </div>
+          </div>
+          <button type="button" class="bo-btn-secondary" id="boOpenChangePasswordModalBtn" style="font-size: 12.5px;">
+            ${BO_ICONS.key}
+            <span>Ouvrir l'Assistant Rapide</span>
+          </button>
+        </div>
+
+        <div class="bo-card-body">
+          <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="bo-user-avatar" style="width: 38px; height: 38px; font-size: 13px;">${adminInitials}</div>
+              <div>
+                <div style="font-weight: 700; color: var(--bo-forest); font-size: 13.5px;">
+                  Compte connecté : <strong>${currentAdmin.fullName}</strong> (${currentAdmin.email})
+                </div>
+                <div style="font-size: 11.5px; color: var(--bo-text-muted);">
+                  ${currentAdmin.role} • Dernier changement de mot de passe : ${settings.adminPasswordUpdatedAt ? new Date(settings.adminPasswordUpdatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Mot de passe initial'}
+                </div>
+              </div>
+            </div>
+            <span class="bo-cloudinary-badge-pill is-active">
+              ${BO_ICONS.shield} Protection Active
+            </span>
+          </div>
+
+          <form id="boSettingsPasswordForm">
+            <div class="bo-form-grid-3">
+              <div class="bo-form-group">
+                <label class="bo-label">
+                  <span>Ancien Mot de Passe</span>
+                  <span class="bo-label-hint">Ou code secours (237)</span>
+                </label>
+                <div class="bo-input-pwd-wrap">
+                  <input type="password" id="cfgOldPassword" class="bo-input" placeholder="••••••••" autocomplete="current-password" />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="cfgOldPassword" title="Afficher/Masquer">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label">
+                  <span>Nouveau Mot de Passe</span>
+                  <span class="bo-label-hint">Min. 6 caractères</span>
+                </label>
+                <div class="bo-input-pwd-wrap">
+                  <input type="password" id="cfgNewPassword" class="bo-input" placeholder="••••••••" minlength="6" autocomplete="new-password" required />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="cfgNewPassword" title="Afficher/Masquer">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
+                <div class="bo-pwd-strength-box" id="cfgNewPwdStrengthBox" style="display: none;">
+                  <div class="bo-pwd-strength-bars">
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                  </div>
+                  <div class="bo-pwd-strength-label">
+                    <span>Robustesse</span>
+                    <span>Recommandé : 8+ caractères</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label">
+                  <span>Confirmer le Nouveau Mot de Passe</span>
+                </label>
+                <div class="bo-input-pwd-wrap">
+                  <input type="password" id="cfgConfirmPassword" class="bo-input" placeholder="••••••••" minlength="6" autocomplete="new-password" required />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="cfgConfirmPassword" title="Afficher/Masquer">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
+                <div id="cfgConfirmMatchNotice" style="font-size: 11px; margin-top: 4px; font-weight: 600;"></div>
+              </div>
+            </div>
+
+            <div id="cfgPasswordFeedback" style="margin-top: 10px;"></div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
+              <button type="submit" class="bo-btn-primary" id="boSavePasswordBtn">
+                ${BO_ICONS.check}
+                <span>Enregistrer le Nouveau Mot de Passe</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Administrator Management & Team Card -->
       <div class="bo-card" style="margin-top: 24px;">
         <div class="bo-card-header">
@@ -2313,10 +2809,10 @@ export class BackofficePage {
 
     // Hero Form Submit
     const heroForm = this.element.querySelector('#boHeroForm') as HTMLFormElement;
-    heroForm?.addEventListener('submit', (e) => {
+    heroForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const current = cmsService.getHeroContent();
-      cmsService.saveHeroContent({
+      const res = await cmsService.saveHeroContent({
         ...current,
         titleWord1: (this.element.querySelector('#heroWord1') as HTMLInputElement).value,
         titleWord2: (this.element.querySelector('#heroWord2') as HTMLInputElement).value,
@@ -2324,53 +2820,85 @@ export class BackofficePage {
         description: (this.element.querySelector('#heroDescription') as HTMLTextAreaElement).value,
         badge1: (this.element.querySelector('#heroBadge1') as HTMLInputElement).value,
         badge2: (this.element.querySelector('#heroBadge2') as HTMLInputElement).value,
-        badge3: (this.element.querySelector('#heroBadge3') as HTMLInputElement).value,
-        bgBannerImage: (this.element.querySelector('#heroBgBannerUrl') as HTMLInputElement)?.value.trim() || current.bgBannerImage || ''
+        bgBannerImage: (this.element.querySelector('#heroBgBannerUrl') as HTMLInputElement)
+          ? (this.element.querySelector('#heroBgBannerUrl') as HTMLInputElement).value.trim()
+          : (current.bgBannerImage || '')
       });
-      this.showToast('Section Héro mise à jour avec succès', 'success');
+      if (res.cloudSynced) {
+        this.showToast('Section Héro enregistrée et synchronisée sur Supabase Cloud !', 'success');
+      } else if (res.message && res.message.includes('Échec')) {
+        this.showToast(`Section Héro enregistrée localement (${res.message})`, 'info');
+      } else {
+        this.showToast('Section Héro enregistrée avec succès dans la base de données', 'success');
+      }
     });
 
     // Company Form Submit
     const companyForm = this.element.querySelector('#boCompanyForm') as HTMLFormElement;
-    companyForm?.addEventListener('submit', (e) => {
+    companyForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const current = cmsService.getCompanyContent();
-      cmsService.saveCompanyContent({
+      const res = await cmsService.saveCompanyContent({
         ...current,
+        tagline: (this.element.querySelector('#companyTagline') as HTMLInputElement)?.value.trim() || current.tagline,
         leadTitle: (this.element.querySelector('#companyLeadTitle') as HTMLInputElement).value,
         leadDesc: (this.element.querySelector('#companyLeadDesc') as HTMLTextAreaElement).value,
         savoirFaireTitle: (this.element.querySelector('#companySavoirTitle') as HTMLInputElement).value,
         savoirFaireDesc: (this.element.querySelector('#companySavoirDesc') as HTMLTextAreaElement).value,
         visionTitle: (this.element.querySelector('#companyVisionTitle') as HTMLInputElement).value,
         visionDesc: (this.element.querySelector('#companyVisionDesc') as HTMLTextAreaElement).value,
-        stat1Num: (this.element.querySelector('#stat1Num') as HTMLInputElement).value,
-        stat1Label: (this.element.querySelector('#stat1Label') as HTMLInputElement).value,
-        stat2Num: (this.element.querySelector('#stat2Num') as HTMLInputElement).value,
-        stat2Label: (this.element.querySelector('#stat2Label') as HTMLInputElement).value,
+        stat1Num: (this.element.querySelector('#stat1Num') as HTMLInputElement)?.value || current.stat1Num,
+        stat1Label: (this.element.querySelector('#stat1Label') as HTMLInputElement)?.value || current.stat1Label,
+        stat1Desc: (this.element.querySelector('#stat1Desc') as HTMLInputElement)?.value || current.stat1Desc,
+        stat2Num: (this.element.querySelector('#stat2Num') as HTMLInputElement)?.value || current.stat2Num,
+        stat2Label: (this.element.querySelector('#stat2Label') as HTMLInputElement)?.value || current.stat2Label,
+        stat2Desc: (this.element.querySelector('#stat2Desc') as HTMLInputElement)?.value || current.stat2Desc,
+        stat3Num: (this.element.querySelector('#stat3Num') as HTMLInputElement)?.value || current.stat3Num,
+        stat3Label: (this.element.querySelector('#stat3Label') as HTMLInputElement)?.value || current.stat3Label,
+        stat3Desc: (this.element.querySelector('#stat3Desc') as HTMLInputElement)?.value || current.stat3Desc,
+        stat4Num: (this.element.querySelector('#stat4Num') as HTMLInputElement)?.value || current.stat4Num,
+        stat4Label: (this.element.querySelector('#stat4Label') as HTMLInputElement)?.value || current.stat4Label,
+        stat4Desc: (this.element.querySelector('#stat4Desc') as HTMLInputElement)?.value || current.stat4Desc,
         productionImage: (this.element.querySelector('#compProdImgUrl') as HTMLInputElement)?.value.trim() || current.productionImage,
         savoirFaireImage: (this.element.querySelector('#compSavoirImgUrl') as HTMLInputElement)?.value.trim() || current.savoirFaireImage,
         governanceImage: (this.element.querySelector('#compGovImgUrl') as HTMLInputElement)?.value.trim() || current.governanceImage,
         qualityImage: (this.element.querySelector('#compQualityImgUrl') as HTMLInputElement)?.value.trim() || current.qualityImage
       });
-      this.showToast('Page Entreprise enregistrée', 'success');
+      if (res.cloudSynced) {
+        this.showToast('Page Entreprise enregistrée et synchronisée sur Supabase Cloud !', 'success');
+      } else if (res.message && res.message.includes('Échec')) {
+        this.showToast(`Page Entreprise enregistrée localement (${res.message})`, 'info');
+      } else {
+        this.showToast('Page Entreprise enregistrée avec succès dans la base de données', 'success');
+      }
     });
 
     // Engagements Form Submit
     const rseForm = this.element.querySelector('#boEngagementsForm') as HTMLFormElement;
-    rseForm?.addEventListener('submit', (e) => {
+    rseForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const current = cmsService.getEngagementsContent();
-      cmsService.saveEngagementsContent({
+      const res = await cmsService.saveEngagementsContent({
         ...current,
         heroTitle: (this.element.querySelector('#rseHeroTitle') as HTMLInputElement).value,
         heroSubtitle: (this.element.querySelector('#rseHeroSubtitle') as HTMLInputElement).value,
+        localImpactNum: (this.element.querySelector('#rseLocalImpactNum') as HTMLInputElement)?.value || current.localImpactNum,
+        localImpactLabel: (this.element.querySelector('#rseLocalImpactLabel') as HTMLInputElement)?.value || current.localImpactLabel,
+        filieresTitle: (this.element.querySelector('#rseFilieresTitle') as HTMLInputElement)?.value || current.filieresTitle,
         filieresDesc: (this.element.querySelector('#rseFilieresDesc') as HTMLTextAreaElement).value,
+        ecoTitle: (this.element.querySelector('#rseEcoTitle') as HTMLInputElement)?.value || current.ecoTitle,
         ecoDesc: (this.element.querySelector('#rseEcoDesc') as HTMLTextAreaElement).value,
         filieresImage: (this.element.querySelector('#rseFilieresImgUrl') as HTMLInputElement)?.value.trim() || current.filieresImage,
         qualityImage: (this.element.querySelector('#rseQualityImgUrl') as HTMLInputElement)?.value.trim() || current.qualityImage,
         recyclingImage: (this.element.querySelector('#rseRecyclingImgUrl') as HTMLInputElement)?.value.trim() || current.recyclingImage
       });
-      this.showToast('Engagements RSE enregistrés', 'success');
+      if (res.cloudSynced) {
+        this.showToast('Engagements RSE enregistrés et synchronisés sur Supabase Cloud !', 'success');
+      } else if (res.message && res.message.includes('Échec')) {
+        this.showToast(`Engagements RSE enregistrés localement (${res.message})`, 'info');
+      } else {
+        this.showToast('Engagements RSE enregistrés avec succès dans la base de données', 'success');
+      }
     });
 
     // Wire up Pages Tab Cloudinary Image Uploaders
@@ -2381,6 +2909,18 @@ export class BackofficePage {
       progressBoxId: '#heroBgBannerProgress',
       folder: 'nidj_juice/pages',
       onSuccessToast: 'Bannière Héro sauvegardée sur Cloudinary !'
+    });
+
+    const clearHeroBgBtn = this.element.querySelector('#heroClearBgBtn');
+    clearHeroBgBtn?.addEventListener('click', () => {
+      const urlInput = this.element.querySelector('#heroBgBannerUrl') as HTMLInputElement;
+      const preview = this.element.querySelector('#heroBgBannerPreview') as HTMLImageElement;
+      if (urlInput) urlInput.value = '';
+      if (preview) {
+        preview.src = '/assets/images/gallery-1.webp';
+        preview.style.opacity = '0.35';
+      }
+      this.showToast("Image d'arrière-plan retirée du champ. Cliquez sur « Enregistrer le Héro » pour confirmer.", 'info');
     });
     this.setupImageUploader({
       fileInputId: '#compProdImgFile',
@@ -2441,14 +2981,14 @@ export class BackofficePage {
 
     // Settings Form Submit
     const settingsForm = this.element.querySelector('#boSettingsForm') as HTMLFormElement;
-    settingsForm?.addEventListener('submit', (e) => {
+    settingsForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const current = cmsService.getSettings();
       const cName = (this.element.querySelector('#cfgCloudinaryCloudName') as HTMLInputElement)?.value.trim() || '';
       const cPreset = (this.element.querySelector('#cfgCloudinaryUploadPreset') as HTMLInputElement)?.value.trim() || '';
       const cFolder = (this.element.querySelector('#cfgCloudinaryFolder') as HTMLInputElement)?.value.trim() || 'nidj_juice';
 
-      cmsService.saveSettings({
+      const res = await cmsService.saveSettings({
         ...current,
         whatsappNumber: (this.element.querySelector('#cfgWhatsapp') as HTMLInputElement).value.replace(/\D/g, ''),
         phoneDisplay: (this.element.querySelector('#cfgPhone') as HTMLInputElement).value,
@@ -2469,7 +3009,11 @@ export class BackofficePage {
       // Synchronize Cloudinary config storage
       cloudinaryService.saveConfig({ cloudName: cName, uploadPreset: cPreset, folder: cFolder });
 
-      this.showToast('Paramètres généraux et Cloudinary enregistrés avec succès !', 'success');
+      if (res.cloudSynced) {
+        this.showToast('Paramètres généraux enregistrés et synchronisés sur Supabase Cloud !', 'success');
+      } else {
+        this.showToast('Paramètres généraux enregistrés dans la base de données', 'success');
+      }
       this.render();
     });
 
@@ -2916,13 +3460,118 @@ export class BackofficePage {
     this.element.querySelector('#boResetBtn')?.addEventListener('click', handleReset);
     this.element.querySelector('#boMobileResetBtn')?.addEventListener('click', handleReset);
 
-    // Load admin users list if on settings tab
+    // Load admin users list and password management if on settings tab
     if (this.currentTab === 'settings') {
       this.loadAndRenderAdminUsers();
       this.element.querySelector('#boOpenAddAdminModalBtn')?.addEventListener('click', () => {
         this.openAddAdminModal();
       });
+      this.element.querySelector('#boOpenChangePasswordModalBtn')?.addEventListener('click', () => {
+        this.openChangePasswordModal();
+      });
+
+      // Bind Settings card password form & strength meter
+      this.bindPasswordToggleButtons(this.element);
+
+      const cfgNewPwd = this.element.querySelector('#cfgNewPassword') as HTMLInputElement;
+      const cfgConfirmPwd = this.element.querySelector('#cfgConfirmPassword') as HTMLInputElement;
+      const cfgStrengthBox = this.element.querySelector('#cfgNewPwdStrengthBox')?.parentElement as HTMLElement;
+      const cfgMatchNotice = this.element.querySelector('#cfgConfirmMatchNotice') as HTMLElement;
+
+      cfgNewPwd?.addEventListener('input', () => {
+        const val = cfgNewPwd.value;
+        const strength = this.calculatePasswordStrength(val);
+        this.updateStrengthBars(cfgStrengthBox, strength.score, strength.label, strength.color);
+        if (cfgConfirmPwd?.value) {
+          if (val === cfgConfirmPwd.value) {
+            cfgMatchNotice.innerHTML = '✅ Les mots de passe correspondent';
+            cfgMatchNotice.style.color = '#10b981';
+          } else {
+            cfgMatchNotice.innerHTML = '❌ Les mots de passe ne correspondent pas';
+            cfgMatchNotice.style.color = '#ef4444';
+          }
+        }
+      });
+
+      cfgConfirmPwd?.addEventListener('input', () => {
+        if (!cfgConfirmPwd.value) {
+          cfgMatchNotice.innerHTML = '';
+        } else if (cfgNewPwd?.value === cfgConfirmPwd.value) {
+          cfgMatchNotice.innerHTML = '✅ Les mots de passe correspondent';
+          cfgMatchNotice.style.color = '#10b981';
+        } else {
+          cfgMatchNotice.innerHTML = '❌ Les mots de passe ne correspondent pas';
+          cfgMatchNotice.style.color = '#ef4444';
+        }
+      });
+
+      const pwdForm = this.element.querySelector('#boSettingsPasswordForm') as HTMLFormElement;
+      pwdForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const oldPwd = (this.element.querySelector('#cfgOldPassword') as HTMLInputElement)?.value;
+        const newPwd = cfgNewPwd?.value;
+        const confirmPwd = cfgConfirmPwd?.value;
+        const submitBtn = this.element.querySelector('#boSavePasswordBtn') as HTMLButtonElement;
+        const feedback = this.element.querySelector('#cfgPasswordFeedback') as HTMLElement;
+
+        if (newPwd !== confirmPwd) {
+          if (feedback) {
+            feedback.innerHTML = `
+              <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+                ❌ Les deux nouveaux mots de passe saisis ne sont pas identiques.
+              </div>
+            `;
+          }
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `${BO_ICONS.loader} <span>Enregistrement en cours...</span>`;
+        if (feedback) feedback.innerHTML = '';
+
+        const currentAdmin = cmsService.getCurrentAdmin();
+        const res = await supabaseService.updateAdminPassword(newPwd, oldPwd, currentAdmin.email);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `${BO_ICONS.check} <span>Enregistrer le Nouveau Mot de Passe</span>`;
+
+        if (res.success) {
+          cmsService.setCustomAdminPassword(newPwd);
+          this.showToast(res.message, 'success');
+          if (feedback) {
+            feedback.innerHTML = `
+              <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+                ✅ ${res.message}
+              </div>
+            `;
+          }
+          const oldInput = this.element.querySelector('#cfgOldPassword') as HTMLInputElement;
+          if (oldInput) oldInput.value = '';
+          if (cfgNewPwd) cfgNewPwd.value = '';
+          if (cfgConfirmPwd) cfgConfirmPwd.value = '';
+          if (cfgMatchNotice) cfgMatchNotice.innerHTML = '';
+          const strengthBox = this.element.querySelector('#cfgNewPwdStrengthBox') as HTMLElement;
+          if (strengthBox) strengthBox.style.display = 'none';
+        } else {
+          if (feedback) {
+            feedback.innerHTML = `
+              <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+                ❌ ${res.message}
+              </div>
+            `;
+          }
+          this.showToast(res.message, 'error');
+        }
+      });
     }
+
+    // Change Password Global Button Handlers (Desktop Header & Mobile Drawer)
+    this.element.querySelector('#boChangePasswordTopBtn')?.addEventListener('click', () => {
+      this.openChangePasswordModal();
+    });
+    this.element.querySelector('#boMobileChangePasswordBtn')?.addEventListener('click', () => {
+      this.closeMobileSidebar();
+      this.openChangePasswordModal();
+    });
 
     // Logout (Desktop + Mobile)
     const handleLogout = async () => {
@@ -2954,12 +3603,25 @@ export class BackofficePage {
               <div style="font-size: 12px; color: var(--bo-text-muted);">${current.role} • Session locale active</div>
             </div>
           </div>
-          <span class="bo-cloudinary-badge-pill is-active">🟢 Administrateur Actif</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="bo-action-pill bo-change-admin-pwd-btn" data-email="${current.email}" data-name="${current.fullName}" title="Changer le mot de passe">
+              ${BO_ICONS.key} <span>Changer mot de passe</span>
+            </button>
+            <span class="bo-cloudinary-badge-pill is-active">🟢 Administrateur Actif</span>
+          </div>
         </div>
         <p style="font-size: 12px; color: var(--bo-text-muted); margin: 12px 0 0 4px;">
           💡 <em>Configurez vos clés Supabase ci-dessus pour inviter et synchroniser d'autres administrateurs sur votre base cloud.</em>
         </p>
       `;
+
+      container.querySelectorAll('.bo-change-admin-pwd-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-email') || undefined;
+          const name = btn.getAttribute('data-name') || undefined;
+          this.openChangePasswordModal(email, name);
+        });
+      });
       return;
     }
 
@@ -2983,7 +3645,12 @@ export class BackofficePage {
               <div style="font-size: 12px; color: var(--bo-text-muted);">${current.role} • Session active</div>
             </div>
           </div>
-          <span class="bo-cloudinary-badge-pill is-active">🟢 Session Active</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="bo-action-pill bo-change-admin-pwd-btn" data-email="${current.email}" data-name="${current.fullName}" title="Changer le mot de passe">
+              ${BO_ICONS.key} <span>Changer mot de passe</span>
+            </button>
+            <span class="bo-cloudinary-badge-pill is-active">🟢 Session Active</span>
+          </div>
         </div>
         <div style="margin-top: 14px; text-align: center;">
           <p style="font-size: 12.5px; color: var(--bo-text-muted); margin: 0 0 10px 0;">
@@ -2991,6 +3658,14 @@ export class BackofficePage {
           </p>
         </div>
       `;
+
+      container.querySelectorAll('.bo-change-admin-pwd-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-email') || undefined;
+          const name = btn.getAttribute('data-name') || undefined;
+          this.openChangePasswordModal(email, name);
+        });
+      });
       return;
     }
 
@@ -3038,13 +3713,18 @@ export class BackofficePage {
                     </span>
                   </td>
                   <td style="padding: 14px 16px; text-align: right;">
-                    ${isCurrent ? `
-                      <span style="font-size: 11px; color: var(--bo-text-muted); font-style: italic;">Compte actif</span>
-                    ` : `
-                      <button type="button" class="bo-action-pill danger bo-delete-admin-btn" data-id="${admin.id || ''}" data-email="${admin.email}" title="Supprimer cet administrateur" style="padding: 4px 8px; font-size: 11px;">
-                        ${BO_ICONS.trash} Supprimer
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
+                      <button type="button" class="bo-action-pill bo-change-admin-pwd-btn" data-email="${admin.email}" data-name="${admin.fullName}" title="Modifier le mot de passe de cet administrateur" style="padding: 4px 8px; font-size: 11px;">
+                        ${BO_ICONS.key} <span>Mot de passe</span>
                       </button>
-                    `}
+                      ${isCurrent ? `
+                        <span style="font-size: 11px; color: var(--bo-text-muted); font-style: italic;">(Vous)</span>
+                      ` : `
+                        <button type="button" class="bo-action-pill danger bo-delete-admin-btn" data-id="${admin.id || ''}" data-email="${admin.email}" title="Supprimer cet administrateur" style="padding: 4px 8px; font-size: 11px;">
+                          ${BO_ICONS.trash} Supprimer
+                        </button>
+                      `}
+                    </div>
                   </td>
                 </tr>
               `;
@@ -3053,6 +3733,15 @@ export class BackofficePage {
         </table>
       </div>
     `;
+
+    // Bind change password buttons
+    container.querySelectorAll('.bo-change-admin-pwd-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const email = btn.getAttribute('data-email') || undefined;
+        const name = btn.getAttribute('data-name') || undefined;
+        this.openChangePasswordModal(email, name);
+      });
+    });
 
     // Bind delete buttons
     container.querySelectorAll('.bo-delete-admin-btn').forEach((btn) => {
@@ -3170,6 +3859,270 @@ export class BackofficePage {
             </div>
           `;
         }
+      }
+    });
+  }
+
+  /**
+   * Modal allowing an administrator to change password (their own or another account)
+   */
+  private openChangePasswordModal(targetEmail?: string, targetName?: string): void {
+    const currentAdmin = cmsService.getCurrentAdmin();
+    const email = targetEmail || currentAdmin.email;
+    const name = targetName || currentAdmin.fullName;
+    const isSelf = email.toLowerCase() === currentAdmin.email.toLowerCase();
+
+    const modalContainer = this.element.querySelector('#boModalContainer');
+    if (!modalContainer) return;
+
+    modalContainer.innerHTML = `
+      <div class="bo-modal-overlay" id="boChangePasswordModalOverlay">
+        <div class="bo-modal" style="max-width: 480px;">
+          <div class="bo-modal-header">
+            <div class="bo-modal-title-group">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="bo-card-icon" style="background: rgba(88, 168, 38, 0.15); color: var(--bo-brand-green);">
+                  ${BO_ICONS.key}
+                </div>
+                <div>
+                  <h2 style="font-size: 18px; margin: 0;">Modifier le Mot de Passe</h2>
+                  <p class="bo-modal-subtitle">Administrateur : <strong>${name}</strong> (${email})</p>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="bo-modal-close-btn" id="boClosePwdModalBtn" title="Fermer">
+              ${BO_ICONS.close}
+            </button>
+          </div>
+
+          <form id="boModalChangePasswordForm" style="display: flex; flex-direction: column;">
+            <div class="bo-modal-body">
+              <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: var(--bo-text-secondary); line-height: 1.4;">
+                🔒 Le nouveau mot de passe sera appliqué immédiatement et synchronisé sur <strong>Supabase Auth Cloud</strong> et en session locale.
+              </div>
+
+              ${isSelf ? `
+                <div class="bo-form-group">
+                  <label class="bo-label">
+                    <span>Ancien Mot de Passe</span>
+                    <span class="bo-label-hint">Ou code de secours (237)</span>
+                  </label>
+                  <div class="bo-input-pwd-wrap">
+                    <input type="password" id="modalOldPassword" class="bo-input" placeholder="••••••••" autocomplete="current-password" />
+                    <button type="button" class="bo-pwd-toggle-btn" data-target="modalOldPassword" title="Afficher/Masquer">
+                      ${BO_ICONS.eye}
+                    </button>
+                  </div>
+                </div>
+              ` : ''}
+
+              <div class="bo-form-group">
+                <label class="bo-label">
+                  <span>Nouveau Mot de Passe (Min. 6 caractères)</span>
+                </label>
+                <div class="bo-input-pwd-wrap">
+                  <input type="password" id="modalNewPassword" class="bo-input" placeholder="••••••••" minlength="6" autocomplete="new-password" required />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="modalNewPassword" title="Afficher/Masquer">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
+                <div class="bo-pwd-strength-box" id="modalPwdStrengthBox" style="display: none;">
+                  <div class="bo-pwd-strength-bars">
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                    <div class="bo-pwd-strength-bar"></div>
+                  </div>
+                  <div class="bo-pwd-strength-label">
+                    <span style="color: var(--bo-text-muted);">Robustesse</span>
+                    <span>Recommandé : 8+ caractères</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bo-form-group">
+                <label class="bo-label">
+                  <span>Confirmer le Nouveau Mot de Passe</span>
+                </label>
+                <div class="bo-input-pwd-wrap">
+                  <input type="password" id="modalConfirmPassword" class="bo-input" placeholder="••••••••" minlength="6" autocomplete="new-password" required />
+                  <button type="button" class="bo-pwd-toggle-btn" data-target="modalConfirmPassword" title="Afficher/Masquer">
+                    ${BO_ICONS.eye}
+                  </button>
+                </div>
+                <div id="modalConfirmMatchNotice" style="font-size: 11px; margin-top: 4px; font-weight: 600;"></div>
+              </div>
+
+              <div id="modalPwdFeedback" style="margin-top: 10px;"></div>
+            </div>
+
+            <div class="bo-modal-footer">
+              <button type="button" class="bo-btn-secondary" id="modalCancelPwdBtn">Annuler</button>
+              <button type="submit" class="bo-btn-primary" id="modalSubmitPwdBtn">
+                ${BO_ICONS.check}
+                <span>Enregistrer le Nouveau Mot de Passe</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    const close = () => {
+      modalContainer.innerHTML = '';
+    };
+
+    modalContainer.querySelector('#boClosePwdModalBtn')?.addEventListener('click', close);
+    modalContainer.querySelector('#modalCancelPwdBtn')?.addEventListener('click', close);
+    modalContainer.querySelector('#boChangePasswordModalOverlay')?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) close();
+    });
+
+    this.bindPasswordToggleButtons(modalContainer);
+
+    const newPwdInput = modalContainer.querySelector('#modalNewPassword') as HTMLInputElement;
+    const confirmPwdInput = modalContainer.querySelector('#modalConfirmPassword') as HTMLInputElement;
+    const strengthContainer = modalContainer.querySelector('#modalPwdStrengthBox')?.parentElement as HTMLElement;
+    const matchNotice = modalContainer.querySelector('#modalConfirmMatchNotice') as HTMLElement;
+
+    newPwdInput?.addEventListener('input', () => {
+      const val = newPwdInput.value;
+      const strength = this.calculatePasswordStrength(val);
+      this.updateStrengthBars(strengthContainer, strength.score, strength.label, strength.color);
+      if (confirmPwdInput?.value) {
+        if (val === confirmPwdInput.value) {
+          matchNotice.innerHTML = '✅ Les mots de passe correspondent';
+          matchNotice.style.color = '#10b981';
+        } else {
+          matchNotice.innerHTML = '❌ Les mots de passe ne correspondent pas';
+          matchNotice.style.color = '#ef4444';
+        }
+      }
+    });
+
+    confirmPwdInput?.addEventListener('input', () => {
+      if (!confirmPwdInput.value) {
+        matchNotice.innerHTML = '';
+      } else if (newPwdInput?.value === confirmPwdInput.value) {
+        matchNotice.innerHTML = '✅ Les mots de passe correspondent';
+        matchNotice.style.color = '#10b981';
+      } else {
+        matchNotice.innerHTML = '❌ Les mots de passe ne correspondent pas';
+        matchNotice.style.color = '#ef4444';
+      }
+    });
+
+    const form = modalContainer.querySelector('#boModalChangePasswordForm') as HTMLFormElement;
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const oldPwd = (modalContainer.querySelector('#modalOldPassword') as HTMLInputElement)?.value;
+      const newPwd = newPwdInput?.value;
+      const confirmPwd = confirmPwdInput?.value;
+      const submitBtn = modalContainer.querySelector('#modalSubmitPwdBtn') as HTMLButtonElement;
+      const feedback = modalContainer.querySelector('#modalPwdFeedback') as HTMLElement;
+
+      if (newPwd !== confirmPwd) {
+        if (feedback) {
+          feedback.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 8px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+              ❌ Les deux mots de passe saisis ne sont pas identiques.
+            </div>
+          `;
+        }
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `${BO_ICONS.loader} <span>Mise à jour en cours...</span>`;
+      if (feedback) feedback.innerHTML = '';
+
+      const res = await supabaseService.updateAdminPassword(newPwd, oldPwd, email);
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `${BO_ICONS.check} <span>Enregistrer le Nouveau Mot de Passe</span>`;
+
+      if (res.success) {
+        cmsService.setCustomAdminPassword(newPwd);
+        this.showToast(res.message, 'success');
+        close();
+        if (this.currentTab === 'settings') {
+          this.render();
+        }
+      } else {
+        if (feedback) {
+          feedback.innerHTML = `
+            <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 8px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600;">
+              ❌ ${res.message}
+            </div>
+          `;
+        }
+        this.showToast(res.message, 'error');
+      }
+    });
+  }
+
+  /**
+   * Binds show/hide eye toggle handlers on password inputs
+   */
+  private bindPasswordToggleButtons(parent: ParentNode | HTMLElement | Element = this.element): void {
+    parent.querySelectorAll('.bo-pwd-toggle-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        if (!targetId) return;
+        const input = parent.querySelector(`#${targetId}`) as HTMLInputElement;
+        if (!input) return;
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        btn.innerHTML = isPassword ? BO_ICONS.eyeOff : BO_ICONS.eye;
+      });
+    });
+  }
+
+  /**
+   * Evaluates password strength level
+   */
+  private calculatePasswordStrength(pwd: string): { score: number; label: string; color: string } {
+    if (!pwd) return { score: 0, label: 'Vide', color: '#94a3b8' };
+    let score = 0;
+    if (pwd.length >= 6) score++;
+    if (pwd.length >= 8) score++;
+    if (/[0-9]/.test(pwd) && /[a-zA-Z]/.test(pwd)) score++;
+    if (/[^a-zA-Z0-9]/.test(pwd) || (pwd.length >= 10 && /[A-Z]/.test(pwd) && /[a-z]/.test(pwd))) score++;
+
+    switch (score) {
+      case 1:
+        return { score: 1, label: 'Faible (min. 6 car.)', color: '#ef4444' };
+      case 2:
+        return { score: 2, label: 'Moyen', color: '#f59e0b' };
+      case 3:
+        return { score: 3, label: 'Bon & Recommandé', color: '#10b981' };
+      case 4:
+      default:
+        return { score: 4, label: 'Très Robuste & Sécurisé', color: '#059669' };
+    }
+  }
+
+  /**
+   * Renders colored bars for password strength
+   */
+  private updateStrengthBars(
+    container: ParentNode | HTMLElement | Element | null,
+    score: number,
+    label: string,
+    color: string
+  ): void {
+    if (!container) return;
+    const box = container.querySelector('.bo-pwd-strength-box') as HTMLElement;
+    if (box) box.style.display = score > 0 ? 'block' : 'none';
+    const textSpan = container.querySelector('.bo-pwd-strength-label span:first-child') as HTMLElement;
+    if (textSpan) {
+      textSpan.textContent = `Robustesse : ${label}`;
+      textSpan.style.color = color;
+    }
+    const bars = container.querySelectorAll('.bo-pwd-strength-bar');
+    bars.forEach((bar, index) => {
+      bar.className = 'bo-pwd-strength-bar';
+      if (index < score) {
+        bar.classList.add(`is-lvl${score}`);
       }
     });
   }
@@ -3580,10 +4533,15 @@ export class BackofficePage {
         }
       };
 
-      cmsService.saveProduct(updatedProduct);
+      cmsService.saveProduct(updatedProduct).then((res) => {
+        if (res.cloudSynced) {
+          this.showToast(`✓ Saveur « ${updatedProduct.name} » enregistrée et synchronisée sur Supabase Cloud !`, 'success');
+        } else {
+          this.showToast(`✓ Saveur « ${updatedProduct.name} » enregistrée dans la base de données !`, 'success');
+        }
+      });
       closeModal();
       this.render();
-      this.showToast(`Saveur « ${updatedProduct.name} » enregistrée !`, 'success');
     });
   }
 
@@ -3781,10 +4739,15 @@ export class BackofficePage {
         featured: (modalContainer.querySelector('#collFeatured') as HTMLInputElement).checked
       };
 
-      cmsService.saveCollection(updatedCollection);
+      cmsService.saveCollection(updatedCollection).then((res) => {
+        if (res.cloudSynced) {
+          this.showToast(`✓ Collection « ${updatedCollection.name} » enregistrée et synchronisée sur Supabase Cloud !`, 'success');
+        } else {
+          this.showToast(`✓ Collection « ${updatedCollection.name} » enregistrée dans la base de données !`, 'success');
+        }
+      });
       closeModal();
       this.render();
-      this.showToast(`Collection « ${updatedCollection.name} » enregistrée !`, 'success');
     });
   }
 
@@ -3997,10 +4960,15 @@ export class BackofficePage {
         lastModified: new Date().toISOString()
       };
 
-      cmsService.saveCustomPage(updatedPage);
+      cmsService.saveCustomPage(updatedPage).then((res) => {
+        if (res.cloudSynced) {
+          this.showToast(`✓ Page « ${updatedPage.title} » enregistrée et synchronisée sur Supabase Cloud !`, 'success');
+        } else {
+          this.showToast(`✓ Page « ${updatedPage.title} » enregistrée dans la base de données !`, 'success');
+        }
+      });
       closeModal();
       this.render();
-      this.showToast(`Page « ${updatedPage.title} » enregistrée avec succès !`, 'success');
     });
   }
 
@@ -4165,10 +5133,15 @@ export class BackofficePage {
         image: (modalContainer.querySelector('#sImgUrl') as HTMLInputElement)?.value.trim() || s.image
       };
 
-      cmsService.saveStore(updatedStore);
+      cmsService.saveStore(updatedStore).then((res) => {
+        if (res.cloudSynced) {
+          this.showToast(`✓ Point de vente « ${updatedStore.name} » enregistré et synchronisé sur Supabase Cloud !`, 'success');
+        } else {
+          this.showToast(`✓ Point de vente « ${updatedStore.name} » enregistré dans la base de données !`, 'success');
+        }
+      });
       closeModal();
       this.render();
-      this.showToast(`Point de vente « ${updatedStore.name} » enregistré !`, 'success');
     });
   }
 
@@ -4388,10 +5361,15 @@ export class BackofficePage {
         description: (modalContainer.querySelector('#gDesc') as HTMLTextAreaElement).value.trim()
       };
 
-      cmsService.saveGalleryItem(updatedGallery);
+      cmsService.saveGalleryItem(updatedGallery).then((res) => {
+        if (res.cloudSynced) {
+          this.showToast('✓ Photo enregistrée et synchronisée sur Supabase Cloud !', 'success');
+        } else {
+          this.showToast('✓ Photo enregistrée dans la base de données !', 'success');
+        }
+      });
       closeModal();
       this.render();
-      this.showToast('Photo de galerie enregistrée !', 'success');
     });
   }
 
@@ -4623,10 +5601,15 @@ export class BackofficePage {
         tag: (modalContainer.querySelector('#rTag') as HTMLInputElement).value.trim()
       };
 
-      cmsService.saveVideoReel(updatedReel);
+      cmsService.saveVideoReel(updatedReel).then((res) => {
+        if (res.cloudSynced) {
+          this.showToast('✓ Vidéo enregistrée et synchronisée sur Supabase Cloud !', 'success');
+        } else {
+          this.showToast('✓ Vidéo enregistrée dans la base de données !', 'success');
+        }
+      });
       closeModal();
       this.render();
-      this.showToast('Vidéo Reel enregistrée !', 'success');
     });
   }
 
@@ -4739,15 +5722,19 @@ export class BackofficePage {
   // =========================================================================
   // 9. TOAST NOTIFICATIONS (AGENCY PILL WITH SVG ICONS)
   // =========================================================================
-  private showToast(message: string, type: 'success' | 'error' = 'success'): void {
+  private showToast(message: string, type: 'success' | 'error' | 'info' = 'success'): void {
     const container = this.element.querySelector('#boToastContainer');
     if (!container) return;
+
+    let icon = BO_ICONS.check;
+    if (type === 'error') icon = BO_ICONS.close;
+    else if (type === 'info') icon = BO_ICONS.info;
 
     const toast = document.createElement('div');
     toast.className = `bo-toast ${type}`;
     toast.innerHTML = `
       <div class="bo-toast-icon">
-        ${type === 'success' ? BO_ICONS.check : BO_ICONS.close}
+        ${icon}
       </div>
       <span>${message}</span>
     `;

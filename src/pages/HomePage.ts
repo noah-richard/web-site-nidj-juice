@@ -15,6 +15,7 @@ import { StoreLocator } from '../components/locator/StoreLocator';
 export class HomePage {
   private element: HTMLElement;
   private hero: HeroSection;
+  private about: StorySection;
   private showcase: BrandShowcaseSection;
   private flavors: FlavorShowcase;
   private reels: VideoReelsSection;
@@ -25,7 +26,7 @@ export class HomePage {
     this.element.className = 'page page-home';
 
     this.hero = new HeroSection();
-    const about = new StorySection();
+    this.about = new StorySection();
     this.showcase = new BrandShowcaseSection();
     this.flavors = new FlavorShowcase();
     const promo = new PromoOrderBanner();
@@ -33,7 +34,7 @@ export class HomePage {
     this.locator = new StoreLocator();
 
     this.element.appendChild(this.hero.getElement());
-    this.element.appendChild(about.getElement());
+    this.element.appendChild(this.about.getElement());
     this.element.appendChild(this.showcase.getElement());
     this.element.appendChild(this.flavors.getElement());
     this.element.appendChild(promo.getElement());
@@ -47,6 +48,7 @@ export class HomePage {
 
   public destroy(): void {
     this.hero.destroy();
+    this.about.destroy();
     this.showcase.destroy();
     this.flavors.destroy();
     this.reels.destroy();

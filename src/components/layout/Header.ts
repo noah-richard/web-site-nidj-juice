@@ -11,6 +11,7 @@ export class Header {
   private isSearchOpen: boolean = false;
   private activeMegaId: string | null = null;
   private megaCloseTimeout: number | null = null;
+  private unsubscribeCms: (() => void) | null = null;
 
   public isMobileMenuOpen(): boolean {
     return this.isMenuOpen;
@@ -21,6 +22,16 @@ export class Header {
     this.element.className = 'site-header';
     this.render();
     this.bindEvents();
+    this.unsubscribeCms = cmsService.onDataChanged(() => {
+      this.refresh();
+    });
+  }
+
+  public destroy(): void {
+    if (this.unsubscribeCms) {
+      this.unsubscribeCms();
+      this.unsubscribeCms = null;
+    }
   }
 
   public getElement(): HTMLElement {

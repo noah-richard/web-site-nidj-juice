@@ -329,6 +329,116 @@
   color: var(--bo-red);
 }
 
+.bo-pwd-btn {
+  background: none;
+  border: none;
+  color: var(--bo-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--bo-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.bo-pwd-btn:hover {
+  background: var(--bo-brand-green-tint);
+  color: var(--bo-brand-green);
+}
+
+/* Password Input & Strength Meter */
+.bo-input-pwd-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.bo-input-pwd-wrap .bo-input {
+  padding-right: 44px;
+  width: 100%;
+}
+
+.bo-pwd-toggle-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--bo-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--bo-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  z-index: 2;
+}
+
+.bo-pwd-toggle-btn:hover {
+  color: var(--bo-forest);
+  background: var(--bo-surface-subtle);
+}
+
+.bo-pwd-strength-box {
+  margin-top: 8px;
+  background: var(--bo-surface-subtle);
+  border: 1px solid var(--bo-border);
+  border-radius: var(--bo-radius-sm);
+  padding: 8px 12px;
+}
+
+.bo-pwd-strength-bars {
+  display: flex;
+  gap: 5px;
+  height: 5px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+  margin-bottom: 6px;
+}
+
+.bo-pwd-strength-bar {
+  flex: 1;
+  height: 100%;
+  border-radius: 3px;
+  background: transparent;
+  transition: background-color 0.25s ease;
+}
+
+.bo-pwd-strength-bar.is-lvl1 {
+  background: #ef4444; /* Rouge - Faible */
+}
+
+.bo-pwd-strength-bar.is-lvl2 {
+  background: #f59e0b; /* Orange - Moyen */
+}
+
+.bo-pwd-strength-bar.is-lvl3 {
+  background: #10b981; /* Vert - Bon */
+}
+
+.bo-pwd-strength-bar.is-lvl4 {
+  background: #059669; /* Émeraude - Excellent */
+}
+
+.bo-pwd-strength-label {
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bo-pwd-strength-label span:last-child {
+  font-size: 10.5px;
+  color: var(--bo-text-muted);
+  font-weight: 500;
+}
+
 /* ==========================================================================
    2. STUDIO BODY LAYOUT (SIDEBAR + WORKSPACE)
    ========================================================================== */

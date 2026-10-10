@@ -525,8 +525,10 @@ export class SupabaseService {
       }
     }
 
-    // 2. Local Master / Emergency Fallback for Direction & Demo access
-    const isMasterPwd = password === 'admin' || password === '237' || password === '2370' || password === 'nidjeu';
+    // 2. Local Master / Emergency Fallback for Direction & Demo access, plus custom modified password
+    const customPassword = typeof window !== 'undefined' ? localStorage.getItem('nidj_custom_admin_password') : null;
+    const isCustomMatch = Boolean(customPassword && password === customPassword);
+    const isMasterPwd = password === 'admin' || password === '237' || password === '2370' || password === 'nidjeu' || isCustomMatch;
     if (isMasterPwd) {
       const fallbackUser: AdminUser = {
         email: cleanEmail || 'direction@nidj-juice.cm',
@@ -725,6 +727,151 @@ export class SupabaseService {
     } catch (err: any) {
       return { success: false, message: err?.message || 'Erreur' };
     }
+  }
+
+  /**
+   * Updates administrator password in Supabase Auth and local persistent fallback
+   */
+  public async updateAdminPassword(
+    newPassword: string,
+    oldPassword?: string,
+    adminEmail?: string
+  ): Promise<{ success: boolean; message: string }> {
+    const cleanEmail = (adminEmail || '').trim().toLowerCase();
+    const client = this.getClient();
+
+    if (!newPassword || newPassword.length < 6) {
+      return {
+        success: false,
+        message: 'Le nouveau mot de passe doit comporter au moins 6 caractères.'
+      };
+    }
+
+    let cloudUpdated = false;
+    let cloudNotice = '';
+
+    // 1. If Supabase is connected, attempt user password update
+    if (client) {
+      try {
+        const { data: userData } = await client.auth.getUser();
+        if (userData?.user) {
+          const { error: updErr } = await client.auth.updateUser({ password: newPassword });
+          if (!updErr) {
+            cloudUpdated = true;
+          } else {
+            cloudNotice = updErr.message;
+          }
+        } else if (cleanEmail && oldPassword) {
+          // Re-authenticate user to update password if session wasn't active
+          const { data: authData, error: signErr } = await client.auth.signInWithPassword({
+            email: cleanEmail,
+            password: oldPassword
+          });
+          if (!signErr && authData?.user) {
+            const { error: updErr } = await client.auth.updateUser({ password: newPassword });
+            if (!updErr) {
+              cloudUpdated = true;
+            } else {
+              cloudNotice = updErr.message;
+            }
+          } else if (signErr) {
+            cloudNotice = signErr.message;
+          }
+        }
+
+        // Keep admin_users record in sync
+        if (cleanEmail) {
+          try {
+            await client
+              .from('admin_users')
+              .update({ last_login: new Date().toISOString() })
+              .eq('email', cleanEmail);
+          } catch (e) {
+            // Ignore if column doesn't match
+          }
+        }
+      } catch (err: any) {
+        console.warn('Supabase updateAdminPassword error:', err);
+        cloudNotice = err?.message || 'Erreur de connexion Supabase';
+      }
+    }
+
+    // 2. Always persist locally so offline & fallback sessions use the new password immediately
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('nidj_custom_admin_password', newPassword);
+      }
+    } catch (e) {
+      console.warn('Could not save local admin password:', e);
+    }
+
+    if (cloudUpdated) {
+      return {
+        success: true,
+        message: 'Mot de passe administrateur mis à jour avec succès dans Supabase Cloud !'
+      };
+    }
+
+    return {
+      success: true,
+      message: cloudNotice
+        ? `Nouveau mot de passe administrateur validé et enregistré ! (${cloudNotice})`
+        : 'Nouveau mot de passe administrateur validé et enregistré avec succès !'
+    };
+  }
+
+  /**
+   * Resets administrator password using a master recovery code or old password
+   */
+  public async resetAdminPassword(
+    email: string,
+    securityCodeOrOldPassword: string,
+    newPassword: string
+  ): Promise<{ success: boolean; message: string }> {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanCode = (securityCodeOrOldPassword || '').trim();
+
+    if (!cleanEmail) {
+      return { success: false, message: 'Veuillez renseigner votre adresse email administrateur.' };
+    }
+    if (!newPassword || newPassword.length < 6) {
+      return { success: false, message: 'Le nouveau mot de passe doit comporter au moins 6 caractères.' };
+    }
+
+    const customPwd = typeof window !== 'undefined' ? localStorage.getItem('nidj_custom_admin_password') : null;
+    const isMasterCode =
+      cleanCode === 'admin' ||
+      cleanCode === '237' ||
+      cleanCode === '2370' ||
+      cleanCode === 'nidjeu' ||
+      (customPwd && cleanCode === customPwd);
+
+    const client = this.getClient();
+    let authSuccess = false;
+
+    // Check if old credentials work in Supabase
+    if (client && cleanCode) {
+      try {
+        const { data, error } = await client.auth.signInWithPassword({
+          email: cleanEmail,
+          password: cleanCode
+        });
+        if (!error && data?.user) {
+          authSuccess = true;
+        }
+      } catch (e) {
+        // Ignore
+      }
+    }
+
+    if (!isMasterCode && !authSuccess) {
+      return {
+        success: false,
+        message: 'Code de sécurité ou ancien mot de passe non reconnu. (Code de sécurité Société Nidjeu : 237)'
+      };
+    }
+
+    return await this.updateAdminPassword(newPassword, cleanCode, cleanEmail);
   }
 
   /**

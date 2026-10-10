@@ -59,15 +59,15 @@ export class HeroSection {
           <!-- Split Two-Tone Big Typography with Accessible SEO Brand Name -->
           <h1 class="hero-title">
             <span class="sr-only">Nidj Juice — </span>
-            <span class="hero-title-word1" id="heroWord1">${isBissap ? (heroContent.titleWord1 || 'Cocktail.') : 'Ananas.'}</span>
-            <span class="hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}" id="heroWord2">${isBissap ? (heroContent.titleWord2 || 'Bissap') : 'Gingembre'}</span>
+            <span class="hero-title-word1" id="heroWord1">${heroContent.titleWord1 || (isBissap ? 'Cocktail.' : 'Ananas.')}</span>
+            <span class="hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}" id="heroWord2">${heroContent.titleWord2 || (isBissap ? 'Bissap' : 'Gingembre')}</span>
           </h1>
 
           <p class="hero-subtitle" id="heroSubtitle">
             ${heroContent.subtitle || 'Jus 100% naturels pour un mode de vie sain et énergisant'}
           </p>
           <p class="hero-description" id="heroFlavorDesc">
-            ${activeFlavor?.description || heroContent.description}
+            ${heroContent.description || activeFlavor?.description || 'Une fraîcheur naturelle incomparable, pressée avec passion à Douala à partir de calices d’hibiscus du Grand Nord et d’ananas gorgés de soleil.'}
           </p>
 
           <!-- Buttons matching mockup -->
@@ -269,6 +269,19 @@ export class HeroSection {
 
   private refreshCmsTexts(): void {
     const heroContent = cmsService.getHeroContent();
+    const isBissap = this.currentFlavorId === 'bissap';
+    const word1 = this.element.querySelector('#heroWord1');
+    if (word1) word1.textContent = heroContent.titleWord1 || (isBissap ? 'Cocktail.' : 'Ananas.');
+
+    const word2 = this.element.querySelector('#heroWord2');
+    if (word2) {
+      word2.textContent = heroContent.titleWord2 || (isBissap ? 'Bissap' : 'Gingembre');
+      word2.className = `hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}`;
+    }
+
+    const desc = this.element.querySelector('#heroFlavorDesc');
+    if (desc) desc.textContent = heroContent.description || '';
+
     const sub = this.element.querySelector('#heroSubtitle');
     if (sub) sub.textContent = heroContent.subtitle || 'Jus 100% naturels pour un mode de vie sain et énergisant';
 
@@ -280,6 +293,21 @@ export class HeroSection {
 
     const b3 = this.element.querySelector('#heroBadge3');
     if (b3) b3.textContent = heroContent.badge3 || 'Société Nidjeu • Cameroun';
+
+    // Update hero background banner image
+    let bgBanner = this.element.querySelector('.hero-bg-custom-banner') as HTMLElement;
+    if (heroContent.bgBannerImage) {
+      if (!bgBanner) {
+        bgBanner = document.createElement('div');
+        bgBanner.className = 'hero-bg-custom-banner';
+        bgBanner.style.cssText = 'position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.12; pointer-events: none; z-index: 0; transition: opacity 0.3s ease;';
+        this.element.prepend(bgBanner);
+      }
+      bgBanner.style.backgroundImage = `url('${heroContent.bgBannerImage}')`;
+      bgBanner.style.display = 'block';
+    } else if (bgBanner) {
+      bgBanner.remove();
+    }
   }
 
   private handleVisibilityChange = (): void => {
@@ -353,9 +381,9 @@ export class HeroSection {
       headline.style.opacity = '0.3';
       headline.style.transform = 'translateY(6px)';
       setTimeout(() => {
-        if (word1) word1.textContent = isBissap ? (heroContent.titleWord1 || 'Cocktail.') : 'Ananas.';
+        if (word1) word1.textContent = heroContent.titleWord1 || (isBissap ? 'Cocktail.' : 'Ananas.');
         if (word2) {
-          word2.textContent = isBissap ? (heroContent.titleWord2 || 'Bissap') : 'Gingembre';
+          word2.textContent = heroContent.titleWord2 || (isBissap ? 'Bissap' : 'Gingembre');
           word2.className = `hero-title-word2 ${isBissap ? 'color-bissap' : 'color-ananas'}`;
         }
         headline.style.opacity = '1';
@@ -367,7 +395,7 @@ export class HeroSection {
       desc.style.transition = 'opacity 0.2s ease';
       desc.style.opacity = '0.3';
       setTimeout(() => {
-        desc.textContent = flavor?.description || heroContent.description;
+        desc.textContent = heroContent.description || flavor?.description || '';
         desc.style.opacity = '1';
       }, 150);
     }

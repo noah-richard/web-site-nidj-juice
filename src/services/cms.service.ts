@@ -92,6 +92,8 @@ export interface SiteSettings {
   supabaseUrl?: string;
   supabaseAnonKey?: string;
   supabaseAutoSync?: boolean;
+  customAdminPassword?: string;
+  adminPasswordUpdatedAt?: string;
 }
 
 export interface CmsDatabase {
@@ -236,20 +238,86 @@ export class CmsService {
     }
   }
 
+  // --- Password Management Helpers ---
+  public getCustomAdminPassword(): string | null {
+    try {
+      return localStorage.getItem('nidj_custom_admin_password') || this.db?.settings?.customAdminPassword || null;
+    } catch {
+      return this.db?.settings?.customAdminPassword || null;
+    }
+  }
+
+  public setCustomAdminPassword(newPassword: string): void {
+    try {
+      localStorage.setItem('nidj_custom_admin_password', newPassword);
+      if (!this.db.settings) {
+        this.db.settings = this.getDefaultDatabase().settings;
+      }
+      this.db.settings.customAdminPassword = newPassword;
+      this.db.settings.adminPasswordUpdatedAt = new Date().toISOString();
+      void this.persist();
+    } catch (e) {
+      console.warn('Error saving custom admin password', e);
+    }
+  }
+
+  public verifyAdminPassword(pwd: string): boolean {
+    const custom = this.getCustomAdminPassword();
+    if (custom) {
+      return pwd === custom;
+    }
+    return pwd === 'admin' || pwd === '237' || pwd === '2370' || pwd === 'nidjeu';
+  }
+
   // --- Storage Operations ---
   private loadFromStorage(): CmsDatabase | null {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.products) && parsed.products.length > 0) {
-        if (!Array.isArray(parsed.collections) || parsed.collections.length === 0) {
-          parsed.collections = this.getDefaultCollections();
-        }
-        if (!Array.isArray(parsed.customPages) || parsed.customPages.length === 0) {
-          parsed.customPages = this.getDefaultCustomPages();
-        }
-        return parsed as CmsDatabase;
+      if (parsed && typeof parsed === 'object') {
+        const defaults = this.getDefaultDatabase();
+        return {
+          ...defaults,
+          ...parsed,
+          hero: {
+            ...defaults.hero,
+            ...(parsed.hero || {})
+          },
+          company: {
+            ...defaults.company,
+            ...(parsed.company || {})
+          },
+          engagements: {
+            ...defaults.engagements,
+            ...(parsed.engagements || {})
+          },
+          settings: {
+            ...defaults.settings,
+            ...(parsed.settings || {})
+          },
+          products: Array.isArray(parsed.products) && parsed.products.length > 0
+            ? parsed.products
+            : defaults.products,
+          collections: Array.isArray(parsed.collections) && parsed.collections.length > 0
+            ? parsed.collections
+            : defaults.collections,
+          customPages: Array.isArray(parsed.customPages) && parsed.customPages.length > 0
+            ? parsed.customPages
+            : defaults.customPages,
+          stores: Array.isArray(parsed.stores) && parsed.stores.length > 0
+            ? parsed.stores
+            : defaults.stores,
+          galleryItems: Array.isArray(parsed.galleryItems) && parsed.galleryItems.length > 0
+            ? parsed.galleryItems
+            : defaults.galleryItems,
+          videoReels: Array.isArray(parsed.videoReels) && parsed.videoReels.length > 0
+            ? parsed.videoReels
+            : defaults.videoReels,
+          faqs: Array.isArray(parsed.faqs) && parsed.faqs.length > 0
+            ? parsed.faqs
+            : defaults.faqs
+        } as CmsDatabase;
       }
       return null;
     } catch (err) {
@@ -258,7 +326,7 @@ export class CmsService {
     }
   }
 
-  private persist(): void {
+  public async persist(triggerCloud: boolean = true): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     try {
       this.db.lastUpdated = new Date().toISOString();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
@@ -268,18 +336,38 @@ export class CmsService {
         })
       );
 
-      // Asynchronous auto-sync to Supabase Cloud if configured
-      if (supabaseService.isConfigured() && this.db.settings?.supabaseAutoSync !== false) {
-        supabaseService.saveSiteData(this.db).then((res) => {
-          if (res.success) {
+      let cloudSynced = false;
+      let cloudMsg = '';
+
+      // Auto-sync to Supabase Cloud if configured
+      if (triggerCloud && supabaseService.isConfigured() && this.db.settings?.supabaseAutoSync !== false) {
+        try {
+          const cloudRes = await supabaseService.saveSiteData(this.db);
+          cloudSynced = cloudRes.success;
+          cloudMsg = cloudRes.message;
+          if (cloudRes.success) {
             console.log('⚡ [Supabase Cloud] Sauvegarde automatique effectuée avec succès.');
+          } else {
+            console.warn('⚠️ [Supabase Cloud] Synchronisation:', cloudRes.message);
           }
-        }).catch((err) => {
-          console.warn('⚠️ [Supabase Cloud] Auto-synchronisation ignorée:', err);
-        });
+        } catch (err: any) {
+          cloudMsg = err?.message || 'Erreur réseau Supabase';
+          console.warn('⚠️ [Supabase Cloud] Erreur auto-synchronisation:', err);
+        }
       }
-    } catch (err) {
+
+      return {
+        success: true,
+        cloudSynced,
+        message: cloudMsg
+      };
+    } catch (err: any) {
       console.error('Error saving CMS data to localStorage:', err);
+      return {
+        success: false,
+        cloudSynced: false,
+        message: err?.message || 'Erreur locale'
+      };
     }
   }
 
@@ -294,10 +382,24 @@ export class CmsService {
             const localTime = new Date(this.db.lastUpdated || 0).getTime();
             if (cloudTime > localTime) {
               console.log('⚡ [Supabase Cloud] Version cloud plus récente détectée. Mise à jour des données locales.');
-              this.db = res.data;
+              const defaults = this.getDefaultDatabase();
+              this.db = {
+                ...defaults,
+                ...res.data,
+                hero: { ...defaults.hero, ...(res.data.hero || {}) },
+                company: { ...defaults.company, ...(res.data.company || {}) },
+                engagements: { ...defaults.engagements, ...(res.data.engagements || {}) },
+                settings: { ...defaults.settings, ...(res.data.settings || {}) }
+              };
               localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
               window.dispatchEvent(new CustomEvent('nidj:cms-data-changed', { detail: this.db }));
+            } else if (localTime > cloudTime) {
+              console.log('⚡ [Supabase Cloud] Version locale plus récente. Synchronisation vers Supabase Cloud...');
+              await supabaseService.saveSiteData(this.db);
             }
+          } else if (!res.success && res.message?.includes('Aucune donnée')) {
+            console.log('⚡ [Supabase Cloud] Table vide détectée. Initialisation du Cloud avec les données actuelles...');
+            await supabaseService.saveSiteData(this.db);
           }
         }
       }, 600);
@@ -612,14 +714,14 @@ export class CmsService {
   }
 
   // --- Setters / Mutations ---
-  public saveProduct(product: ShowcaseProduct): void {
+  public async saveProduct(product: ShowcaseProduct): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     const idx = this.db.products.findIndex((p) => p.id === product.id);
     if (idx >= 0) {
       this.db.products[idx] = { ...product };
     } else {
       this.db.products.push({ ...product });
     }
-    this.persist();
+    return await this.persist();
   }
 
   public deleteProduct(id: string): boolean {
@@ -627,11 +729,11 @@ export class CmsService {
       return false; // Prevent deleting all products
     }
     this.db.products = this.db.products.filter((p) => p.id !== id);
-    this.persist();
+    void this.persist();
     return true;
   }
 
-  public saveCollection(collection: JuiceCollection): void {
+  public async saveCollection(collection: JuiceCollection): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     if (!this.db.collections) this.db.collections = [];
     const idx = this.db.collections.findIndex((c) => c.id === collection.id);
     if (idx >= 0) {
@@ -639,7 +741,7 @@ export class CmsService {
     } else {
       this.db.collections.push({ ...collection });
     }
-    this.persist();
+    return await this.persist();
   }
 
   public deleteCollection(id: string): boolean {
@@ -647,11 +749,11 @@ export class CmsService {
       return false; // Prevent deleting all collections
     }
     this.db.collections = this.db.collections.filter((c) => c.id !== id);
-    this.persist();
+    void this.persist();
     return true;
   }
 
-  public saveCustomPage(page: CmsCustomPage): void {
+  public async saveCustomPage(page: CmsCustomPage): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     if (!this.db.customPages) this.db.customPages = [];
     page.lastModified = new Date().toISOString();
     const idx = this.db.customPages.findIndex((p) => p.id === page.id);
@@ -660,84 +762,84 @@ export class CmsService {
     } else {
       this.db.customPages.push({ ...page });
     }
-    this.persist();
+    return await this.persist();
   }
 
   public deleteCustomPage(id: string): boolean {
     if (!this.db.customPages) return false;
     this.db.customPages = this.db.customPages.filter((p) => p.id !== id);
-    this.persist();
+    void this.persist();
     return true;
   }
 
-  public saveStore(store: StoreLocation): void {
+  public async saveStore(store: StoreLocation): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     const idx = this.db.stores.findIndex((s) => s.id === store.id);
     if (idx >= 0) {
       this.db.stores[idx] = { ...store };
     } else {
       this.db.stores.push({ ...store });
     }
-    this.persist();
+    return await this.persist();
   }
 
   public deleteStore(id: string): void {
     this.db.stores = this.db.stores.filter((s) => s.id !== id);
-    this.persist();
+    void this.persist();
   }
 
-  public saveGalleryItem(item: GalleryItem): void {
+  public async saveGalleryItem(item: GalleryItem): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     const idx = this.db.galleryItems.findIndex((g) => g.id === item.id);
     if (idx >= 0) {
       this.db.galleryItems[idx] = { ...item };
     } else {
       this.db.galleryItems.unshift({ ...item });
     }
-    this.persist();
+    return await this.persist();
   }
 
   public deleteGalleryItem(id: string): void {
     this.db.galleryItems = this.db.galleryItems.filter((g) => g.id !== id);
-    this.persist();
+    void this.persist();
   }
 
-  public saveVideoReel(reel: VideoReel): void {
+  public async saveVideoReel(reel: VideoReel): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     const idx = this.db.videoReels.findIndex((r) => r.id === reel.id);
     if (idx >= 0) {
       this.db.videoReels[idx] = { ...reel };
     } else {
       this.db.videoReels.push({ ...reel });
     }
-    this.persist();
+    return await this.persist();
   }
 
   public deleteVideoReel(id: string): void {
     this.db.videoReels = this.db.videoReels.filter((r) => r.id !== id);
-    this.persist();
+    void this.persist();
   }
 
-  public saveHeroContent(hero: HeroContent): void {
+  public async saveHeroContent(hero: HeroContent): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     this.db.hero = { ...hero };
-    this.persist();
+    return await this.persist();
   }
 
-  public saveCompanyContent(company: CompanyContent): void {
+  public async saveCompanyContent(company: CompanyContent): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     this.db.company = { ...company };
-    this.persist();
+    return await this.persist();
   }
 
-  public saveEngagementsContent(engagements: EngagementsContent): void {
+  public async saveEngagementsContent(engagements: EngagementsContent): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     this.db.engagements = { ...engagements };
-    this.persist();
+    return await this.persist();
   }
 
-  public saveFaqs(faqs: FaqItem[]): void {
+  public async saveFaqs(faqs: FaqItem[]): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     this.db.faqs = [...faqs];
-    this.persist();
+    return await this.persist();
   }
 
-  public saveSettings(settings: SiteSettings): void {
+  public async saveSettings(settings: SiteSettings): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
     this.db.settings = { ...settings };
-    this.persist();
+    return await this.persist();
   }
 
   // --- Export / Import / Reset ---
@@ -750,7 +852,7 @@ export class CmsService {
       const parsed = JSON.parse(jsonString) as CmsDatabase;
       if (parsed && Array.isArray(parsed.products) && parsed.products.length > 0) {
         this.db = parsed;
-        this.persist();
+        void this.persist();
         return true;
       }
       return false;
@@ -761,7 +863,7 @@ export class CmsService {
 
   public resetToDefaults(): void {
     this.db = this.getDefaultDatabase();
-    this.persist();
+    void this.persist();
   }
 
   // --- Cloud Sync Helpers ---
