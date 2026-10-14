@@ -371,38 +371,75 @@ export class CmsService {
     }
   }
 
-  private async initCloudSync(): Promise<void> {
+  private realtimeUnsubscribe: (() => void) | null = null;
+
+  public async initCloudSync(): Promise<void> {
     try {
       if (typeof window === 'undefined') return;
-      setTimeout(async () => {
-        if (supabaseService.isConfigured()) {
-          const res = await supabaseService.loadSiteData();
-          if (res.success && res.data) {
-            const cloudTime = new Date(res.data.lastUpdated || 0).getTime();
-            const localTime = new Date(this.db.lastUpdated || 0).getTime();
-            if (cloudTime > localTime) {
-              console.log('⚡ [Supabase Cloud] Version cloud plus récente détectée. Mise à jour des données locales.');
-              const defaults = this.getDefaultDatabase();
-              this.db = {
-                ...defaults,
-                ...res.data,
-                hero: { ...defaults.hero, ...(res.data.hero || {}) },
-                company: { ...defaults.company, ...(res.data.company || {}) },
-                engagements: { ...defaults.engagements, ...(res.data.engagements || {}) },
-                settings: { ...defaults.settings, ...(res.data.settings || {}) }
-              };
+      
+      const checkAndSync = async () => {
+        if (!supabaseService.isConfigured()) return;
+
+        // 1. Setup real-time WebSocket listener if not already active
+        if (!this.realtimeUnsubscribe) {
+          this.realtimeUnsubscribe = supabaseService.subscribeToSiteChanges((cloudDb) => {
+            console.log('⚡ [Supabase Realtime] Application instantanée des données du Cloud.');
+            const defaults = this.getDefaultDatabase();
+            this.db = {
+              ...defaults,
+              ...cloudDb,
+              hero: { ...defaults.hero, ...(cloudDb.hero || {}) },
+              company: { ...defaults.company, ...(cloudDb.company || {}) },
+              engagements: { ...defaults.engagements, ...(cloudDb.engagements || {}) },
+              settings: { ...defaults.settings, ...(cloudDb.settings || {}) }
+            };
+            try {
               localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
-              window.dispatchEvent(new CustomEvent('nidj:cms-data-changed', { detail: this.db }));
-            } else if (localTime > cloudTime) {
-              console.log('⚡ [Supabase Cloud] Version locale plus récente. Synchronisation vers Supabase Cloud...');
-              await supabaseService.saveSiteData(this.db);
+            } catch (e) {
+              console.warn('Could not cache realtime cloud data to localStorage', e);
             }
-          } else if (!res.success && res.message?.includes('Aucune donnée')) {
+            window.dispatchEvent(new CustomEvent('nidj:cms-data-changed', { detail: this.db }));
+          });
+        }
+
+        // 2. Initial fetch from Cloud
+        const res = await supabaseService.loadSiteData();
+        if (res.success && res.data) {
+          const cloudTime = new Date(res.data.lastUpdated || 0).getTime();
+          const localTime = new Date(this.db.lastUpdated || 0).getTime();
+          const hasLocalEdits = Boolean(localStorage.getItem(STORAGE_KEY));
+
+          // If current browser has no local edits OR cloud version is newer or equal: accept cloud
+          if (!hasLocalEdits || cloudTime >= localTime) {
+            console.log('⚡ [Supabase Cloud] Données Cloud synchronisées avec succès.');
+            const defaults = this.getDefaultDatabase();
+            this.db = {
+              ...defaults,
+              ...res.data,
+              hero: { ...defaults.hero, ...(res.data.hero || {}) },
+              company: { ...defaults.company, ...(res.data.company || {}) },
+              engagements: { ...defaults.engagements, ...(res.data.engagements || {}) },
+              settings: { ...defaults.settings, ...(res.data.settings || {}) }
+            };
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+            } catch (e) {
+              console.warn('Could not cache cloud data to localStorage', e);
+            }
+            window.dispatchEvent(new CustomEvent('nidj:cms-data-changed', { detail: this.db }));
+          } else if (hasLocalEdits && localTime > cloudTime) {
+            console.log('⚡ [Supabase Cloud] Version locale modifiée plus récente. Envoi vers Supabase Cloud...');
+            await supabaseService.saveSiteData(this.db);
+          }
+        } else if (!res.success && res.message?.includes('Aucune donnée')) {
+          if (Boolean(localStorage.getItem(STORAGE_KEY))) {
             console.log('⚡ [Supabase Cloud] Table vide détectée. Initialisation du Cloud avec les données actuelles...');
             await supabaseService.saveSiteData(this.db);
           }
         }
-      }, 600);
+      };
+
+      setTimeout(checkAndSync, 400);
     } catch (err) {
       console.warn('Cloud sync init error:', err);
     }
@@ -412,7 +449,7 @@ export class CmsService {
   private getDefaultDatabase(): CmsDatabase {
     return {
       version: 1,
-      lastUpdated: new Date().toISOString(),
+      lastUpdated: '2024-01-01T00:00:00.000Z',
       products: JSON.parse(JSON.stringify(SHOWCASE_PRODUCTS)),
       collections: this.getDefaultCollections(),
       customPages: this.getDefaultCustomPages(),

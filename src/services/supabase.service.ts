@@ -115,8 +115,11 @@ export class SupabaseService {
       anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || '';
     }
 
+    // Sanitize URL (strip trailing /rest/v1 or trailing slashes)
+    const cleanUrl = url.trim().replace(/\/rest\/v1\/?$/i, '').replace(/\/+$/, '');
+
     return {
-      url: url.trim(),
+      url: cleanUrl,
       anonKey: anonKey.trim(),
       autoSync
     };
@@ -331,6 +334,51 @@ export class SupabaseService {
         success: false,
         message: `Impossible de récupérer les données depuis Supabase : ${err?.message || 'Erreur inconnue'}`
       };
+    }
+  }
+
+  /**
+   * Subscribes to real-time changes in the 'site_database' table via WebSockets.
+   * Enables instant universal updates across all opened browsers without page refresh.
+   */
+  public subscribeToSiteChanges(callback: (db: CmsDatabase) => void): (() => void) | null {
+    const client = this.getClient();
+    if (!client) return null;
+
+    try {
+      const channel = client
+        .channel('site_database_realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'site_database',
+            filter: 'id=eq.main'
+          },
+          (payload: any) => {
+            if (payload?.new && payload.new.data) {
+              console.log('⚡ [Supabase Realtime] Mise à jour en direct reçue du Cloud !');
+              callback(payload.new.data as CmsDatabase);
+            }
+          }
+        )
+        .subscribe((status: string) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('⚡ [Supabase Realtime] Connecté avec succès au canal de synchronisation temps réel.');
+          }
+        });
+
+      return () => {
+        try {
+          void client.removeChannel(channel);
+        } catch (e) {
+          console.warn('Error removing realtime channel:', e);
+        }
+      };
+    } catch (err) {
+      console.warn('Erreur souscription Supabase Realtime:', err);
+      return null;
     }
   }
 
@@ -1000,6 +1048,24 @@ CREATE POLICY "Allow all admin_users"
 ON public.admin_users FOR ALL 
 USING (true) 
 WITH CHECK (true);
+
+-- =============================================================================
+-- SYNCHRONISATION TEMPS RÉEL (SUPABASE REALTIME WEBSOCKETS)
+-- Active la diffusion instantanée des changements vers tous les navigateurs connectés
+-- =============================================================================
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' 
+    AND schemaname = 'public' 
+    AND tablename = 'site_database'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.site_database;
+  END IF;
+END $$;
+
+ALTER TABLE public.site_database REPLICA IDENTITY FULL;
 
 -- Notification de succès
 COMMENT ON TABLE public.site_database IS 'Base de données CMS officielle Nidj Juice';

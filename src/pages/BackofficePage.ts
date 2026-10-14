@@ -3267,6 +3267,7 @@ export class BackofficePage {
       });
 
       this.showToast('Configuration Supabase enregistrée avec succès !', 'success');
+      void cmsService.initCloudSync();
       this.render();
     });
 
