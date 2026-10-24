@@ -509,115 +509,90 @@ export class SupabaseService {
     const cleanEmail = (email || '').trim().toLowerCase();
     const client = this.getClient();
 
-    // 1. Attempt Supabase Cloud Auth if client is configured
-    if (client && cleanEmail) {
-      try {
-        const { data, error } = await client.auth.signInWithPassword({
-          email: cleanEmail,
-          password
-        });
-
-        if (!error && data?.user) {
-          const authUser = data.user;
-          let role = (authUser.user_metadata?.role as string) || 'Direction';
-          let fullName = (authUser.user_metadata?.full_name as string) || cleanEmail.split('@')[0];
-
-          try {
-            const { data: record } = await client
-              .from('admin_users')
-              .select('*')
-              .eq('email', cleanEmail)
-              .maybeSingle();
-
-            if (record) {
-              fullName = record.full_name || fullName;
-              role = record.role || role;
-              await client
-                .from('admin_users')
-                .update({ last_login: new Date().toISOString() })
-                .eq('id', record.id);
-            } else {
-              await client
-                .from('admin_users')
-                .insert([
-                  {
-                    id: authUser.id,
-                    email: cleanEmail,
-                    full_name: fullName,
-                    role: role,
-                    is_active: true,
-                    last_login: new Date().toISOString()
-                  }
-                ]);
-            }
-          } catch (e) {
-            console.warn('Could not sync admin_users table:', e);
-          }
-
-          const adminUser: AdminUser = {
-            id: authUser.id,
-            email: cleanEmail,
-            fullName,
-            role,
-            lastLogin: new Date().toISOString()
-          };
-
-          return {
-            success: true,
-            user: adminUser,
-            message: 'Connexion administrateur réussie via Supabase Cloud !'
-          };
-        }
-      } catch (err) {
-        console.warn('Supabase Auth signIn attempt notice:', err);
-      }
+    if (!client) {
+      return {
+        success: false,
+        message: 'Le service d’authentification Supabase n’est pas configuré.'
+      };
     }
 
-    // 2. Local Master / Emergency Fallback for Direction & Demo access, plus custom modified password
-    const customPassword = typeof window !== 'undefined' ? localStorage.getItem('nidj_custom_admin_password') : null;
-    const isCustomMatch = Boolean(customPassword && password === customPassword);
-    const isMasterPwd = password === 'admin' || password === '237' || password === '2370' || password === 'nidjeu' || isCustomMatch;
-    if (isMasterPwd) {
-      const fallbackUser: AdminUser = {
-        email: cleanEmail || 'direction@nidj-juice.cm',
-        fullName: cleanEmail.includes('nidjeu') || cleanEmail.includes('admin') || !cleanEmail
-          ? 'Direction Société Nidjeu'
-          : cleanEmail.split('@')[0],
-        role: 'Direction Générale',
-        lastLogin: new Date().toISOString()
+    if (!cleanEmail || !password) {
+      return {
+        success: false,
+        message: 'Veuillez renseigner votre email et votre mot de passe.'
       };
+    }
 
-      // If Supabase is connected, record the active login in admin_users
-      if (client) {
-        try {
-          await client.from('admin_users').upsert(
-            [
+    try {
+      const { data, error } = await client.auth.signInWithPassword({
+        email: cleanEmail,
+        password
+      });
+
+      if (error || !data?.user) {
+        return {
+          success: false,
+          message: error?.message === 'Invalid login credentials'
+            ? 'Email ou mot de passe administrateur incorrect.'
+            : (error?.message || 'Identifiants incorrects.')
+        };
+      }
+
+      const authUser = data.user;
+      let role = (authUser.user_metadata?.role as string) || 'Direction';
+      let fullName = (authUser.user_metadata?.full_name as string) || cleanEmail.split('@')[0];
+
+      try {
+        const { data: record } = await client
+          .from('admin_users')
+          .select('*')
+          .eq('email', cleanEmail)
+          .maybeSingle();
+
+        if (record) {
+          fullName = record.full_name || fullName;
+          role = record.role || role;
+          await client
+            .from('admin_users')
+            .update({ last_login: new Date().toISOString() })
+            .eq('id', record.id);
+        } else {
+          await client
+            .from('admin_users')
+            .insert([
               {
-                email: fallbackUser.email,
-                full_name: fallbackUser.fullName,
-                role: fallbackUser.role,
+                id: authUser.id,
+                email: cleanEmail,
+                full_name: fullName,
+                role: role,
                 is_active: true,
                 last_login: new Date().toISOString()
               }
-            ],
-            { onConflict: 'email' }
-          );
-        } catch (e) {
-          console.warn('Fallback admin upsert notice:', e);
+            ]);
         }
+      } catch (e) {
+        console.warn('Could not sync admin_users table:', e);
       }
+
+      const adminUser: AdminUser = {
+        id: authUser.id,
+        email: cleanEmail,
+        fullName,
+        role,
+        lastLogin: new Date().toISOString()
+      };
 
       return {
         success: true,
-        user: fallbackUser,
-        message: 'Connexion administrateur validée avec succès.'
+        user: adminUser,
+        message: 'Connexion administrateur réussie via Supabase Cloud !'
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: `Erreur de connexion : ${err?.message || 'Impossible de joindre le serveur'}`
       };
     }
-
-    return {
-      success: false,
-      message: 'Identifiants incorrects. Vérifiez l’adresse email et le mot de passe.'
-    };
   }
 
   /**
@@ -844,15 +819,6 @@ export class SupabaseService {
       }
     }
 
-    // 2. Always persist locally so offline & fallback sessions use the new password immediately
-    try {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('nidj_custom_admin_password', newPassword);
-      }
-    } catch (e) {
-      console.warn('Could not save local admin password:', e);
-    }
-
     if (cloudUpdated) {
       return {
         success: true,
@@ -861,62 +827,110 @@ export class SupabaseService {
     }
 
     return {
-      success: true,
-      message: cloudNotice
-        ? `Nouveau mot de passe administrateur validé et enregistré ! (${cloudNotice})`
-        : 'Nouveau mot de passe administrateur validé et enregistré avec succès !'
+      success: false,
+      message: cloudNotice || 'Échec de la mise à jour du mot de passe dans Supabase.'
     };
   }
 
   /**
-   * Resets administrator password using a master recovery code or old password
+   * Retrieves and verifies the currently authenticated Supabase administrator session
+   */
+  public async getAuthenticatedAdmin(): Promise<AdminUser | null> {
+    const client = this.getClient();
+    if (!client) return null;
+
+    try {
+      const { data: { user }, error } = await client.auth.getUser();
+      if (error || !user || !user.email) {
+        return null;
+      }
+
+      const cleanEmail = user.email.toLowerCase();
+      let role = (user.user_metadata?.role as string) || 'Direction';
+      let fullName = (user.user_metadata?.full_name as string) || cleanEmail.split('@')[0];
+
+      try {
+        const { data: record } = await client
+          .from('admin_users')
+          .select('*')
+          .eq('email', cleanEmail)
+          .maybeSingle();
+
+        if (record) {
+          fullName = record.full_name || fullName;
+          role = record.role || role;
+        }
+      } catch {
+        // Ignore optional table sync error
+      }
+
+      return {
+        id: user.id,
+        email: cleanEmail,
+        fullName,
+        role,
+        lastLogin: new Date().toISOString()
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Sends a secure one-time password reset link to the administrator email
+   */
+  public async sendPasswordResetEmail(email: string): Promise<{ success: boolean; message: string }> {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    if (!cleanEmail) {
+      return { success: false, message: 'Veuillez saisir votre adresse email professionnelle.' };
+    }
+
+    const client = this.getClient();
+    if (!client) {
+      return { success: false, message: 'Le service Supabase n’est pas configuré.' };
+    }
+
+    try {
+      const redirectUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/nidj-juice-backoffice`
+        : undefined;
+
+      const { error } = await client.auth.resetPasswordForEmail(cleanEmail, {
+        redirectTo: redirectUrl
+      });
+
+      if (error) {
+        return { success: false, message: `Erreur Supabase : ${error.message}` };
+      }
+
+      return {
+        success: true,
+        message: 'Un lien sécurisé de réinitialisation a été envoyé à votre adresse email professionnelle.'
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.message || 'Erreur lors de l’envoi de l’email.'
+      };
+    }
+  }
+
+  /**
+   * Resets administrator password using authenticated verification
    */
   public async resetAdminPassword(
     email: string,
-    securityCodeOrOldPassword: string,
+    currentPassword: string,
     newPassword: string
   ): Promise<{ success: boolean; message: string }> {
     const cleanEmail = (email || '').trim().toLowerCase();
-    const cleanCode = (securityCodeOrOldPassword || '').trim();
+    const cleanCode = (currentPassword || '').trim();
 
     if (!cleanEmail) {
       return { success: false, message: 'Veuillez renseigner votre adresse email administrateur.' };
     }
-    if (!newPassword || newPassword.length < 6) {
-      return { success: false, message: 'Le nouveau mot de passe doit comporter au moins 6 caractères.' };
-    }
-
-    const customPwd = typeof window !== 'undefined' ? localStorage.getItem('nidj_custom_admin_password') : null;
-    const isMasterCode =
-      cleanCode === 'admin' ||
-      cleanCode === '237' ||
-      cleanCode === '2370' ||
-      cleanCode === 'nidjeu' ||
-      (customPwd && cleanCode === customPwd);
-
-    const client = this.getClient();
-    let authSuccess = false;
-
-    // Check if old credentials work in Supabase
-    if (client && cleanCode) {
-      try {
-        const { data, error } = await client.auth.signInWithPassword({
-          email: cleanEmail,
-          password: cleanCode
-        });
-        if (!error && data?.user) {
-          authSuccess = true;
-        }
-      } catch (e) {
-        // Ignore
-      }
-    }
-
-    if (!isMasterCode && !authSuccess) {
-      return {
-        success: false,
-        message: 'Code de sécurité ou ancien mot de passe non reconnu. (Code de sécurité Société Nidjeu : 237)'
-      };
+    if (!newPassword || newPassword.length < 8) {
+      return { success: false, message: 'Le nouveau mot de passe doit comporter au moins 8 caractères.' };
     }
 
     return await this.updateAdminPassword(newPassword, cleanCode, cleanEmail);
@@ -947,11 +961,11 @@ CREATE INDEX IF NOT EXISTS idx_site_database_updated_at ON public.site_database 
 -- 2. TABLE DES COMMANDES CLIENTS (HOTLINE & WEB CONVERSIONS)
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    flavor TEXT NOT NULL,
+    flavor TEXT NOT NULL CONSTRAINT check_orders_flavor CHECK (char_length(flavor) BETWEEN 1 AND 150),
     format TEXT,
-    quantity INTEGER DEFAULT 1,
-    customer_name TEXT NOT NULL,
-    customer_phone TEXT NOT NULL,
+    quantity INTEGER DEFAULT 1 CONSTRAINT check_orders_quantity CHECK (quantity >= 1 AND quantity <= 1000),
+    customer_name TEXT NOT NULL CONSTRAINT check_orders_name CHECK (char_length(customer_name) BETWEEN 2 AND 150),
+    customer_phone TEXT NOT NULL CONSTRAINT check_orders_phone CHECK (char_length(customer_phone) BETWEEN 4 AND 35),
     city TEXT,
     neighborhood TEXT,
     delivery_address TEXT,
@@ -968,19 +982,19 @@ CREATE INDEX IF NOT EXISTS idx_orders_created_at ON public.orders (created_at DE
 -- 3. TABLE DES MESSAGES DE CONTACT & B2B
 CREATE TABLE IF NOT EXISTS public.contact_messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    email TEXT,
-    phone TEXT,
-    subject TEXT,
-    message TEXT NOT NULL,
+    name TEXT NOT NULL CONSTRAINT check_contact_name CHECK (char_length(name) BETWEEN 2 AND 150),
+    email TEXT CONSTRAINT check_contact_email CHECK (email IS NULL OR char_length(email) <= 255),
+    phone TEXT CONSTRAINT check_contact_phone CHECK (phone IS NULL OR char_length(phone) <= 35),
+    subject TEXT CONSTRAINT check_contact_subject CHECK (subject IS NULL OR char_length(subject) <= 200),
+    message TEXT NOT NULL CONSTRAINT check_contact_message CHECK (char_length(message) BETWEEN 2 AND 5000),
     created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
 -- 4. TABLE DES ADMINISTRATEURS (ÉQUIPE & GESTION DES ACCÈS)
 CREATE TABLE IF NOT EXISTS public.admin_users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email TEXT UNIQUE NOT NULL,
-    full_name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL CONSTRAINT check_admin_email CHECK (char_length(email) BETWEEN 5 AND 255),
+    full_name TEXT NOT NULL CONSTRAINT check_admin_name CHECK (char_length(full_name) BETWEEN 2 AND 150),
     role TEXT DEFAULT 'Direction',
     is_active BOOLEAN DEFAULT true,
     last_login TIMESTAMPTZ,
@@ -990,7 +1004,7 @@ CREATE TABLE IF NOT EXISTS public.admin_users (
 CREATE INDEX IF NOT EXISTS idx_admin_users_email ON public.admin_users (email);
 
 -- =============================================================================
--- SÉCURITÉ : ACTIVATION DU ROW LEVEL SECURITY (RLS) & POLITIQUES PUBLIQUES
+-- SÉCURITÉ RENFORCÉE : ROW LEVEL SECURITY (RLS) & PROTECTION DES DONNÉES
 -- =============================================================================
 
 ALTER TABLE public.site_database ENABLE ROW LEVEL SECURITY;
@@ -998,56 +1012,95 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contact_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
 
--- Politiques pour site_database (Lecture et écriture publiques / anon)
+-- 1. Politiques pour site_database :
+-- Lecture publique (visiteurs anonymes et connectés) pour afficher le site
 DROP POLICY IF EXISTS "Allow public read site_database" ON public.site_database;
+DROP POLICY IF EXISTS "Allow public insert update site_database" ON public.site_database;
+DROP POLICY IF EXISTS "Allow authenticated modify site_database" ON public.site_database;
+
 CREATE POLICY "Allow public read site_database" 
 ON public.site_database FOR SELECT 
+TO anon, authenticated 
 USING (true);
 
-DROP POLICY IF EXISTS "Allow public insert update site_database" ON public.site_database;
-CREATE POLICY "Allow public insert update site_database" 
+-- Écriture (INSERT, UPDATE, DELETE) STRICTEMENT RÉSERVÉE aux administrateurs authentifiés
+CREATE POLICY "Allow authenticated modify site_database" 
 ON public.site_database FOR ALL 
-USING (true) 
-WITH CHECK (true);
+TO authenticated 
+USING (auth.role() = 'authenticated') 
+WITH CHECK (auth.role() = 'authenticated');
 
--- Politiques pour orders (Insertion libre par les visiteurs du site, lecture par l'admin)
+-- 2. Politiques pour orders (Protection des données personnelles des clients) :
+-- Insertion libre par tout visiteur du site (anonyme ou non) lors d'une commande
 DROP POLICY IF EXISTS "Allow anon insert orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow select orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow update orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow authenticated read orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow authenticated update orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow authenticated delete orders" ON public.orders;
+
 CREATE POLICY "Allow anon insert orders" 
 ON public.orders FOR INSERT 
+TO anon, authenticated 
 WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Allow select orders" ON public.orders;
-CREATE POLICY "Allow select orders" 
+-- Consultation, modification et suppression des commandes STRICTEMENT RÉSERVÉES aux administrateurs connectés
+CREATE POLICY "Allow authenticated read orders" 
 ON public.orders FOR SELECT 
-USING (true);
+TO authenticated 
+USING (auth.role() = 'authenticated');
 
-DROP POLICY IF EXISTS "Allow update orders" ON public.orders;
-CREATE POLICY "Allow update orders" 
+CREATE POLICY "Allow authenticated update orders" 
 ON public.orders FOR UPDATE 
-USING (true);
+TO authenticated 
+USING (auth.role() = 'authenticated') 
+WITH CHECK (auth.role() = 'authenticated');
 
--- Politiques pour contact_messages
+CREATE POLICY "Allow authenticated delete orders" 
+ON public.orders FOR DELETE 
+TO authenticated 
+USING (auth.role() = 'authenticated');
+
+-- 3. Politiques pour contact_messages :
+-- Insertion autorisée par tout visiteur
 DROP POLICY IF EXISTS "Allow anon insert contact_messages" ON public.contact_messages;
+DROP POLICY IF EXISTS "Allow select contact_messages" ON public.contact_messages;
+DROP POLICY IF EXISTS "Allow authenticated read contact_messages" ON public.contact_messages;
+DROP POLICY IF EXISTS "Allow authenticated delete contact_messages" ON public.contact_messages;
+
 CREATE POLICY "Allow anon insert contact_messages" 
 ON public.contact_messages FOR INSERT 
+TO anon, authenticated 
 WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Allow select contact_messages" ON public.contact_messages;
-CREATE POLICY "Allow select contact_messages" 
+-- Lecture et suppression STRICTEMENT RÉSERVÉES aux administrateurs connectés
+CREATE POLICY "Allow authenticated read contact_messages" 
 ON public.contact_messages FOR SELECT 
-USING (true);
+TO authenticated 
+USING (auth.role() = 'authenticated');
 
--- Politiques pour admin_users
+CREATE POLICY "Allow authenticated delete contact_messages" 
+ON public.contact_messages FOR DELETE 
+TO authenticated 
+USING (auth.role() = 'authenticated');
+
+-- 4. Politiques pour admin_users :
+-- AUCUN ACCÈS ANONYME. Seuls les administrateurs connectés peuvent lire ou gérer les comptes
 DROP POLICY IF EXISTS "Allow select admin_users" ON public.admin_users;
-CREATE POLICY "Allow select admin_users" 
-ON public.admin_users FOR SELECT 
-USING (true);
-
 DROP POLICY IF EXISTS "Allow all admin_users" ON public.admin_users;
-CREATE POLICY "Allow all admin_users" 
+DROP POLICY IF EXISTS "Allow authenticated select admin_users" ON public.admin_users;
+DROP POLICY IF EXISTS "Allow authenticated manage admin_users" ON public.admin_users;
+
+CREATE POLICY "Allow authenticated select admin_users" 
+ON public.admin_users FOR SELECT 
+TO authenticated 
+USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Allow authenticated manage admin_users" 
 ON public.admin_users FOR ALL 
-USING (true) 
-WITH CHECK (true);
+TO authenticated 
+USING (auth.role() = 'authenticated') 
+WITH CHECK (auth.role() = 'authenticated');
 
 -- =============================================================================
 -- SYNCHRONISATION TEMPS RÉEL (SUPABASE REALTIME WEBSOCKETS)

@@ -147,8 +147,6 @@ export class Router {
       return '/engagements';
     } else if (rawPath === '/evenements' || rawPath === '/moments' || rawPath === '/gallery') {
       return '/galerie';
-    } else if (rawPath === '/admin' || rawPath === '/backoffice' || rawPath === '/dashboard') {
-      return '/nidj-juice-backoffice';
     } else if (rawPath.startsWith('/saveurs/')) {
       return rawPath;
     } else if (rawPath.startsWith('/page/')) {

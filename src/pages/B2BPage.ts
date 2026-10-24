@@ -4,6 +4,7 @@
    ========================================================================== */
 
 import { cmsService } from '../services/cms.service';
+import { supabaseService } from '../services/supabase.service';
 
 export class B2BPage {
   private element: HTMLElement;
@@ -164,16 +165,38 @@ export class B2BPage {
       e.preventDefault();
       const settings = cmsService.getSettings();
       const whatsappClean = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '237677426612';
-      const company = (this.element.querySelector('#b2bCompany') as HTMLInputElement).value;
+      const company = (this.element.querySelector('#b2bCompany') as HTMLInputElement).value.trim();
       const city = (this.element.querySelector('#b2bCity') as HTMLSelectElement).value;
-      const name = (this.element.querySelector('#b2bContactName') as HTMLInputElement).value;
-      const phone = (this.element.querySelector('#b2bPhone') as HTMLInputElement).value;
+      const name = (this.element.querySelector('#b2bContactName') as HTMLInputElement).value.trim();
+      const phone = (this.element.querySelector('#b2bPhone') as HTMLInputElement).value.trim();
       const volume = (this.element.querySelector('#b2bVolume') as HTMLSelectElement).value;
 
+      if (!company || company.length < 2 || company.length > 120) {
+        alert('Veuillez renseigner le nom de votre établissement.');
+        return;
+      }
+      if (!name || name.length < 2 || name.length > 100) {
+        alert('Veuillez renseigner votre nom complet.');
+        return;
+      }
+      if (!phone || phone.length < 6 || phone.length > 30) {
+        alert('Veuillez renseigner un numéro de téléphone valide.');
+        return;
+      }
+
       const message = `Bonjour ${settings.companyName}, je souhaite devenir distributeur agréé ${settings.brandName}.\n\nÉtablissement : ${company}\nVille : ${city}\nResponsable : ${name}\nTéléphone : ${phone}\nVolume prévisionnel : ${volume}`;
+
+      // Save inquiry to Supabase
+      void supabaseService.saveContactMessage({
+        name: `${name} (${company})`,
+        phone,
+        subject: `Demande Distributeur B2B - ${city} (${volume})`,
+        message
+      }).catch((err) => console.warn('Supabase saveContactMessage error:', err));
+
       const waUrl = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(message)}`;
 
-      window.open(waUrl, '_blank');
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
     });
   }
 }

@@ -6,10 +6,11 @@
 
 import { cmsService, type FaqItem } from '../services/cms.service';
 import { cloudinaryService } from '../services/cloudinary.service';
-import { supabaseService, type AdminUser } from '../services/supabase.service';
+import { supabaseService } from '../services/supabase.service';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
 import type { StoreLocation, VideoReel, JuiceCollection, CmsCustomPage } from '../types/product.types';
 import type { GalleryItem } from '../data/gallery.data';
+import { escapeHtml } from '../utils/dom';
 
 type BackofficeTab = 'overview' | 'products' | 'collections' | 'pages' | 'gallery' | 'reels' | 'stores' | 'settings';
 
@@ -52,7 +53,7 @@ const BO_ICONS = {
 export class BackofficePage {
   private element: HTMLElement;
   private currentTab: BackofficeTab = 'overview';
-  private authMode: 'login' | 'register' | 'reset' = 'login';
+  private authMode: 'login' | 'reset' = 'login';
 
   constructor() {
     this.element = document.createElement('div');
@@ -92,10 +93,41 @@ export class BackofficePage {
 
   public render(): void {
     document.body.classList.remove('bo-sidebar-locked');
+
     if (!cmsService.isAuthenticated()) {
       this.renderAuthGate();
+      return;
+    }
+
+    if (supabaseService.isConfigured()) {
+      // Secure state: Display a non-sensitive verification screen while validating genuine Supabase session
+      this.element.innerHTML = `
+        <div class="bo-auth-container">
+          <div class="bo-auth-card" style="text-align: center; padding: 48px 24px;">
+            <div style="font-size: 28px; margin-bottom: 16px;">${BO_ICONS.loader}</div>
+            <h2 style="font-size: 17px; font-weight: 700; color: var(--bo-forest); margin-bottom: 8px;">Vérification de la session sécurisée...</h2>
+            <p style="font-size: 13px; color: var(--bo-text-muted); margin: 0;">Validation cryptographique auprès de Supabase Cloud.</p>
+          </div>
+        </div>
+      `;
+
+      void supabaseService.getAuthenticatedAdmin().then((user) => {
+        if (user) {
+          cmsService.setCurrentAdmin(user);
+          this.renderDashboard();
+        } else {
+          cmsService.setCurrentAdmin(null);
+          this.renderAuthGate();
+          this.showToast('Session expirée ou non autorisée. Veuillez vous reconnecter.', 'error');
+        }
+      }).catch(() => {
+        cmsService.setCurrentAdmin(null);
+        this.renderAuthGate();
+      });
     } else {
-      this.renderDashboard();
+      // If cloud authentication is not configured, reject access
+      cmsService.setCurrentAdmin(null);
+      this.renderAuthGate();
     }
   }
 
@@ -122,17 +154,13 @@ export class BackofficePage {
               : `<span class="bo-auth-badge-status is-local">⚠️ Mode Local (Supabase à configurer)</span>`}
           </div>
 
-          <!-- Auth Mode Tabs (Connexion / Nouvel Administrateur) -->
-          <!-- Auth Mode Tabs (Connexion / Nouvel Administrateur / Changer Mot de Passe) -->
+          <!-- Auth Mode Tabs (Connexion / Mot de Passe Oublié) -->
           <div class="bo-auth-tabs">
             <button type="button" class="bo-auth-tab-btn ${this.authMode === 'login' ? 'is-active' : ''}" id="boTabLoginBtn">
               Connexion
             </button>
-            <button type="button" class="bo-auth-tab-btn ${this.authMode === 'register' ? 'is-active' : ''}" id="boTabRegisterBtn">
-              Créer un Compte
-            </button>
             <button type="button" class="bo-auth-tab-btn ${this.authMode === 'reset' ? 'is-active' : ''}" id="boTabResetBtn">
-              Changer Mot de Passe
+              Mot de Passe Oublié
             </button>
           </div>
 
@@ -145,7 +173,7 @@ export class BackofficePage {
                   type="email" 
                   id="boAuthEmail" 
                   class="bo-input" 
-                  placeholder="ex: nidjeuinsarl@gmail.com ou admin" 
+                  placeholder="ex: nidjeuinsarl@gmail.com" 
                   value="nidjeuinsarl@gmail.com"
                   autocomplete="username"
                   required
@@ -178,7 +206,7 @@ export class BackofficePage {
                   <span>Rester connecté</span>
                 </label>
                 <button type="button" id="boForgotPwdBtn" style="background:none; border:none; color:var(--bo-brand-green); font-size:12px; font-weight:700; cursor:pointer; padding:0; text-decoration:underline;">
-                  Changer de mot de passe ?
+                  Mot de passe oublié ?
                 </button>
               </div>
 
@@ -189,171 +217,34 @@ export class BackofficePage {
                 <span>Se Connecter au Backoffice</span>
               </button>
             </form>
-          ` : this.authMode === 'register' ? `
-            <form id="boRegisterForm" class="bo-form">
-              <div class="bo-form-group">
-                <label class="bo-label" for="boRegName">Nom et Prénom de l'Administrateur</label>
-                <input 
-                  type="text" 
-                  id="boRegName" 
-                  class="bo-input" 
-                  placeholder="ex: Noah Richard - Direction" 
-                  required
-                />
-              </div>
-
-              <div class="bo-form-group">
-                <label class="bo-label" for="boRegEmail">Adresse Email Professionnelle</label>
-                <input 
-                  type="email" 
-                  id="boRegEmail" 
-                  class="bo-input" 
-                  placeholder="ex: nidjeuinsarl@gmail.com" 
-                  required
-                />
-              </div>
-
-              <div class="bo-form-group">
-                <label class="bo-label" for="boRegRole">Rôle Administratif</label>
-                <select id="boRegRole" class="bo-select" required>
-                  <option value="Direction Générale">Direction Générale</option>
-                  <option value="Responsable Ventes & Distribution">Responsable Ventes & Distribution</option>
-                  <option value="Gestionnaire Catalogue & Contenus">Gestionnaire Catalogue & Contenus</option>
-                  <option value="Superviseur Production">Superviseur Production</option>
-                </select>
-              </div>
-
-              <div class="bo-form-group">
-                <label class="bo-label" for="boRegPassword">Mot de passe Supabase (Min. 6 caractères)</label>
-                <div class="bo-input-pwd-wrap">
-                  <input 
-                    type="password" 
-                    id="boRegPassword" 
-                    class="bo-input" 
-                    placeholder="••••••••" 
-                    required
-                    minlength="6"
-                  />
-                  <button type="button" class="bo-pwd-toggle-btn" data-target="boRegPassword" title="Afficher/Masquer le mot de passe">
-                    ${BO_ICONS.eye}
-                  </button>
-                </div>
-              </div>
-
-              <div id="boAuthFeedback" style="margin-bottom: 12px;"></div>
-
-              <button type="submit" class="bo-btn-primary" id="boRegisterSubmitBtn" style="width: 100%; justify-content: center; background: #2ea069; border-color: #2ea069; margin-top: 4px;">
-                ${BO_ICONS.plus}
-                <span>Créer l'Administrateur sur Supabase</span>
-              </button>
-            </form>
           ` : `
-            <!-- Password Reset / Change Form -->
+            <!-- Password Reset Request Form via Supabase Auth Email Link -->
             <form id="boResetPwdForm" class="bo-form">
               <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: var(--bo-text-secondary); line-height: 1.4;">
-                🔑 Définissez un nouveau mot de passe administrateur pour votre compte. Validé instantanément sur <strong>Supabase Auth Cloud</strong> et en local.
+                🔑 Saisissez votre adresse email administrateur. Un lien officiel et sécurisé de réinitialisation vous sera transmis via <strong>Supabase Auth</strong>.
               </div>
 
               <div class="bo-form-group">
-                <label class="bo-label" for="boResetEmail">Adresse Email Administrateur</label>
+                <label class="bo-label" for="boResetEmail">Adresse Email Professionnelle</label>
                 <input 
                   type="email" 
                   id="boResetEmail" 
                   class="bo-input" 
-                  placeholder="ex: nidjeuinsarl@gmail.com ou direction@nidj-juice.cm" 
+                  placeholder="ex: nidjeuinsarl@gmail.com" 
                   value="nidjeuinsarl@gmail.com"
                   autocomplete="username"
                   required
                 />
               </div>
 
-              <div class="bo-form-group">
-                <label class="bo-label" for="boResetCode">
-                  <span>Ancien Mot de Passe ou Code Sécurité</span>
-                  <span class="bo-label-hint">Code secours : 237</span>
-                </label>
-                <div class="bo-input-pwd-wrap">
-                  <input 
-                    type="password" 
-                    id="boResetCode" 
-                    class="bo-input" 
-                    placeholder="Ancien mot de passe ou code 237" 
-                    required
-                  />
-                  <button type="button" class="bo-pwd-toggle-btn" data-target="boResetCode" title="Afficher/Masquer">
-                    ${BO_ICONS.eye}
-                  </button>
-                </div>
-              </div>
-
-              <div class="bo-form-group">
-                <label class="bo-label" for="boResetNewPassword">Nouveau Mot de Passe (Min. 6 caractères)</label>
-                <div class="bo-input-pwd-wrap">
-                  <input 
-                    type="password" 
-                    id="boResetNewPassword" 
-                    class="bo-input" 
-                    placeholder="••••••••" 
-                    minlength="6"
-                    autocomplete="new-password"
-                    required
-                  />
-                  <button type="button" class="bo-pwd-toggle-btn" data-target="boResetNewPassword" title="Afficher/Masquer">
-                    ${BO_ICONS.eye}
-                  </button>
-                </div>
-                <div class="bo-pwd-strength-box" id="boResetStrengthBox" style="display: none;">
-                  <div class="bo-pwd-strength-bars">
-                    <div class="bo-pwd-strength-bar"></div>
-                    <div class="bo-pwd-strength-bar"></div>
-                    <div class="bo-pwd-strength-bar"></div>
-                    <div class="bo-pwd-strength-bar"></div>
-                  </div>
-                  <div class="bo-pwd-strength-label">
-                    <span>Robustesse</span>
-                    <span>Recommandé : 8+ caractères</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="bo-form-group">
-                <label class="bo-label" for="boResetConfirmPassword">Confirmer le Nouveau Mot de Passe</label>
-                <div class="bo-input-pwd-wrap">
-                  <input 
-                    type="password" 
-                    id="boResetConfirmPassword" 
-                    class="bo-input" 
-                    placeholder="••••••••" 
-                    minlength="6"
-                    autocomplete="new-password"
-                    required
-                  />
-                  <button type="button" class="bo-pwd-toggle-btn" data-target="boResetConfirmPassword" title="Afficher/Masquer">
-                    ${BO_ICONS.eye}
-                  </button>
-                </div>
-                <div id="boResetMatchNotice" style="font-size: 11px; margin-top: 4px; font-weight: 600;"></div>
-              </div>
-
               <div id="boAuthFeedback" style="margin-bottom: 12px;"></div>
 
               <button type="submit" class="bo-btn-primary" id="boResetSubmitBtn" style="width: 100%; justify-content: center; background: var(--bo-forest); border-color: var(--bo-forest); margin-top: 4px;">
                 ${BO_ICONS.key}
-                <span>Enregistrer le Nouveau Mot de Passe</span>
+                <span>Envoyer le Lien de Réinitialisation</span>
               </button>
             </form>
           `}
-
-          <!-- Quick Unlock for Demo -->
-          <div class="bo-quick-unlock-card">
-            <p style="font-size: 12px; color: var(--bo-forest); font-weight: 600; margin: 0 0 10px 0;">
-              Accès rapide de démonstration client :
-            </p>
-            <button type="button" class="bo-quick-unlock-btn" id="boQuickUnlockBtn">
-              ${BO_ICONS.sparkles}
-              <span>Déverrouillage Instantané (1-Clic)</span>
-            </button>
-          </div>
 
           <div style="margin-top: 22px;">
             <a href="/" class="bo-btn-secondary" style="font-size: 12.5px; padding: 8px 14px; text-decoration: none;">
@@ -369,10 +260,6 @@ export class BackofficePage {
       this.authMode = 'login';
       this.renderAuthGate();
     });
-    this.element.querySelector('#boTabRegisterBtn')?.addEventListener('click', () => {
-      this.authMode = 'register';
-      this.renderAuthGate();
-    });
     this.element.querySelector('#boTabResetBtn')?.addEventListener('click', () => {
       this.authMode = 'reset';
       this.renderAuthGate();
@@ -385,7 +272,7 @@ export class BackofficePage {
     // Password Eye Toggles
     this.bindPasswordToggleButtons(this.element);
 
-    // Login Form Submit (Supabase Auth + Fallback)
+    // Login Form Submit (Supabase Auth)
     const loginForm = this.element.querySelector('#boLoginForm') as HTMLFormElement;
     loginForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -419,34 +306,36 @@ export class BackofficePage {
       }
     });
 
-    // Registration Form Submit (Supabase Auth Sign Up)
-    const regForm = this.element.querySelector('#boRegisterForm') as HTMLFormElement;
-    regForm?.addEventListener('submit', async (e) => {
+    // Reset Password Form Submit (Supabase Auth Email Link)
+    const resetForm = this.element.querySelector('#boResetPwdForm') as HTMLFormElement;
+    resetForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = (this.element.querySelector('#boRegName') as HTMLInputElement)?.value.trim();
-      const email = (this.element.querySelector('#boRegEmail') as HTMLInputElement)?.value.trim();
-      const role = (this.element.querySelector('#boRegRole') as HTMLSelectElement)?.value;
-      const password = (this.element.querySelector('#boRegPassword') as HTMLInputElement)?.value;
-      const submitBtn = this.element.querySelector('#boRegisterSubmitBtn') as HTMLButtonElement;
+      const email = (this.element.querySelector('#boResetEmail') as HTMLInputElement)?.value.trim();
+      const submitBtn = this.element.querySelector('#boResetSubmitBtn') as HTMLButtonElement;
       const feedback = this.element.querySelector('#boAuthFeedback') as HTMLElement;
 
-      if (!name || !email || !password) {
-        this.showToast('Veuillez renseigner tous les champs.', 'error');
+      if (!email) {
+        this.showToast('Veuillez renseigner votre email.', 'error');
         return;
       }
 
       submitBtn.disabled = true;
-      submitBtn.innerHTML = `${BO_ICONS.loader} <span>Création sur Supabase...</span>`;
+      submitBtn.innerHTML = `${BO_ICONS.loader} <span>Envoi en cours...</span>`;
       if (feedback) feedback.innerHTML = '';
 
-      const res = await supabaseService.signUpAdmin(email, password, name, role);
+      const res = await supabaseService.sendPasswordResetEmail(email);
       submitBtn.disabled = false;
-      submitBtn.innerHTML = `${BO_ICONS.plus} <span>Créer l'Administrateur sur Supabase</span>`;
+      submitBtn.innerHTML = `${BO_ICONS.key} <span>Envoyer le Lien de Réinitialisation</span>`;
 
-      if (res.success && res.user) {
-        cmsService.setCurrentAdmin(res.user, true);
-        this.render();
-        this.showToast('Compte administrateur créé et enregistré avec succès dans Supabase !', 'success');
+      if (res.success) {
+        if (feedback) {
+          feedback.innerHTML = `
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
+              ✅ ${res.message}
+            </div>
+          `;
+        }
+        this.showToast('Lien de réinitialisation envoyé !', 'success');
       } else {
         if (feedback) {
           feedback.innerHTML = `
@@ -455,113 +344,8 @@ export class BackofficePage {
             </div>
           `;
         }
-        this.showToast('Erreur création administrateur', 'error');
+        this.showToast('Erreur envoi email', 'error');
       }
-    });
-
-    // Reset Password Form Submit (Supabase Auth & Local sync)
-    const resetForm = this.element.querySelector('#boResetPwdForm') as HTMLFormElement;
-    if (resetForm) {
-      const resetNewPwd = this.element.querySelector('#boResetNewPassword') as HTMLInputElement;
-      const resetConfirmPwd = this.element.querySelector('#boResetConfirmPassword') as HTMLInputElement;
-      const resetStrengthBox = this.element.querySelector('#boResetStrengthBox')?.parentElement as HTMLElement;
-      const resetMatchNotice = this.element.querySelector('#boResetMatchNotice') as HTMLElement;
-
-      resetNewPwd?.addEventListener('input', () => {
-        const val = resetNewPwd.value;
-        const strength = this.calculatePasswordStrength(val);
-        this.updateStrengthBars(resetStrengthBox, strength.score, strength.label, strength.color);
-        if (resetConfirmPwd?.value) {
-          if (val === resetConfirmPwd.value) {
-            resetMatchNotice.innerHTML = '✅ Les mots de passe correspondent';
-            resetMatchNotice.style.color = '#10b981';
-          } else {
-            resetMatchNotice.innerHTML = '❌ Les mots de passe ne correspondent pas';
-            resetMatchNotice.style.color = '#ef4444';
-          }
-        }
-      });
-
-      resetConfirmPwd?.addEventListener('input', () => {
-        if (!resetConfirmPwd.value) {
-          resetMatchNotice.innerHTML = '';
-        } else if (resetNewPwd?.value === resetConfirmPwd.value) {
-          resetMatchNotice.innerHTML = '✅ Les mots de passe correspondent';
-          resetMatchNotice.style.color = '#10b981';
-        } else {
-          resetMatchNotice.innerHTML = '❌ Les mots de passe ne correspondent pas';
-          resetMatchNotice.style.color = '#ef4444';
-        }
-      });
-
-      resetForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = (this.element.querySelector('#boResetEmail') as HTMLInputElement)?.value.trim();
-        const code = (this.element.querySelector('#boResetCode') as HTMLInputElement)?.value;
-        const newPassword = resetNewPwd.value;
-        const confirmPassword = resetConfirmPwd.value;
-        const submitBtn = this.element.querySelector('#boResetSubmitBtn') as HTMLButtonElement;
-        const feedback = this.element.querySelector('#boAuthFeedback') as HTMLElement;
-
-        if (newPassword !== confirmPassword) {
-          if (feedback) {
-            feedback.innerHTML = `
-              <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
-                ❌ Les deux mots de passe saisis ne sont pas identiques.
-              </div>
-            `;
-          }
-          return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `${BO_ICONS.loader} <span>Mise à jour en cours...</span>`;
-        if (feedback) feedback.innerHTML = '';
-
-        const res = await supabaseService.resetAdminPassword(email, code, newPassword);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `${BO_ICONS.key} <span>Enregistrer le Nouveau Mot de Passe</span>`;
-
-        if (res.success) {
-          cmsService.setCustomAdminPassword(newPassword);
-          this.showToast('Nouveau mot de passe enregistré avec succès !', 'success');
-          this.authMode = 'login';
-          this.renderAuthGate();
-          const authFeedback = this.element.querySelector('#boAuthFeedback') as HTMLElement;
-          if (authFeedback) {
-            authFeedback.innerHTML = `
-              <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
-                ✅ Mot de passe mis à jour ! Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
-              </div>
-            `;
-          }
-          const emailInput = this.element.querySelector('#boAuthEmail') as HTMLInputElement;
-          if (emailInput) emailInput.value = email;
-        } else {
-          if (feedback) {
-            feedback.innerHTML = `
-              <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #DC2626; padding: 9px 12px; border-radius: var(--bo-radius-sm); font-size: 12px; font-weight: 600; text-align: left;">
-                ❌ ${res.message}
-              </div>
-            `;
-          }
-          this.showToast('Erreur réinitialisation mot de passe', 'error');
-        }
-      });
-    }
-
-    // 1-Click demo unlock
-    const quickBtn = this.element.querySelector('#boQuickUnlockBtn');
-    quickBtn?.addEventListener('click', () => {
-      const demoUser: AdminUser = {
-        email: 'direction@nidj-juice.cm',
-        fullName: 'Direction Société Nidjeu',
-        role: 'Direction Générale',
-        lastLogin: new Date().toISOString()
-      };
-      cmsService.setCurrentAdmin(demoUser, true);
-      this.render();
-      this.showToast('Accès Administrateur Déverrouillé avec succès', 'success');
     });
   }
 
@@ -608,7 +392,7 @@ export class BackofficePage {
         <div class="bo-header-right">
           <!-- Desktop Action Buttons -->
           <div class="bo-desktop-actions">
-            <a href="/" class="bo-btn-public-site" target="_blank" title="Ouvrir le site public dans un nouvel onglet">
+            <a href="/" class="bo-btn-public-site" target="_blank" rel="noopener noreferrer" title="Ouvrir le site public dans un nouvel onglet">
               <span>Voir le site</span>
               ${BO_ICONS.external}
             </a>
@@ -762,7 +546,7 @@ export class BackofficePage {
           <!-- Mobile Actions in Drawer (Backups, Reset) -->
           <div class="bo-sidebar-mobile-actions">
             <div class="bo-nav-heading">Outils & Sauvegardes</div>
-            <a href="/" target="_blank" class="bo-mobile-action-link">
+            <a href="/" target="_blank" rel="noopener noreferrer" class="bo-mobile-action-link">
               ${BO_ICONS.external}
               <span>Ouvrir le Site Public</span>
             </a>
@@ -1084,7 +868,7 @@ export class BackofficePage {
                 ${p.badges[0] || '100% Naturel'}
               </span>
               <div style="display: flex; gap: 8px; align-items: center;">
-                <a href="/saveurs/${p.id}" class="bo-btn-icon" title="Prévisualiser la page officielle de cette saveur" target="_blank">
+                <a href="/saveurs/${p.id}" class="bo-btn-icon" title="Prévisualiser la page officielle de cette saveur" target="_blank" rel="noopener noreferrer">
                   ${BO_ICONS.eye}
                 </a>
                 <button type="button" class="bo-btn-edit" data-edit-product="${p.id}">
@@ -1285,7 +1069,7 @@ export class BackofficePage {
                       </td>
                       <td>
                         <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
-                          <a href="/page/${page.id}" class="bo-btn-icon" target="_blank" title="Aperçu public de la page">
+                          <a href="/page/${page.id}" class="bo-btn-icon" target="_blank" rel="noopener noreferrer" title="Aperçu public de la page">
                             ${BO_ICONS.eye}
                           </a>
                           <button type="button" class="bo-btn-edit" data-edit-custom-page="${page.id}" title="Éditer la page">
@@ -2281,7 +2065,7 @@ export class BackofficePage {
               <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 14px 16px; margin-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
                 <div style="font-size: 12px; color: var(--bo-text-secondary); line-height: 1.5; max-width: 680px;">
                   💡 <strong>Comment créer un Upload Preset en 1 minute ?</strong><br/>
-                  1. Connectez-vous sur votre compte gratuit <a href="https://cloudinary.com" target="_blank" rel="noopener" style="color: var(--bo-brand-green); font-weight: 700; text-decoration: underline;">Cloudinary.com</a><br/>
+                  1. Connectez-vous sur votre compte gratuit <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" style="color: var(--bo-brand-green); font-weight: 700; text-decoration: underline;">Cloudinary.com</a><br/>
                   2. Allez dans <strong>Settings (⚙️) &rarr; Upload &rarr; Upload presets</strong><br/>
                   3. Cliquez sur <strong>Add upload preset</strong>, réglez <strong>Signing Mode</strong> sur <strong>Unsigned</strong>, puis enregistrez et collez son nom ci-dessus.
                 </div>
@@ -2448,7 +2232,7 @@ export class BackofficePage {
             <div style="padding: 16px 18px; border-top: 1px solid var(--bo-border);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
                 <p style="font-size: 12.5px; color: var(--bo-text-muted); margin: 0;">
-                  Exécutez ce script une seule fois dans votre espace <a href="https://supabase.com/dashboard" target="_blank" rel="noopener" style="color: var(--bo-brand-green); font-weight: 700;">Supabase &rarr; SQL Editor</a> pour créer automatiquement les tables et les permissions :
+                  Exécutez ce script une seule fois dans votre espace <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer" style="color: var(--bo-brand-green); font-weight: 700;">Supabase &rarr; SQL Editor</a> pour créer automatiquement les tables et les permissions :
                 </p>
                 <button type="button" class="bo-btn-secondary" id="boCopySqlScriptBtn" style="font-size: 12px; padding: 6px 12px;">
                   ${BO_ICONS.sparkles}
@@ -2505,7 +2289,7 @@ export class BackofficePage {
               <div class="bo-form-group">
                 <label class="bo-label">
                   <span>Ancien Mot de Passe</span>
-                  <span class="bo-label-hint">Ou code secours (237)</span>
+                  <span class="bo-label-hint">Requis</span>
                 </label>
                 <div class="bo-input-pwd-wrap">
                   <input type="password" id="cfgOldPassword" class="bo-input" placeholder="••••••••" autocomplete="current-password" />
@@ -3642,8 +3426,8 @@ export class BackofficePage {
               ${current.fullName.slice(0, 2).toUpperCase()}
             </div>
             <div>
-              <div style="font-weight: 700; color: var(--bo-forest); font-size: 14px;">${current.fullName} (${current.email})</div>
-              <div style="font-size: 12px; color: var(--bo-text-muted);">${current.role} • Session active</div>
+              <div style="font-weight: 700; color: var(--bo-forest); font-size: 14px;">${escapeHtml(current.fullName)} (${escapeHtml(current.email)})</div>
+              <div style="font-size: 12px; color: var(--bo-text-muted);">${escapeHtml(current.role)} • Session active</div>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -3695,14 +3479,14 @@ export class BackofficePage {
                     <div style="display: flex; align-items: center; gap: 10px;">
                       <div class="bo-user-avatar" style="width: 34px; height: 34px; font-size: 12px;">${initials}</div>
                       <div>
-                        <div style="font-weight: 700; color: var(--bo-forest);">${admin.fullName} ${isCurrent ? '<span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700;">(Vous)</span>' : ''}</div>
-                        <div style="font-size: 11.5px; color: var(--bo-text-muted);">${admin.email}</div>
+                        <div style="font-weight: 700; color: var(--bo-forest);">${escapeHtml(admin.fullName)} ${isCurrent ? '<span style="font-size: 11px; color: var(--bo-brand-green); font-weight: 700;">(Vous)</span>' : ''}</div>
+                        <div style="font-size: 11.5px; color: var(--bo-text-muted);">${escapeHtml(admin.email)}</div>
                       </div>
                     </div>
                   </td>
                   <td style="padding: 14px 16px;">
                     <span style="display: inline-block; background: var(--bo-brand-green-tint); border: 1px solid rgba(88,168,38,0.25); color: var(--bo-forest); font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: var(--bo-radius-pill);">
-                      ${admin.role}
+                      ${escapeHtml(admin.role)}
                     </span>
                   </td>
                   <td style="padding: 14px 16px; color: var(--bo-text-muted); font-size: 12px;">
@@ -3906,7 +3690,7 @@ export class BackofficePage {
                 <div class="bo-form-group">
                   <label class="bo-label">
                     <span>Ancien Mot de Passe</span>
-                    <span class="bo-label-hint">Ou code de secours (237)</span>
+                    <span class="bo-label-hint">Requis</span>
                   </label>
                   <div class="bo-input-pwd-wrap">
                     <input type="password" id="modalOldPassword" class="bo-input" placeholder="••••••••" autocomplete="current-password" />

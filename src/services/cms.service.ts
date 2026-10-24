@@ -11,6 +11,7 @@ import { VIDEO_REELS } from '../data/flavors.data';
 import type { ShowcaseProduct } from '../components/showcase/showcase.types';
 import type { StoreLocation, VideoReel, JuiceCollection, CmsCustomPage } from '../types/product.types';
 import { supabaseService, type AdminUser } from './supabase.service';
+import { sanitizeHtml } from '../utils/dom';
 
 export type { JuiceCollection, CmsCustomPage, AdminUser };
 
@@ -166,12 +167,18 @@ export class CmsService {
 
   public isAuthenticated(): boolean {
     try {
-      return (
-        sessionStorage.getItem(AUTH_KEY) === 'true' ||
-        localStorage.getItem(AUTH_KEY) === 'true' ||
-        Boolean(sessionStorage.getItem('nidj_current_admin')) ||
-        Boolean(localStorage.getItem('nidj_current_admin'))
-      );
+      if (this.currentAdmin && this.currentAdmin.email) {
+        return true;
+      }
+      const raw = sessionStorage.getItem('nidj_current_admin') || localStorage.getItem('nidj_current_admin');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && parsed.email) {
+          this.currentAdmin = parsed;
+          return true;
+        }
+      }
+      return false;
     } catch {
       return false;
     }
@@ -201,7 +208,7 @@ export class CmsService {
   public setCurrentAdmin(admin: AdminUser | null, remember: boolean = false): void {
     this.currentAdmin = admin;
     try {
-      if (admin) {
+      if (admin && admin.email) {
         sessionStorage.setItem('nidj_current_admin', JSON.stringify(admin));
         sessionStorage.setItem(AUTH_KEY, 'true');
         if (remember) {
@@ -209,10 +216,12 @@ export class CmsService {
           localStorage.setItem(AUTH_KEY, 'true');
         }
       } else {
+        this.currentAdmin = null;
         sessionStorage.removeItem('nidj_current_admin');
         sessionStorage.removeItem(AUTH_KEY);
         localStorage.removeItem('nidj_current_admin');
         localStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem('nidj_custom_admin_password');
       }
     } catch (e) {
       console.warn('Error saving admin session', e);
@@ -221,7 +230,7 @@ export class CmsService {
 
   public setAuthenticated(auth: boolean, remember: boolean = false): void {
     try {
-      if (auth) {
+      if (auth && this.currentAdmin) {
         sessionStorage.setItem(AUTH_KEY, 'true');
         if (remember) {
           localStorage.setItem(AUTH_KEY, 'true');
@@ -232,6 +241,7 @@ export class CmsService {
         sessionStorage.removeItem('nidj_current_admin');
         localStorage.removeItem(AUTH_KEY);
         localStorage.removeItem('nidj_current_admin');
+        localStorage.removeItem('nidj_custom_admin_password');
       }
     } catch (e) {
       console.error('Error saving auth state', e);
@@ -239,34 +249,22 @@ export class CmsService {
   }
 
   // --- Password Management Helpers ---
-  public getCustomAdminPassword(): string | null {
+  public recordPasswordUpdatedAt(): void {
     try {
-      return localStorage.getItem('nidj_custom_admin_password') || this.db?.settings?.customAdminPassword || null;
-    } catch {
-      return this.db?.settings?.customAdminPassword || null;
-    }
-  }
-
-  public setCustomAdminPassword(newPassword: string): void {
-    try {
-      localStorage.setItem('nidj_custom_admin_password', newPassword);
       if (!this.db.settings) {
         this.db.settings = this.getDefaultDatabase().settings;
       }
-      this.db.settings.customAdminPassword = newPassword;
       this.db.settings.adminPasswordUpdatedAt = new Date().toISOString();
+      delete this.db.settings.customAdminPassword;
+      localStorage.removeItem('nidj_custom_admin_password');
       void this.persist();
     } catch (e) {
-      console.warn('Error saving custom admin password', e);
+      console.warn('Error recording password update', e);
     }
   }
 
-  public verifyAdminPassword(pwd: string): boolean {
-    const custom = this.getCustomAdminPassword();
-    if (custom) {
-      return pwd === custom;
-    }
-    return pwd === 'admin' || pwd === '237' || pwd === '2370' || pwd === 'nidjeu';
+  public setCustomAdminPassword(_newPassword?: string): void {
+    this.recordPasswordUpdatedAt();
   }
 
   // --- Storage Operations ---
@@ -887,7 +885,37 @@ export class CmsService {
   public importBackupJson(jsonString: string): boolean {
     try {
       const parsed = JSON.parse(jsonString) as CmsDatabase;
-      if (parsed && Array.isArray(parsed.products) && parsed.products.length > 0) {
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        Array.isArray(parsed.products) &&
+        parsed.products.length > 0
+      ) {
+        // Validate each product has minimum required fields
+        const validProducts = parsed.products.every(
+          (p) => p && typeof p.id === 'string' && typeof p.name === 'string'
+        );
+        if (!validProducts) return false;
+
+        // Preserve authenticated infrastructure settings from current environment
+        const existingSettings = this.db.settings;
+        if (parsed.settings) {
+          parsed.settings.supabaseUrl = existingSettings.supabaseUrl;
+          parsed.settings.supabaseAnonKey = existingSettings.supabaseAnonKey;
+          parsed.settings.cloudinaryCloudName = existingSettings.cloudinaryCloudName;
+          parsed.settings.cloudinaryUploadPreset = existingSettings.cloudinaryUploadPreset;
+        } else {
+          parsed.settings = existingSettings;
+        }
+
+        // Sanitize rich HTML in custom pages
+        if (Array.isArray(parsed.customPages)) {
+          parsed.customPages = parsed.customPages.map((pg: CmsCustomPage) => ({
+            ...pg,
+            content: sanitizeHtml(pg.content || '')
+          }));
+        }
+
         this.db = parsed;
         void this.persist();
         return true;

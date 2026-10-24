@@ -123,15 +123,32 @@ class CloudinaryService {
       );
     }
 
-    // Detect resource type if set to auto or undefined
-    let resourceType: 'image' | 'video' | 'auto' = options.resourceType || 'auto';
-    if (resourceType === 'auto') {
-      if (file.type.startsWith('video/')) {
-        resourceType = 'video';
-      } else {
-        resourceType = 'image';
-      }
+    // Security: Validate file type and file size to prevent Stored XSS (e.g. malicious SVGs/HTML) and quota flooding
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
+    const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
+    const MAX_VIDEO_SIZE = 60 * 1024 * 1024; // 60 MB
+
+    const mime = file.type ? file.type.toLowerCase() : '';
+    const isImage = ALLOWED_IMAGE_TYPES.includes(mime);
+    const isVideo = ALLOWED_VIDEO_TYPES.includes(mime);
+
+    if (!isImage && !isVideo) {
+      throw new Error(
+        'Format de fichier non autorisé. Seules les images JPEG, PNG, WEBP, AVIF et les vidéos MP4/WEBM sont acceptées pour des raisons de sécurité.'
+      );
     }
+
+    if (isImage && file.size > MAX_IMAGE_SIZE) {
+      throw new Error('Image trop volumineuse. La taille maximale autorisée est de 10 Mo.');
+    }
+
+    if (isVideo && file.size > MAX_VIDEO_SIZE) {
+      throw new Error('Vidéo trop volumineuse. La taille maximale autorisée est de 60 Mo.');
+    }
+
+    // Detect resource type
+    let resourceType: 'image' | 'video' = isVideo ? 'video' : 'image';
 
     const uploadUrl = `https://api.cloudinary.com/v1_1/${encodeURIComponent(config.cloudName)}/${resourceType}/upload`;
 

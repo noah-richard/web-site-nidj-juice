@@ -216,18 +216,29 @@ export class OrderModal {
       const phone = (this.element.querySelector('#orderPhone') as HTMLInputElement).value.trim();
       const storeHint = (this.element.querySelector('#orderStoreHint') as HTMLInputElement).value;
 
-      if (!neighborhood || !name || !phone) {
-        alert('Veuillez renseigner votre nom, quartier et numéro de téléphone.');
+      const parsedQty = parseInt(qty, 10);
+      const safeQty = isNaN(parsedQty) || parsedQty < 1 ? 1 : Math.min(parsedQty, 100);
+
+      if (!name || name.length < 2 || name.length > 100) {
+        alert('Veuillez renseigner un nom valide (entre 2 et 100 caractères).');
+        return;
+      }
+      if (!phone || phone.length < 6 || phone.length > 30) {
+        alert('Veuillez renseigner un numéro de téléphone valide.');
+        return;
+      }
+      if (!neighborhood || neighborhood.length < 2 || neighborhood.length > 120) {
+        alert('Veuillez renseigner votre quartier de livraison (entre 2 et 120 caractères).');
         return;
       }
 
       audioController.playPop();
 
-      // Asynchronously record order in Supabase Cloud Database
+      // Asynchronously record order in Supabase Cloud Database with validated values
       supabaseService.saveOrder({
         flavor,
         format,
-        quantity: parseInt(qty, 10) || 1,
+        quantity: safeQty,
         customer_name: name,
         customer_phone: phone,
         city,

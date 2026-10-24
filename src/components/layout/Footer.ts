@@ -150,9 +150,6 @@ export class Footer {
           <div class="footer-copyright-bar">
             <p>
               &copy; ${currentYear} <strong>${settings.brandName}</strong> — ${settings.companyName}. Tous droits réservés.
-              <a href="/nidj-juice-backoffice" class="footer-admin-link" style="opacity: 0.4; font-size: 0.75rem; text-decoration: none; margin-left: 1rem; color: inherit; transition: opacity 0.2s;">
-                • Espace Administration
-              </a>
             </p>
           </div>
 

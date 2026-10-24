@@ -5,6 +5,7 @@
 
 import { cmsService } from '../services/cms.service';
 import type { CmsCustomPage } from '../types/product.types';
+import { sanitizeHtml } from '../utils/dom';
 
 export class CustomPageView {
   private element: HTMLElement;
@@ -94,7 +95,7 @@ export class CustomPageView {
 
         <div class="custom-page-content-card" style="background: #FFFFFF; border: 1px solid rgba(10, 61, 34, 0.1); border-radius: var(--radius-xl, 16px); padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); max-width: 920px; margin: 0 auto;">
           <div class="custom-page-rich-content editorial-body" style="font-size: 16px; line-height: 1.8; color: var(--color-text, #2D3748);">
-            ${page.content}
+            ${sanitizeHtml(page.content)}
           </div>
 
           ${page.ctaText && page.ctaLink ? `

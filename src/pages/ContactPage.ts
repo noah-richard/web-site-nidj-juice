@@ -5,6 +5,7 @@
    ========================================================================== */
 
 import { cmsService } from '../services/cms.service';
+import { supabaseService } from '../services/supabase.service';
 
 export class ContactPage {
   private element: HTMLElement;
@@ -201,21 +202,42 @@ export class ContactPage {
       });
     });
 
-    // Form submit via WhatsApp
+    // Form submit via WhatsApp & Supabase
     const form = this.element.querySelector('#consumerContactForm') as HTMLFormElement;
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
       const settings = cmsService.getSettings();
       const whatsappClean = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '237677426612';
-      const name = (this.element.querySelector('#contactName') as HTMLInputElement).value;
-      const phone = (this.element.querySelector('#contactPhone') as HTMLInputElement).value;
+      const name = (this.element.querySelector('#contactName') as HTMLInputElement).value.trim();
+      const phone = (this.element.querySelector('#contactPhone') as HTMLInputElement).value.trim();
       const subject = (this.element.querySelector('#contactSubject') as HTMLSelectElement).value;
-      const msg = (this.element.querySelector('#contactMsg') as HTMLTextAreaElement).value;
+      const msg = (this.element.querySelector('#contactMsg') as HTMLTextAreaElement).value.trim();
+
+      if (!name || name.length < 2 || name.length > 100) {
+        alert('Veuillez renseigner un nom valide (entre 2 et 100 caractères).');
+        return;
+      }
+      if (!phone || phone.length < 6 || phone.length > 30) {
+        alert('Veuillez renseigner un numéro de téléphone valide.');
+        return;
+      }
+      if (!msg || msg.length < 3 || msg.length > 3000) {
+        alert('Veuillez saisir votre message (entre 3 et 3000 caractères).');
+        return;
+      }
+
+      // Record contact message in Supabase Cloud
+      void supabaseService.saveContactMessage({
+        name,
+        phone,
+        subject,
+        message: msg
+      }).catch((err) => console.warn('Supabase saveContactMessage error:', err));
 
       const message = `Bonjour ${settings.companyName},\n\nNom : ${name}\nTéléphone : ${phone}\nObjet : ${subject}\n\nMessage : ${msg}`;
       const waUrl = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(message)}`;
 
-      window.open(waUrl, '_blank');
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
     });
 
     if (!this.unsubscribeCms) {
