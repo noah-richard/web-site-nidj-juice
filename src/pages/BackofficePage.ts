@@ -47,6 +47,7 @@ const BO_ICONS = {
   key: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="m21 2-9.6 9.6"></path><path d="m15.5 7.5 3 3L22 7l-3-3"></path></svg>`,
   shield: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
   info: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
+  user: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
   eyeOff: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`
 };
 
@@ -987,6 +988,18 @@ export class BackofficePage {
     const bissapProd = products.find((p) => p.id === 'cocktail-bissap' || p.id === 'bissap') || products[0];
     const ananasProd = products.find((p) => p.id === 'ananas-gingembre' || p.id === 'ananas') || products[1] || products[0];
 
+    const bissapDefaultBottle = '/assets/images/bottle-bissap.png';
+    const bissapDefaultSplash = '/assets/images/splash-bissap.png';
+    const bissapHeroVisual = bissapProd?.heroImage || bissapProd?.bottleImage || bissapDefaultBottle;
+    const isBissapHeroCustom = Boolean(bissapProd?.heroImage && bissapProd.heroImage !== bissapDefaultBottle);
+    const isBissapSplashCustom = Boolean(bissapProd?.splashImage && bissapProd.splashImage !== bissapDefaultSplash);
+
+    const ananasDefaultBottle = '/assets/images/bottle-ananas.png';
+    const ananasDefaultSplash = '/assets/images/splash-ananas.png';
+    const ananasHeroVisual = ananasProd?.heroImage || ananasProd?.bottleImage || ananasDefaultBottle;
+    const isAnanasHeroCustom = Boolean(ananasProd?.heroImage && ananasProd.heroImage !== ananasDefaultBottle);
+    const isAnanasSplashCustom = Boolean(ananasProd?.splashImage && ananasProd.splashImage !== ananasDefaultSplash);
+
     return `
       <div class="bo-page-header">
         <div class="bo-page-title-group">
@@ -1193,18 +1206,23 @@ export class BackofficePage {
                 </div>
               </div>
 
-              <!-- 2. Visuels des Bouteilles & Splashs affichés dans le Héro (Saveurs 01 & 02) -->
-              <div style="background: var(--bo-surface-subtle); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-md); padding: 16px;">
-                <div style="margin-bottom: 12px;">
-                  <label class="bo-label" style="margin: 0; font-size: 13px; font-weight: 700; color: var(--bo-text-headline);">
-                    2. Bouteilles & Éclaboussures (Splashs) affichées dans la Zone Héro
-                  </label>
-                  <p style="font-size: 11.5px; color: var(--bo-text-muted); margin: 2px 0 0 0;">
-                    Le Héro présente les saveurs en rotation (01 Cocktail de Bissap et 02 Jus d'Ananas Gingembre). Cliquez sur <strong>« Modifier »</strong> pour changer la bouteille détourée ou l'éclaboussure de fruits.
+              <!-- 2. Visuels Spécifiques à la Zone Héro (Indépendants du Catalogue & du Bas) -->
+              <div style="background: var(--bo-surface-subtle); border: 1.5px solid #bbf7d0; border-radius: var(--bo-radius-md); padding: 18px;">
+                <div style="margin-bottom: 14px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <label class="bo-label" style="margin: 0; font-size: 13.5px; font-weight: 800; color: var(--bo-forest);">
+                      2. Visuels Spécifiques à la Zone Héro (Indépendants du Catalogue)
+                    </label>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--bo-forest); background: #dcfce7; padding: 3px 8px; border-radius: var(--bo-radius-pill);">
+                      Isolation Garantie
+                    </span>
+                  </div>
+                  <p style="font-size: 11.5px; color: var(--bo-forest); background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--bo-radius-sm); padding: 8px 12px; margin: 8px 0 0 0; line-height: 1.5;">
+                    <strong>🛡️ Protection des sections du bas :</strong> Les visuels modifiés ou téléversés ici s'appliquent <strong>uniquement sur la bannière Héro du haut</strong>. Les bouteilles officielles de votre vitrine <em>« Nos Saveurs »</em>, du carrousel 3D et des pages produits restent 100% intactes !
                   </p>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px;">
                   
                   <!-- Carte Saveur 01: Cocktail de Bissap -->
                   <div style="background: #FFFFFF; border: 1.5px solid rgba(196, 0, 62, 0.2); border-radius: var(--bo-radius-sm); padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
@@ -1216,25 +1234,102 @@ export class BackofficePage {
                         <span style="font-weight: 700; font-size: 12px; color: var(--bo-text-primary);">${bissapProd?.name || 'Cocktail de Bissap'}</span>
                       </div>
 
-                      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
-                        <div style="text-align: center; flex: 1;">
-                          <div style="height: 80px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border);">
-                            <img src="${bissapProd?.bottleImage || '/assets/images/bottle-bissap.png'}" alt="Bouteille Bissap" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                      <!-- Toggle Mode Image Simple (Sans décoratif en arrière) -->
+                      <label style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 700; color: ${bissapProd?.hideHeroDecorations ? 'var(--flavor-bissap-primary, #C4003E)' : 'var(--bo-text-headline)'}; cursor: pointer; padding: 7px 10px; background: ${bissapProd?.hideHeroDecorations ? 'rgba(196, 0, 62, 0.08)' : 'var(--bo-surface-subtle)'}; border-radius: var(--bo-radius-sm); border: 1.5px solid ${bissapProd?.hideHeroDecorations ? 'var(--flavor-bissap-primary, #C4003E)' : 'var(--bo-border)'}; margin-bottom: 12px; transition: all 0.2s ease;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                          ${bissapProd?.hideHeroDecorations ? BO_ICONS.sparkles : BO_ICONS.image}
+                          <span>Mode Image Simple (sans décoratif / splash en arrière)</span>
+                        </span>
+                        <input type="checkbox" data-toggle-hero-decorations="${bissapProd?.id || 'cocktail-bissap'}" ${bissapProd?.hideHeroDecorations ? 'checked' : ''} style="accent-color: var(--flavor-bissap-primary, #C4003E); width: 16px; height: 16px; cursor: pointer;" />
+                      </label>
+
+                      <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px;">
+                        
+                        <!-- Visuel spécifique au Héro -->
+                        <div style="text-align: center; flex: 1; display: flex; flex-direction: column;">
+                          <div style="height: 84px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border); position: relative; overflow: hidden;">
+                            <img src="${bissapHeroVisual}" alt="Visuel Héro Bissap" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                            ${isBissapHeroCustom ? `
+                              <span style="position: absolute; top: 3px; right: 3px; font-size: 9px; font-weight: 800; color: #b45309; background: rgba(254, 243, 199, 0.95); border: 1px solid #fde68a; padding: 1px 5px; border-radius: 4px; line-height: 1.2;">
+                                Héro Spécifique
+                              </span>
+                            ` : ''}
                           </div>
-                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">Bouteille détourée</span>
-                        </div>
-                        <div style="text-align: center; flex: 1;">
-                          <div style="height: 80px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border);">
-                            <img src="${bissapProd?.splashImage || '/assets/images/splash-bissap.png'}" alt="Splash Bissap" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">${bissapProd?.hideHeroDecorations ? 'Image simple (droite)' : 'Visuel dédié Héro'}</span>
+                          
+                          <div style="display: flex; gap: 4px; margin-top: 6px;">
+                            ${isBissapHeroCustom ? `
+                              <button type="button" class="bo-btn-icon" data-delete-hero-img="hero" data-flavor-id="${bissapProd?.id || 'cocktail-bissap'}" title="Supprimer le visuel héro personnalisé et rétablir la bouteille standard pour le haut" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 700; color: #dc2626; border: 1px solid #fca5a5; border-radius: var(--bo-radius-sm); background: #fff5f5; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.trash}
+                                <span>Rétablir Bouteille</span>
+                              </button>
+                            ` : `
+                              <button type="button" class="bo-btn-icon" data-delete-hero-img="hero" data-flavor-id="${bissapProd?.id || 'cocktail-bissap'}" title="Réinitialiser vers la bouteille standard" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 600; color: var(--bo-text-muted); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.refresh}
+                                <span>Par défaut</span>
+                              </button>
+                            `}
+                            <label class="bo-btn-icon" title="Changer le visuel du Héro (sans impacter le bas)" style="flex: 1; padding: 4px 6px; font-size: 10.5px; font-weight: 600; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); color: var(--bo-forest); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                              ${BO_ICONS.camera}
+                              <span>Changer</span>
+                              <input type="file" data-quick-upload-hero-img="hero" data-flavor-id="${bissapProd?.id || 'cocktail-bissap'}" accept="image/*" style="display: none;" />
+                            </label>
                           </div>
-                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">Splash de fruits</span>
                         </div>
+
+                        <!-- Splash de fruits / Décoratif -->
+                        <div style="text-align: center; flex: 1; display: flex; flex-direction: column;">
+                          <div style="height: 84px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border); position: relative; overflow: hidden; opacity: ${bissapProd?.hideHeroDecorations ? '0.35' : '1'};">
+                            <img src="${bissapProd?.splashImage && bissapProd.splashImage !== 'none' ? bissapProd.splashImage : bissapDefaultSplash}" alt="Splash Bissap" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                            ${bissapProd?.hideHeroDecorations ? `
+                              <span style="position: absolute; top: 3px; right: 3px; font-size: 9px; font-weight: 800; color: var(--bo-text-muted); background: #f1f5f9; border: 1px solid #cbd5e1; padding: 1px 5px; border-radius: 4px; line-height: 1.2;">
+                                Masqué
+                              </span>
+                            ` : (isBissapSplashCustom ? `
+                              <span style="position: absolute; top: 3px; right: 3px; font-size: 9px; font-weight: 800; color: #b45309; background: rgba(254, 243, 199, 0.95); border: 1px solid #fde68a; padding: 1px 5px; border-radius: 4px; line-height: 1.2;">
+                                Modifié
+                              </span>
+                            ` : '')}
+                          </div>
+                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">${bissapProd?.hideHeroDecorations ? 'Décoratif (Désactivé)' : 'Splash de fruits'}</span>
+                          
+                          <div style="display: flex; gap: 4px; margin-top: 6px;">
+                            ${bissapProd?.hideHeroDecorations ? `
+                              <button type="button" class="bo-btn-icon" data-enable-splash="${bissapProd?.id || 'cocktail-bissap'}" title="Réactiver le splash de fruits sur le Héro" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 700; color: var(--bo-forest); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.sparkles}
+                                <span>Réactiver</span>
+                              </button>
+                            ` : (isBissapSplashCustom ? `
+                              <button type="button" class="bo-btn-icon" data-delete-hero-img="splash" data-flavor-id="${bissapProd?.id || 'cocktail-bissap'}" title="Supprimer le splash personnalisé et rétablir le splash officiel" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 700; color: #dc2626; border: 1px solid #fca5a5; border-radius: var(--bo-radius-sm); background: #fff5f5; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.trash}
+                                <span>Rétablir</span>
+                              </button>
+                            ` : `
+                              <button type="button" class="bo-btn-icon" data-delete-hero-img="splash" data-flavor-id="${bissapProd?.id || 'cocktail-bissap'}" title="Désactiver le splash de fruits" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 600; color: var(--bo-text-muted); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.trash}
+                                <span>Masquer</span>
+                              </button>
+                            `)}
+                            <label class="bo-btn-icon" title="Changer l'éclaboussure de fruits" style="flex: 1; padding: 4px 6px; font-size: 10.5px; font-weight: 600; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); color: var(--bo-forest); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                              ${BO_ICONS.camera}
+                              <span>Changer</span>
+                              <input type="file" data-quick-upload-hero-img="splash" data-flavor-id="${bissapProd?.id || 'cocktail-bissap'}" accept="image/*" style="display: none;" />
+                            </label>
+                          </div>
+                        </div>
+
                       </div>
+
+                      <!-- Preset 1-Clic Ambassadrice Nidj Juice (T-shirt Rose) -->
+                      <button type="button" class="bo-btn-secondary" data-apply-ambassador="${bissapProd?.id || 'cocktail-bissap'}" title="Appliquer la photo de l'ambassadrice UNIQUEMENT sur le Héro (sans impacter le bas)" style="width: 100%; justify-content: center; font-size: 11px; padding: 6px 10px; margin-bottom: 8px; gap: 6px; border-color: rgba(196, 0, 62, 0.25); background: #fff8fa; color: var(--flavor-bissap-primary, #C4003E);">
+                        ${BO_ICONS.user}
+                        <span>Appliquer Photo Ambassadrice (Hero Uniquement)</span>
+                      </button>
                     </div>
 
                     <button type="button" class="bo-btn-secondary" data-edit-product="${bissapProd?.id || 'cocktail-bissap'}" style="width: 100%; justify-content: center;">
                       ${BO_ICONS.edit}
-                      <span>Modifier Bouteille & Splash (01)</span>
+                      <span>Modifier Fiche Complète (01)</span>
                     </button>
                   </div>
 
@@ -1248,25 +1343,102 @@ export class BackofficePage {
                         <span style="font-weight: 700; font-size: 12px; color: var(--bo-text-primary);">${ananasProd?.name || "Jus d'Ananas Gingembre"}</span>
                       </div>
 
-                      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
-                        <div style="text-align: center; flex: 1;">
-                          <div style="height: 80px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border);">
-                            <img src="${ananasProd?.bottleImage || '/assets/images/bottle-ananas.png'}" alt="Bouteille Ananas" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                      <!-- Toggle Mode Image Simple (Sans décoratif en arrière) -->
+                      <label style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 700; color: ${ananasProd?.hideHeroDecorations ? '#B37D00' : 'var(--bo-text-headline)'}; cursor: pointer; padding: 7px 10px; background: ${ananasProd?.hideHeroDecorations ? 'rgba(230, 163, 0, 0.12)' : 'var(--bo-surface-subtle)'}; border-radius: var(--bo-radius-sm); border: 1.5px solid ${ananasProd?.hideHeroDecorations ? '#B37D00' : 'var(--bo-border)'}; margin-bottom: 12px; transition: all 0.2s ease;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                          ${ananasProd?.hideHeroDecorations ? BO_ICONS.sparkles : BO_ICONS.image}
+                          <span>Mode Image Simple (sans décoratif / splash en arrière)</span>
+                        </span>
+                        <input type="checkbox" data-toggle-hero-decorations="${ananasProd?.id || 'ananas-gingembre'}" ${ananasProd?.hideHeroDecorations ? 'checked' : ''} style="accent-color: #B37D00; width: 16px; height: 16px; cursor: pointer;" />
+                      </label>
+
+                      <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px;">
+                        
+                        <!-- Visuel spécifique au Héro -->
+                        <div style="text-align: center; flex: 1; display: flex; flex-direction: column;">
+                          <div style="height: 84px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border); position: relative; overflow: hidden;">
+                            <img src="${ananasHeroVisual}" alt="Visuel Héro Ananas" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                            ${isAnanasHeroCustom ? `
+                              <span style="position: absolute; top: 3px; right: 3px; font-size: 9px; font-weight: 800; color: #b45309; background: rgba(254, 243, 199, 0.95); border: 1px solid #fde68a; padding: 1px 5px; border-radius: 4px; line-height: 1.2;">
+                                Héro Spécifique
+                              </span>
+                            ` : ''}
                           </div>
-                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">Bouteille détourée</span>
-                        </div>
-                        <div style="text-align: center; flex: 1;">
-                          <div style="height: 80px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border);">
-                            <img src="${ananasProd?.splashImage || '/assets/images/splash-ananas.png'}" alt="Splash Ananas" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">${ananasProd?.hideHeroDecorations ? 'Image simple (droite)' : 'Visuel dédié Héro'}</span>
+                          
+                          <div style="display: flex; gap: 4px; margin-top: 6px;">
+                            ${isAnanasHeroCustom ? `
+                              <button type="button" class="bo-btn-icon" data-delete-hero-img="hero" data-flavor-id="${ananasProd?.id || 'ananas-gingembre'}" title="Supprimer le visuel héro personnalisé et rétablir la bouteille standard pour le haut" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 700; color: #dc2626; border: 1px solid #fca5a5; border-radius: var(--bo-radius-sm); background: #fff5f5; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.trash}
+                                <span>Rétablir Bouteille</span>
+                              </button>
+                            ` : `
+                              <button type="button" class="bo-btn-icon" data-delete-hero-img="hero" data-flavor-id="${ananasProd?.id || 'ananas-gingembre'}" title="Réinitialiser vers la bouteille standard" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 600; color: var(--bo-text-muted); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.refresh}
+                                <span>Par défaut</span>
+                              </button>
+                            `}
+                            <label class="bo-btn-icon" title="Changer le visuel du Héro (sans impacter le bas)" style="flex: 1; padding: 4px 6px; font-size: 10.5px; font-weight: 600; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); color: var(--bo-forest); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                              ${BO_ICONS.camera}
+                              <span>Changer</span>
+                              <input type="file" data-quick-upload-hero-img="hero" data-flavor-id="${ananasProd?.id || 'ananas-gingembre'}" accept="image/*" style="display: none;" />
+                            </label>
                           </div>
-                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">Splash de fruits</span>
                         </div>
+
+                        <!-- Splash de fruits / Décoratif -->
+                        <div style="text-align: center; flex: 1; display: flex; flex-direction: column;">
+                          <div style="height: 84px; background: var(--bo-surface-subtle); border-radius: var(--bo-radius-sm); display: flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--bo-border); position: relative; overflow: hidden; opacity: ${ananasProd?.hideHeroDecorations ? '0.35' : '1'};">
+                            <img src="${ananasProd?.splashImage && ananasProd.splashImage !== 'none' ? ananasProd.splashImage : ananasDefaultSplash}" alt="Splash Ananas" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                            ${ananasProd?.hideHeroDecorations ? `
+                              <span style="position: absolute; top: 3px; right: 3px; font-size: 9px; font-weight: 800; color: var(--bo-text-muted); background: #f1f5f9; border: 1px solid #cbd5e1; padding: 1px 5px; border-radius: 4px; line-height: 1.2;">
+                                Masqué
+                              </span>
+                            ` : (isAnanasSplashCustom ? `
+                              <span style="position: absolute; top: 3px; right: 3px; font-size: 9px; font-weight: 800; color: #b45309; background: rgba(254, 243, 199, 0.95); border: 1px solid #fde68a; padding: 1px 5px; border-radius: 4px; line-height: 1.2;">
+                                Modifié
+                              </span>
+                            ` : '')}
+                          </div>
+                          <span style="font-size: 11px; color: var(--bo-text-muted); font-weight: 600; display: block; margin-top: 4px;">${ananasProd?.hideHeroDecorations ? 'Décoratif (Désactivé)' : 'Splash de fruits'}</span>
+                          
+                          <div style="display: flex; gap: 4px; margin-top: 6px;">
+                            ${ananasProd?.hideHeroDecorations ? `
+                              <button type="button" class="bo-btn-icon" data-enable-splash="${ananasProd?.id || 'ananas-gingembre'}" title="Réactiver le splash de fruits sur le Héro" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 700; color: var(--bo-forest); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.sparkles}
+                                <span>Réactiver</span>
+                              </button>
+                            ` : (isAnanasSplashCustom ? `
+                              <button type="button" class="bo-btn-icon" data-delete-hero-img="splash" data-flavor-id="${ananasProd?.id || 'ananas-gingembre'}" title="Supprimer le splash personnalisé et rétablir le splash officiel" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 700; color: #dc2626; border: 1px solid #fca5a5; border-radius: var(--bo-radius-sm); background: #fff5f5; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.trash}
+                                <span>Rétablir</span>
+                              </button>
+                            ` : `
+                              <button type="button" class="bo-btn-icon" data-delete-hero-img="splash" data-flavor-id="${ananasProd?.id || 'ananas-gingembre'}" title="Désactiver le splash de fruits" style="flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 600; color: var(--bo-text-muted); border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                                ${BO_ICONS.trash}
+                                <span>Masquer</span>
+                              </button>
+                            `)}
+                            <label class="bo-btn-icon" title="Changer l'éclaboussure de fruits" style="flex: 1; padding: 4px 6px; font-size: 10.5px; font-weight: 600; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); color: var(--bo-forest); background: #FFF; justify-content: center; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">
+                              ${BO_ICONS.camera}
+                              <span>Changer</span>
+                              <input type="file" data-quick-upload-hero-img="splash" data-flavor-id="${ananasProd?.id || 'ananas-gingembre'}" accept="image/*" style="display: none;" />
+                            </label>
+                          </div>
+                        </div>
+
                       </div>
+
+                      <!-- Preset 1-Clic Ambassadrice Nidj Juice (T-shirt Rose) -->
+                      <button type="button" class="bo-btn-secondary" data-apply-ambassador="${ananasProd?.id || 'ananas-gingembre'}" title="Appliquer la photo de l'ambassadrice UNIQUEMENT sur le Héro (sans impacter le bas)" style="width: 100%; justify-content: center; font-size: 11px; padding: 6px 10px; margin-bottom: 8px; gap: 6px; border-color: rgba(230, 163, 0, 0.35); background: #fffdf5; color: #B37D00;">
+                        ${BO_ICONS.user}
+                        <span>Appliquer Photo Ambassadrice (Hero Uniquement)</span>
+                      </button>
                     </div>
 
                     <button type="button" class="bo-btn-secondary" data-edit-product="${ananasProd?.id || 'ananas-gingembre'}" style="width: 100%; justify-content: center;">
                       ${BO_ICONS.edit}
-                      <span>Modifier Bouteille & Splash (02)</span>
+                      <span>Modifier Fiche Complète (02)</span>
                     </button>
                   </div>
 
@@ -2515,6 +2687,189 @@ export class BackofficePage {
       });
     });
 
+    // Delete / Reset Hero Image triggers (Hero visual or Splash)
+    this.element.querySelectorAll('[data-delete-hero-img]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const type = btn.getAttribute('data-delete-hero-img') as 'hero' | 'splash';
+        const flavorId = btn.getAttribute('data-flavor-id');
+        if (!flavorId || !type) return;
+
+        const prod = cmsService.getProductById(flavorId);
+        if (!prod) return;
+
+        const isBissap = prod.id === 'cocktail-bissap' || prod.id === 'bissap';
+        const defaultSplash = isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png';
+        const defaultBottle = isBissap ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png';
+
+        if (type === 'hero') {
+          if (confirm(`Voulez-vous supprimer le visuel dédié au Héro pour « ${prod.name} » et rétablir la bouteille standard ?`)) {
+            const updated: ShowcaseProduct = {
+              ...prod,
+              heroImage: '',
+              bottleImage: prod.bottleImage && !prod.bottleImage.includes('ambassador') ? prod.bottleImage : defaultBottle,
+              hideHeroDecorations: false,
+              splashImage: prod.splashImage === 'none' ? defaultSplash : prod.splashImage
+            };
+            const res = await cmsService.saveProduct(updated);
+            if (res.cloudSynced) {
+              this.showToast(`Visuel Héro réinitialisé ! Bouteille officielle rétablie et synchronisée sur Supabase Cloud.`, 'success');
+            } else {
+              this.showToast(`Visuel Héro réinitialisé ! Bouteille officielle rétablie avec succès.`, 'success');
+            }
+            this.render();
+          }
+        } else {
+          // type === 'splash'
+          if (confirm(`Voulez-vous réinitialiser le splash de fruits pour « ${prod.name} » et rétablir l'éclaboussure officielle d'origine ?`)) {
+            const updated: ShowcaseProduct = {
+              ...prod,
+              splashImage: defaultSplash
+            };
+            const res = await cmsService.saveProduct(updated);
+            if (res.cloudSynced) {
+              this.showToast(`Splash réinitialisé et synchronisé sur Supabase Cloud !`, 'success');
+            } else {
+              this.showToast(`Splash réinitialisé avec succès !`, 'success');
+            }
+            this.render();
+          }
+        }
+      });
+    });
+
+    // Toggle Hero Decorations (Simple Image Mode vs Standard Splash Mode)
+    this.element.querySelectorAll<HTMLInputElement>('input[data-toggle-hero-decorations]').forEach((cb) => {
+      cb.addEventListener('change', async () => {
+        const flavorId = cb.getAttribute('data-toggle-hero-decorations');
+        if (!flavorId) return;
+
+        const prod = cmsService.getProductById(flavorId);
+        if (!prod) return;
+
+        const isSimple = cb.checked;
+        const defaultSplash = (prod.id === 'cocktail-bissap' || prod.id === 'bissap') ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png';
+
+        const updated: ShowcaseProduct = {
+          ...prod,
+          hideHeroDecorations: isSimple,
+          splashImage: isSimple ? 'none' : (prod.splashImage === 'none' ? defaultSplash : prod.splashImage)
+        };
+
+        await cmsService.saveProduct(updated);
+        if (isSimple) {
+          this.showToast('Mode Image Simple activé : le visuel sera affiché droit sans décoratif ni splash en arrière-plan.', 'success');
+        } else {
+          this.showToast('Mode Standard rétabli : les décoratifs d’arrière-plan (splash & aura) sont réactivés.', 'info');
+        }
+        this.render();
+      });
+    });
+
+    // Enable Splash trigger
+    this.element.querySelectorAll('[data-enable-splash]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const flavorId = btn.getAttribute('data-enable-splash');
+        if (!flavorId) return;
+
+        const prod = cmsService.getProductById(flavorId);
+        if (!prod) return;
+
+        const defaultSplash = (prod.id === 'cocktail-bissap' || prod.id === 'bissap') ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png';
+
+        const updated: ShowcaseProduct = {
+          ...prod,
+          hideHeroDecorations: false,
+          splashImage: defaultSplash
+        };
+
+        await cmsService.saveProduct(updated);
+        this.showToast('Splash de fruits et décoratif réactivés avec succès !', 'success');
+        this.render();
+      });
+    });
+
+    // Apply Ambassador Photo Preset in 1 click
+    this.element.querySelectorAll('[data-apply-ambassador]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const flavorId = btn.getAttribute('data-apply-ambassador');
+        if (!flavorId) return;
+
+        const prod = cmsService.getProductById(flavorId);
+        if (!prod) return;
+
+        const isBissap = prod.id === 'cocktail-bissap' || prod.id === 'bissap';
+        const defaultBottle = isBissap ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png';
+
+        if (confirm(`Appliquer la photo de l'ambassadrice (T-shirt rose) en mode image simple (sans décoratif en arrière-plan) pour « ${prod.name} » ?\n\nNote : La bouteille officielle restera 100% préservée dans le carrousel « Nos Saveurs » et le catalogue.`)) {
+          const updated: ShowcaseProduct = {
+            ...prod,
+            heroImage: '/assets/images/nidj-ambassador.png',
+            bottleImage: prod.bottleImage && !prod.bottleImage.includes('ambassador') ? prod.bottleImage : defaultBottle,
+            hideHeroDecorations: true,
+            splashImage: 'none'
+          };
+          const res = await cmsService.saveProduct(updated);
+          if (res.cloudSynced) {
+            this.showToast('Photo Ambassadrice appliquée sur le Héro et synchronisée sur Supabase Cloud !', 'success');
+          } else {
+            this.showToast('Photo Ambassadrice appliquée sur le Héro avec succès en mode image simple !', 'success');
+          }
+          this.render();
+        }
+      });
+    });
+
+    // Quick Upload Hero Image triggers (Hero visual or Splash direct upload)
+    this.element.querySelectorAll<HTMLInputElement>('input[data-quick-upload-hero-img]').forEach((input) => {
+      input.addEventListener('change', async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        const type = input.getAttribute('data-quick-upload-hero-img') as 'hero' | 'splash';
+        const flavorId = input.getAttribute('data-flavor-id');
+        if (!file || !flavorId || !type) return;
+
+        const prod = cmsService.getProductById(flavorId);
+        if (!prod) return;
+
+        const label = type === 'hero' ? 'visuel dédié au Héro' : 'splash de fruits';
+        this.showToast(`Téléversement de la nouvelle image (${label}) en cours...`, 'info');
+
+        let newUrl = '';
+        if (cloudinaryService.isConfigured()) {
+          try {
+            const res = await cloudinaryService.upload(file, {
+              resourceType: 'image',
+              folder: 'nidj_juice/hero'
+            });
+            newUrl = res.secureUrl;
+          } catch (err: any) {
+            console.error('Cloudinary upload error', err);
+            this.showToast(`Échec Cloudinary : ${err.message || 'Erreur'}`, 'error');
+            return;
+          }
+        } else {
+          newUrl = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (evt) => resolve(evt.target?.result as string);
+            reader.readAsDataURL(file);
+          });
+        }
+
+        if (newUrl) {
+          const updated: ShowcaseProduct = {
+            ...prod,
+            ...(type === 'hero' ? { heroImage: newUrl } : { splashImage: newUrl })
+          };
+          const res = await cmsService.saveProduct(updated);
+          if (res.cloudSynced) {
+            this.showToast(`Image de ${label} mise à jour et synchronisée sur Supabase Cloud !`, 'success');
+          } else {
+            this.showToast(`Image de ${label} mise à jour avec succès !`, 'success');
+          }
+          this.render();
+        }
+      });
+    });
+
     // Delete Product triggers
     this.element.querySelectorAll('[data-delete-product]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -2696,7 +3051,7 @@ export class BackofficePage {
     });
 
     const clearHeroBgBtn = this.element.querySelector('#heroClearBgBtn');
-    clearHeroBgBtn?.addEventListener('click', () => {
+    clearHeroBgBtn?.addEventListener('click', async () => {
       const urlInput = this.element.querySelector('#heroBgBannerUrl') as HTMLInputElement;
       const preview = this.element.querySelector('#heroBgBannerPreview') as HTMLImageElement;
       if (urlInput) urlInput.value = '';
@@ -2704,7 +3059,17 @@ export class BackofficePage {
         preview.src = '/assets/images/gallery-1.webp';
         preview.style.opacity = '0.35';
       }
-      this.showToast("Image d'arrière-plan retirée du champ. Cliquez sur « Enregistrer le Héro » pour confirmer.", 'info');
+      const current = cmsService.getHeroContent();
+      const res = await cmsService.saveHeroContent({
+        ...current,
+        bgBannerImage: ''
+      });
+      if (res.cloudSynced) {
+        this.showToast("Image d'arrière-plan du Héro supprimée et synchronisée sur Supabase Cloud !", 'success');
+      } else {
+        this.showToast("Image d'arrière-plan du Héro supprimée avec succès !", 'success');
+      }
+      this.render();
     });
     this.setupImageUploader({
       fileInputId: '#compProdImgFile',
@@ -4023,11 +4388,17 @@ export class BackofficePage {
                   </div>
                   <div style="flex: 1; min-width: 0;">
                     <input type="text" id="pImgUrl" class="bo-input" value="${p.bottleImage}" placeholder="URL Cloudinary ou chemin local" style="margin-bottom: 8px;" />
-                    <label class="bo-upload-action-btn" style="cursor: pointer;">
-                      ${BO_ICONS.camera}
-                      <span>Téléverser vers Cloudinary</span>
-                      <input type="file" id="pImgFileInput" accept="image/*" style="display: none;" />
-                    </label>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                      <label class="bo-upload-action-btn" style="cursor: pointer;">
+                        ${BO_ICONS.camera}
+                        <span>Téléverser vers Cloudinary</span>
+                        <input type="file" id="pImgFileInput" accept="image/*" style="display: none;" />
+                      </label>
+                      <button type="button" class="bo-btn-icon" id="pClearBottleImgBtn" title="Supprimer l'image personnalisée et rétablir le visuel officiel d'origine" style="padding: 6px 12px; font-size: 12px; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); color: var(--bo-red); display: inline-flex; align-items: center; gap: 4px; background: #FFF; cursor: pointer;">
+                        ${BO_ICONS.trash}
+                        <span>Supprimer / Rétablir l'original</span>
+                      </button>
+                    </div>
                     <div id="pUploadProgress" style="display: none;"></div>
                   </div>
                 </div>
@@ -4048,14 +4419,34 @@ export class BackofficePage {
                   </div>
                   <div style="flex: 1; min-width: 0;">
                     <input type="text" id="pSplashImgUrl" class="bo-input" value="${p.splashImage || ''}" placeholder="URL Cloudinary ou chemin local (/assets/images/...)" style="margin-bottom: 8px;" />
-                    <label class="bo-upload-action-btn" style="cursor: pointer;">
-                      ${BO_ICONS.camera}
-                      <span>Téléverser vers Cloudinary</span>
-                      <input type="file" id="pSplashImgFileInput" accept="image/*" style="display: none;" />
-                    </label>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                      <label class="bo-upload-action-btn" style="cursor: pointer;">
+                        ${BO_ICONS.camera}
+                        <span>Téléverser vers Cloudinary</span>
+                        <input type="file" id="pSplashImgFileInput" accept="image/*" style="display: none;" />
+                      </label>
+                      <button type="button" class="bo-btn-icon" id="pClearSplashImgBtn" title="Supprimer l'éclaboussure personnalisée et rétablir le splash officiel d'origine" style="padding: 6px 12px; font-size: 12px; border: 1px solid var(--bo-border); border-radius: var(--bo-radius-sm); color: var(--bo-red); display: inline-flex; align-items: center; gap: 4px; background: #FFF; cursor: pointer;">
+                        ${BO_ICONS.trash}
+                        <span>Supprimer / Rétablir le splash</span>
+                      </button>
+                    </div>
                     <div id="pSplashUploadProgress" style="display: none;"></div>
                   </div>
                 </div>
+              </div>
+
+              <!-- Mode Visuel Simple sans décoratif -->
+              <div class="bo-form-group" style="background: var(--bo-surface-subtle); padding: 12px 14px; border-radius: var(--bo-radius-sm); border: 1px solid var(--bo-border);">
+                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 700; color: var(--bo-forest); cursor: pointer; margin: 0;">
+                  <span style="display: flex; align-items: center; gap: 8px;">
+                    ${BO_ICONS.sparkles}
+                    <span>Mode Image Simple sur le Héro (sans décoratif en arrière, ni splash ni aura)</span>
+                  </span>
+                  <input type="checkbox" id="pHideHeroDecorations" ${p.hideHeroDecorations ? 'checked' : ''} style="accent-color: var(--bo-brand-green); width: 18px; height: 18px; cursor: pointer;" />
+                </label>
+                <p style="font-size: 11.5px; color: var(--bo-text-muted); margin: 6px 0 0 26px;">
+                  Activez cette option pour les visuels simples comme les photos d'ambassadrices, mannequins ou portraits afin de masquer l'éclaboussure de fruits et le halo d'arrière-plan sur le Héro.
+                </p>
               </div>
 
               <!-- Colors & Branding -->
@@ -4280,6 +4671,27 @@ export class BackofficePage {
       container: modalContainer as HTMLElement
     });
 
+    const defaultBottleForModal = (p.id === 'cocktail-bissap' || p.id === 'bissap') ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png';
+    const defaultSplashForModal = (p.id === 'cocktail-bissap' || p.id === 'bissap') ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png';
+
+    // Clear / Reset Bottle Image in modal
+    const clearBottleBtn = modalContainer.querySelector('#pClearBottleImgBtn');
+    clearBottleBtn?.addEventListener('click', () => {
+      imgUrlInput.value = defaultBottleForModal;
+      imgPreview.src = defaultBottleForModal;
+      this.showToast("Image de bouteille rétablie au visuel officiel d'origine. Cliquez sur « Enregistrer la Saveur » pour confirmer.", 'info');
+    });
+
+    // Clear / Reset Splash Image in modal
+    const clearSplashBtn = modalContainer.querySelector('#pClearSplashImgBtn');
+    clearSplashBtn?.addEventListener('click', () => {
+      const splashInput = modalContainer.querySelector('#pSplashImgUrl') as HTMLInputElement;
+      const splashPreview = modalContainer.querySelector('#pSplashImgPreview') as HTMLImageElement;
+      if (splashInput) splashInput.value = defaultSplashForModal;
+      if (splashPreview) splashPreview.src = defaultSplashForModal;
+      this.showToast("Splash rétabli au visuel officiel d'origine. Cliquez sur « Enregistrer la Saveur » pour confirmer.", 'info');
+    });
+
     // Form Submit
     const form = modalContainer.querySelector('#boProductEditForm') as HTMLFormElement;
     form?.addEventListener('submit', (e) => {
@@ -4290,8 +4702,9 @@ export class BackofficePage {
         name: (modalContainer.querySelector('#pName') as HTMLInputElement).value.trim().toUpperCase(),
         subtitle: (modalContainer.querySelector('#pSubtitle') as HTMLInputElement).value.trim(),
         category: (modalContainer.querySelector('#pCategory') as HTMLInputElement).value.trim(),
-        bottleImage: imgUrlInput.value.trim() || p.bottleImage,
-        splashImage: (modalContainer.querySelector('#pSplashImgUrl') as HTMLInputElement)?.value.trim() || p.splashImage || '',
+        bottleImage: imgUrlInput.value.trim() || defaultBottleForModal,
+        splashImage: (modalContainer.querySelector('#pSplashImgUrl') as HTMLInputElement)?.value.trim() || defaultSplashForModal,
+        hideHeroDecorations: (modalContainer.querySelector('#pHideHeroDecorations') as HTMLInputElement)?.checked ?? false,
         accentColor: colorText.value.trim() || '#58A826',
         glowColor: (modalContainer.querySelector('#pHaloColor') as HTMLInputElement).value.trim() || p.glowColor,
         quote: (modalContainer.querySelector('#pQuote') as HTMLInputElement).value.trim(),

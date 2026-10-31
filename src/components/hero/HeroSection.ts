@@ -41,6 +41,7 @@ export class HeroSection {
     const bissapProd = products.find((p) => p.id === 'cocktail-bissap' || p.id === 'bissap') || products[0];
     const ananasProd = products.find((p) => p.id === 'ananas-gingembre' || p.id === 'ananas') || products[1] || products[0];
     const activeFlavor = isBissap ? bissapProd : ananasProd;
+    const isSimpleMode = Boolean(activeFlavor?.hideHeroDecorations || activeFlavor?.splashImage === 'none' || activeFlavor?.splashImage === '');
 
     this.element.innerHTML = `
       ${heroContent.bgBannerImage ? `<div class="hero-bg-custom-banner" style="position: absolute; inset: 0; background-image: url('${heroContent.bgBannerImage}'); background-size: cover; background-position: center; opacity: 0.12; pointer-events: none; z-index: 0;"></div>` : ''}
@@ -123,26 +124,27 @@ export class HeroSection {
 
         </div>
 
-        <!-- Right Column: Hero Visual with Bottle, Splash & Fruit Slices -->
+        <!-- Right Column: Hero Visual with Bottle or Ambassador Visual -->
         <div class="hero-visual" id="heroVisualWrapper">
           
-          <div class="hero-circle-aura" aria-hidden="true"></div>
+          <div class="hero-circle-aura" id="heroCircleAura" aria-hidden="true" style="${isSimpleMode ? 'display: none;' : ''}"></div>
 
           <!-- Dynamic Splash Image with Fruit Slices -->
           <img 
-            src="${activeFlavor?.splashImage || (isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png')}" 
+            src="${!isSimpleMode && activeFlavor?.splashImage && activeFlavor.splashImage !== 'none' ? activeFlavor.splashImage : (isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png')}" 
             alt="Fruit Splash" 
             class="hero-splash-bg-img"
             id="heroSplashImg"
             aria-hidden="true"
+            style="${isSimpleMode ? 'display: none;' : ''}"
           />
 
-          <!-- Floating Bottle with 3D Tilt -->
-          <div class="hero-bottle-stage" id="bottleStage">
+          <!-- Floating Bottle or Ambassador with adaptive mode -->
+          <div class="hero-bottle-stage ${isSimpleMode ? 'is-simple-mode' : ''}" id="bottleStage">
             <img 
-              src="${activeFlavor?.bottleImage || (isBissap ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png')}" 
-              alt="Bouteille Nidj Juice ${activeFlavor?.name || ''}" 
-              class="hero-bottle-main"
+              src="${activeFlavor?.heroImage || activeFlavor?.bottleImage || (isBissap ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png')}" 
+              alt="Visuel Nidj Juice ${activeFlavor?.name || ''}" 
+              class="hero-bottle-main ${isSimpleMode ? 'is-simple-mode' : ''}"
               id="heroBottleImg"
             />
           </div>
@@ -400,29 +402,41 @@ export class HeroSection {
       }, 150);
     }
 
-    // Update Bottle Image with fluid scale/slide transition
+    // Update Visual with adaptive simple mode support
+    const isSimpleMode = Boolean(flavor?.hideHeroDecorations || flavor?.splashImage === 'none' || flavor?.splashImage === '');
+    const aura = this.element.querySelector('#heroCircleAura') as HTMLElement;
+    const stage = this.element.querySelector('#bottleStage') as HTMLElement;
     const bottle = this.element.querySelector('#heroBottleImg') as HTMLImageElement;
     const splash = this.element.querySelector('#heroSplashImg') as HTMLImageElement;
+
+    if (aura) aura.style.display = isSimpleMode ? 'none' : 'block';
+    if (stage) stage.classList.toggle('is-simple-mode', isSimpleMode);
 
     if (bottle) {
       bottle.style.transition = 'opacity 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
       bottle.style.opacity = '0';
-      bottle.style.transform = 'scale(0.92) translateY(18px)';
+      bottle.style.transform = isSimpleMode ? 'scale(0.95)' : 'scale(0.92) translateY(18px)';
+      bottle.classList.toggle('is-simple-mode', isSimpleMode);
       setTimeout(() => {
-        bottle.src = flavor?.bottleImage || (isBissap ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png');
-        bottle.alt = `Bouteille Nidj Juice ${flavor?.name || ''}`;
+        bottle.src = flavor?.heroImage || flavor?.bottleImage || (isBissap ? '/assets/images/bottle-bissap.png' : '/assets/images/bottle-ananas.png');
+        bottle.alt = `Visuel Nidj Juice ${flavor?.name || ''}`;
         bottle.style.opacity = '1';
         bottle.style.transform = 'scale(1) translateY(0)';
       }, 200);
     }
 
     if (splash) {
-      splash.style.transition = 'opacity 0.25s ease';
-      splash.style.opacity = '0';
-      setTimeout(() => {
-        splash.src = flavor?.splashImage || (isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png');
-        splash.style.opacity = '1';
-      }, 200);
+      if (isSimpleMode) {
+        splash.style.display = 'none';
+      } else {
+        splash.style.display = 'block';
+        splash.style.transition = 'opacity 0.25s ease';
+        splash.style.opacity = '0';
+        setTimeout(() => {
+          splash.src = flavor?.splashImage && flavor.splashImage !== 'none' ? flavor.splashImage : (isBissap ? '/assets/images/splash-bissap.png' : '/assets/images/splash-ananas.png');
+          splash.style.opacity = '1';
+        }, 200);
+      }
     }
 
     // Update active dot and reset the progress bar animation

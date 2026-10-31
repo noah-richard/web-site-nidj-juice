@@ -299,6 +299,43 @@
   100% { transform: translateY(0px); }
 }
 
+/* Simple Visual Mode (e.g. Ambassador, lifestyle photos without background decor) */
+.hero-bottle-stage.is-simple-mode {
+  transform: none !important;
+}
+
+.hero-bottle-main.is-simple-mode {
+  animation: float-simple 6s ease-in-out infinite;
+  height: clamp(340px, 58vh, 520px);
+  max-width: 90vw;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 35px rgba(0, 0, 0, 0.22));
+}
+
+@media (min-width: 768px) {
+  .hero-bottle-main.is-simple-mode {
+    height: 540px;
+  }
+}
+
+@media (min-width: 992px) {
+  .hero-bottle-main.is-simple-mode {
+    height: 640px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .hero-bottle-main.is-simple-mode {
+    height: 700px;
+  }
+}
+
+@keyframes float-simple {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
 /* Interactive Pagination Dots below visual */
 .hero-pagination-dots {
   position: relative;

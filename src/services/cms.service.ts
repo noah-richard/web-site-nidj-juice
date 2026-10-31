@@ -122,6 +122,10 @@ export class CmsService {
 
   private constructor() {
     this.db = this.loadFromStorage() || this.getDefaultDatabase();
+    this.db.products = this.sanitizeProducts(this.db.products);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+    } catch {}
 
     // Cross-tab real-time synchronization
     if (typeof window !== 'undefined') {
@@ -129,6 +133,7 @@ export class CmsService {
         if (e.key === STORAGE_KEY && e.newValue) {
           try {
             this.db = JSON.parse(e.newValue);
+            this.db.products = this.sanitizeProducts(this.db.products);
             window.dispatchEvent(new CustomEvent('nidj:cms-data-changed', { detail: this.db }));
           } catch (err) {
             console.error('Failed to parse storage update', err);
@@ -295,7 +300,7 @@ export class CmsService {
             ...(parsed.settings || {})
           },
           products: Array.isArray(parsed.products) && parsed.products.length > 0
-            ? parsed.products
+            ? this.sanitizeProducts(parsed.products)
             : defaults.products,
           collections: Array.isArray(parsed.collections) && parsed.collections.length > 0
             ? parsed.collections
@@ -386,6 +391,7 @@ export class CmsService {
             this.db = {
               ...defaults,
               ...cloudDb,
+              products: Array.isArray(cloudDb.products) ? this.sanitizeProducts(cloudDb.products) : defaults.products,
               hero: { ...defaults.hero, ...(cloudDb.hero || {}) },
               company: { ...defaults.company, ...(cloudDb.company || {}) },
               engagements: { ...defaults.engagements, ...(cloudDb.engagements || {}) },
@@ -414,6 +420,7 @@ export class CmsService {
             this.db = {
               ...defaults,
               ...res.data,
+              products: Array.isArray(res.data.products) ? this.sanitizeProducts(res.data.products) : defaults.products,
               hero: { ...defaults.hero, ...(res.data.hero || {}) },
               company: { ...defaults.company, ...(res.data.company || {}) },
               engagements: { ...defaults.engagements, ...(res.data.engagements || {}) },
@@ -444,6 +451,34 @@ export class CmsService {
   }
 
   // --- Defaults Factory ---
+  private sanitizeProducts(products: ShowcaseProduct[]): ShowcaseProduct[] {
+    return products.map((prod) => {
+      let bottleImage = prod.bottleImage || '';
+      let heroImage = prod.heroImage || '';
+
+      // If bottleImage was contaminated with ambassador photo or simple lifestyle portrait
+      if (bottleImage && (bottleImage.includes('nidj-ambassador') || bottleImage.includes('ambassadrice') || (prod.hideHeroDecorations && bottleImage.includes('ambassador')))) {
+        if (!heroImage) {
+          heroImage = bottleImage;
+        }
+        // Restore authentic product bottle packshot for the rest of the site (carousel, catalog, etc.)
+        if (prod.id === 'cocktail-bissap' || prod.id === 'bissap') {
+          bottleImage = '/assets/images/bottle-bissap.png';
+        } else if (prod.id === 'ananas-gingembre' || prod.id === 'ananas' || prod.id === 'pur-ananas') {
+          bottleImage = '/assets/images/bottle-ananas.png';
+        } else {
+          bottleImage = '/assets/images/bottle-bissap.png';
+        }
+      }
+
+      return {
+        ...prod,
+        bottleImage,
+        heroImage
+      };
+    });
+  }
+
   private getDefaultDatabase(): CmsDatabase {
     return {
       version: 1,
@@ -756,6 +791,7 @@ export class CmsService {
     } else {
       this.db.products.push({ ...product });
     }
+    this.db.products = this.sanitizeProducts(this.db.products);
     return await this.persist();
   }
 
